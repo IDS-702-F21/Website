@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>IDS 702: FALL 2021</title>
+    <link>/</link>
+    <description>Recent content on IDS 702: FALL 2021</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 15 Jul 2021 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>/syllabus/</link>
+      <pubDate>Thu, 15 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/syllabus/</guid>
+      <description>Note: *Please check this page frequently for updates and always remember to refresh the page.*  Week Date Lesson Reading Video Slides Slides (pdf) Class Activity Assignment Project     Conceptual review questions          WEEK 1 Tue, Aug 24 Module 0.1: Course overview and introduction                         MODULE 1: MULTIPLE LINEAR REGRESSION                        Thur, Aug 26 Module 1.</description>
+    </item>
+    
+    <item>
+      <title>Policies</title>
+      <link>/policies/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/policies/</guid>
+      <description>When in doubt about anything at all, ask questions!!!
+Prerequisites Students are expected to know all topics covered in the MIDS summer course review and boot camp. These include basic probability and statistical inference, including random variables, probability distributions, central limit theorem, hypothesis testing, confidence intervals, linear regression with one predictor, and exploratory data analysis methods. Students are also expected to be familiar with R/RStudio and are encouraged to have learned LaTeX or a Markdown language by the end of the course.</description>
+    </item>
+    
+    <item>
+      <title>Resources</title>
+      <link>/resources/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/resources/</guid>
+      <description>Supplementary Textbooks These textbooks are great resources for some of the topics we will cover. You do not need to buy them, but you may be able to borrow them from Duke library should you need extra reading materials, besides the class slides and main textbooks. I may also select and adapt questions from the books for your homework assignments from time to time, but you will not need access to them when I do so.</description>
+    </item>
+    
+  </channel>
+</rss>
