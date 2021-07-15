@@ -1,0 +1,106 @@
+baseurl = "/"
+languageCode = "en-us"
+defaultContentLanguage = "en-us"
+title = "IDS 702: FALL 2021"
+theme = "material"
+#disqusShortname = ""
+# googleAnalytics = ""
+paginate = 7
+relativeurls = true
+publishDir = "docs"
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
+
+[permalinks]
+  post = "/:year/:month/:slug/"
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+  archive = "archives"
+
+[author]
+  name = "Olanrewaju Michael Akande"
+  bio = ""
+  job = "Assistant Professor of the Practice"
+  location = "Social Science Research Institute, and the Department of Statistical Science, Duke University"
+  gravatarEmail = "olanrewaju.akande@duke.edu"
+  # Your profile picture
+  picture = "img/avatar-icon.jpg"
+  #twitter = "Akande_OM"
+
+# Menu Configuration
+[[menu.main]]
+  weight = 1
+  identifier = "home"
+  name = "Home"
+  pre = "<i class=\"sidebar-button-icon fa fa-lg fa-home\"></i>"
+  url = "/"
+[[menu.main]]
+  weight = 2
+  identifier = "syllabus_pdf"
+  name = "Syllabus"
+  pre = "<i class=\"material-icons\">book</i>"
+  url = "syllabus_pdf/Syllabus.pdf"
+[[menu.main]]
+  weight = 3
+  identifier = "syllabus"
+  name = "Class Schedule"
+  pre = "<i class=\"material-icons\">date_range</i>"
+  url = "/syllabus"
+[[menu.main]]
+  weight = 4
+  identifier = "policies"
+  name = "Policies"
+  pre = "<i class=\"material-icons\">gavel</i>"
+  url = "/policies"
+[[menu.main]]
+  weight = 5
+  identifier = "resources"
+  name = "Resources"
+  pre = "<i class=\"material-icons\">folder_shared</i>"
+  url = "/resources"
+[[menu.main]]
+  weight = 6
+  identifier = "gradescope"
+  name = "Gradescope"
+  pre = "<i class=\"material-icons\">assignment</i>"
+  url = "https://www.gradescope.com/courses/280392/assignments"
+#[[menu.main]]
+#  weight = 4
+#  identifier = "rstudio"
+#  name = "RStudio"
+#  pre = "<i class=\"material-icons\">cloud_queue</i>"
+#  url = "https://rstudio.cloud"
+#[[menu.main]]
+#  weight = 6
+#  identifier = "help"
+#  name = "Help"
+#  pre = "<i class=\"material-icons\">help</i>"
+#  url = "https://github.com/Sta199-S18/community/issues"
+
+
+[[menu.footer]]
+  weight = 1
+  identifier = "Duke"
+  name = "Duke MIDS"
+  pre = "<i class=\"button-icon fa fa-2x fa-map-marker\"></i>"
+  url = "https://datascience.duke.edu"
+#[[menu.footer]]
+#  weight = 2
+#  name = "RStudio"
+#  pre = "<i class=\"icon-rlogo\" style=\"font-size:150%\"></i>"
+#  url = "https://rstudio.cloud/"
+#[[menu.footer]]
+#  weight = 3
+#  identifier = "GitHub"
+#  name = "GitHub"
+#  pre = "<i class=\"button-icon fa fa-2x fa-github\"></i>"
+#  url = "https://github.com/Sta199-S18/"
+#[[menu.footer]]
+
+
+[params]
+  dateFormat = "January 2, 2006"
+  background = "https://olanrewajuakande.com/img/IDS702_F21_background_image.png"
+  favicon = "https://olanrewajuakande.com/mids_duke_logo.png"

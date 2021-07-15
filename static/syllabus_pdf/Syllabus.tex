@@ -1,0 +1,316 @@
+\documentclass[11pt, a4paper]{article}
+%\usepackage{geometry}
+\usepackage[inner=2cm,outer=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\pagestyle{empty}
+\usepackage{graphicx}
+\usepackage{fancyhdr, lastpage, bbding, pmboxdraw}
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{darkblue}{rgb}{0,0,.6}
+\definecolor{darkred}{rgb}{.7,0,0}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+\usepackage[colorlinks,pagebackref,pdfusetitle,urlcolor=darkblue,citecolor=darkblue,linkcolor=darkred,bookmarksnumbered,plainpages=false]{hyperref}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{\textsc{IDS 702:\ Modeling and Representation of Data}} }
+%\chead{ \fancyplain{}{} }
+\rhead{ \fancyplain{}{\textsc{Fall 2021}} }
+\rfoot{Page \thepage}
+%\fancyfoot[RO, LE] {page \thepage\ of \pageref{LastPage} }
+\thispagestyle{plain}
+
+%%%%%%%%%%%% LISTING %%%
+\usepackage{listings}
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+\usepackage{verbatim} % used to display code
+\usepackage{fancyvrb}
+\usepackage{acronym}
+\usepackage{amsthm}
+\VerbatimFootnotes % Required, otherwise verbatim does not work in footnotes!
+
+
+
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\definecolor{lightlightgray}{gray}{0.93}
+
+
+\lstset{
+%language=bash,                          % Code langugage
+basicstyle=\ttfamily,                   % Code font, Examples: \footnotesize, \ttfamily
+keywordstyle=\color{OliveGreen},        % Keywords font ('*' = uppercase)
+commentstyle=\color{gray},              % Comments font
+numbers=left,                           % Line nums position
+numberstyle=\tiny,                      % Line-numbers fonts
+stepnumber=1,                           % Step between two line-numbers
+numbersep=5pt,                          % How far are line-numbers from code
+backgroundcolor=\color{lightlightgray}, % Choose background color
+frame=none,                             % A frame around the code
+tabsize=2,                              % Default tab size
+captionpos=t,                           % Caption-position = bottom
+breaklines=true,                        % Automatic line breaking?
+breakatwhitespace=false,                % Automatic breaks only at whitespace?
+showspaces=false,                       % Dont make spaces visible
+showtabs=false,                         % Dont make tabls visible
+columns=flexible,                       % Column format
+morekeywords={__global__, __device__},  % CUDA specific keywords
+}
+
+
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{makecell}
+
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\renewcommand{\arraystretch}{1.5}	
+
+
+\begin{center}
+{\Large \textsc{IDS 702:\ Modeling and Representation of Data}}
+\end{center}
+
+
+\begin{center}
+	\textsc{Fall 2021} \\
+	\textsc{Duke University} \\
+\end{center}
+
+
+
+\begin{center}
+\begin{minipage}[t]{.95\textwidth}
+\begin{tabular}{@{}L{3cm}L{12.5cm}}
+	\toprule[0.065cm]
+\textsc{Instructor:} & \href{https://akandelanre.github.io.}{\textsc{Olanrewaju Michael Akande, Ph.D.}} \\
+\textsc{Email:} &\href{mailto:olanrewaju.akande@duke.edu}{\Envelope ~olanrewaju.akande@duke.edu} \\
+\textsc{Office:} & \textbf{256 Gross Hall} \\
+\textsc{Office Hours:} & \textbf{Wednesdays and Fridays (9am -- 10am)}. \\% \newline Zoom meeting ID: \textbf{See Sakai}. \\
+%\textsc{Office:} & 256 Gross Hall \\
+\textsc{Course Page:} & \href{https://ids702-f21.olanrewajuakande.com}{https://ids702-f21.olanrewajuakande.com} \\
+\textsc{Meeting Times:}  & \textbf{Tuesdays and Thursdays (10:15 - 11:30am), 270 Gross Hall.} \\ % \newline Zoom meeting ID: \textbf{See Sakai}. \\
+\textsc{Teaching Assistants:} & \textbf{TBD} \\
+%\textsc{Teaching Assistants:} & \href{https://datascience.duke.edu/altamash-rafiq}{\textsc{Altamash Rafiq}}. 
+%				\newline \textbf{Mondays (3pm - 5pm) and  Wednesdays (5pm - 7pm)}. \\% \newline Zoom meeting ID: \textbf{See Sakai}.  \\
+%&\href{https://datascience.duke.edu/yiran-becky-chen}{\textsc{Yiran (Becky) Chen}}. 
+%				\newline \textbf{Thursdays (5:15pm - 7:15pm) and  Fridays (6:30pm - 8:30pm)}. \\% \newline Zoom meeting ID: \textbf{See Sakai}. \\
+\textsc{Recommended Textbooks:} & \href{https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV}{\textit{Data Analysis Using Regression and Multilevel/Hierarchical Models}} by Gelman A., and Hill, J. 
+\newline  \href{http://faculty.marshall.usc.edu/gareth-james/ISL/}{\textit{An Introduction to Statistical Learning with Applications in R}} by James, G., Witten, D., Hastie, T., and Tibshirani, R.
+\newline \textit{While recommended, these books are not compulsory. That said, they are both really great books, so be sure to get a copy if you can (free pdf of ISL is available via the link)!}\\ 
+\textsc{Optional Textbooks:}	& \href{https://find.library.duke.edu/catalog/DUKE005142588}{\textit{An Introduction to Categorical Data Analysis, Second Edition}} by Alan Agresti.
+\newline \textit{I will assign some optional readings for a few topics from this book. You can download pdf versions of individual chapters, via Duke library using the link.}\\ 
+\textsc{Important Dates:} & \begin{minipage}[t]{.95\textwidth}
+	\begin{tabular}{@{}ll}
+		\tabitem Monday, August 23	& Fall classes begin \\
+		\tabitem Friday, September 3	& Drop/Add ends \\
+		\tabitem Monday, September 6 & Labor day. Classes in session \\
+		\tabitem Sunday, October 3 & Team project I reports due \\
+		\tabitem Sunday, October 24 & Team project II reports due \\
+		\tabitem Wednesday, October 27 & Final project proposal due \\
+		\tabitem Monday, November 22 & Upload final project presentations \\
+		\tabitem Tuesday, November 23 &	End of semester \\
+		\tabitem Saturday, December 12 &	Final project reports due (tentative) \\
+	\end{tabular}
+\end{minipage} \\
+	 \bottomrule[0.065cm]
+\end{tabular}
+\end{minipage}
+\end{center}
+
+
+\vspace{.5cm}
+\setlength{\unitlength}{1in}
+\renewcommand{\arraystretch}{1.5}
+
+
+
+\section{Course Overview}
+Statistical models are necessary for analyzing the multivariate (often large) datasets that are usually encountered in data science and statistical science. This graduate level course, a core part of Duke's Master in Interdisciplinary Data Science (MIDS) program, aims to provide students with the statistical data analysis tools needed to succeed as data scientists. 
+
+In this course, you will learn the general work flow for building statistical models and using them to answer inferential questions. You will learn several parametric modeling techniques such as linear regression, generalized linear models, models for multilevel data and basic time series models. You will also learn to handle messy data, including data with missing values, assess model fit, and validate model assumptions and more generally, check whether proposed statistical models are appropriate for any given data. You will also learn a bit of causal inference under the potential outcomes framework and should time permit, a bit of nonparametric models such as classification and regression trees. 
+
+Although this course emphasizes data analysis over rigorous mathematical theory, students who wish to explore the mathematical theory in more detail than what is covered in class are welcome to engage with and request further reading materials from the instructor outside of class.
+
+Finally, this course is designed primarily for students in the MIDS program. Enrollment for non-MIDSters is subject to numbers and permission will be granted on a case-by-case basis.
+
+\section{Learning Objectives}
+By the end of this course, students should be able to
+\begin{itemize}[label= {\color{darkblue}{\ArrowBoldRightStrobe}}]
+	\item Use the statistical methods and models covered in class to analyze real multivariate data that intersect with various fields. 
+	\item Assess the adequacy of statistical models to any given data and make a decision on what to do in cases when certain models are not appropriate for a given dataset.
+	\item Cleanup and analyze messy datasets using approaches covered in class.
+	\item Hone collaborative and presentations skills through the process of consistent team work on and class presentations of team projects.
+\end{itemize}
+
+\section{Course Info}
+\subsection{Course Format}
+This course is designed to be primarily synchronous. However, there will also be some asynchronous activities. Students will be required to do pre-assigned readings, go through lecture slides, watch some pre-recorded lecture videos, and take the quizzes embedded in the videos, all before each synchronous meeting times. The meeting times are therefore primarily reserved for in-class activities, discussions and Q\&A sessions. %Each live meeting session will also be recorded and made available to all students afterwards. Additional live sessions include office hours for the instructor and TAs. Those will not be recorded. Students who are unable to attend the office hours can send their questions in advance of the live meeting sessions, so that the instructor or TAs can provide answers during those recorded sessions.
+
+\subsection{Playposit}
+To gain access to the pre-recorded lecture videos, you will have to create a Playposit account. There are participation quizzes embedded within the videos. These quizzes make up a part of your final grade (see: \href{https://ids702-f21.olanrewajuakande.com/policies/}{course policies}) so take them seriously. To join the class on Playposit, you need to create a new account as a student \href{https://www.playposit.com/join}{here}, then use the class link \href{https://www.playposit.com/join-class/1403540-1083318}{here} to join the class. While you need not create an account with your Duke email, I strongly suggest you do.
+
+%\subsection{Zoom meetings}
+%The easiest way for you to join the different Zoom meetings is to log in to Sakai, go to the``Zoom meetings'' tab, and click ``Upcoming Meetings''. For the recordings (for discussion sessions), also log in to Sakai, go to the ``Zoom meetings'' tab, and click ``Cloud Recordings''. Those will be available few minutes after the sessions.
+
+
+\section{Prerequisites}
+Students are expected to know all topics covered in the MIDS summer course review and boot camp. These include basic probability and statistical inference, including random variables, probability distributions, central limit theorem, hypothesis testing, confidence intervals, linear regression with one predictor, and exploratory data analysis methods. Students are also expected to be familiar with \textsf{R}/\textsf{RStudio} and are encouraged to have learned \LaTeX \ or a Markdown language by the end of the course. MIDS students automatically satisfy these requirements. If you are not a MIDS student, email the instructor to ascertain that you have taken courses that cover these topics.
+
+
+\section{Team Work}
+Note that this course, as is the case with most core courses within the MIDS program, emphasizes the ability to work in teams so that students can learn team productivity and performance. Each student must therefore be ready to contribute to their team's success. MIDS students will work in the same teams they have been assigned to for the fall semester. If you are not a MIDS student, you will be assigned to a group with other non-MIDS students, and by enrolling in this course, you are agreeing to being held to the same standard as MIDS students. Consequently,  you are expected to be fully committed to team excellence, performance, and productivity.
+
+
+\section{Class Materials}
+Lecture notes and slides, links to the videos and other reading resources will be posted on the course website. We will only loosely follow the textbooks.
+
+
+\section{Graded Work} 
+Graded work for the course will consist of participation quizzes, data analysis assignments, team projects, and a final project. Regrade requests for data analysis assignments and team projects must be done via Gradescope AT MOST \textbf{24 hours} after grades are released! Regrade requests for the final project must be done via Gradescope AT MOST \textbf{12 hours} after grades are released!
+\begin{itemize}[label= {\color{darkblue}{\ArrowBoldRightStrobe}}]
+	\item There are no make-ups for any of the graded work except for medical or familial emergencies or for reasons approved by the instructor BEFORE the due date. Contact the instructor in advance of relevant due dates to discuss possible alternatives. 
+	
+	\item Grades may be curved at the end of the semester. Cumulative averages of 90\% -- 100\% are guaranteed at least an A-, 80\% -- 89\% at least a B-, and 70\% -- 79\% at least a C-, however the exact ranges for letter grades will be determined at the end of the course.
+	
+	\item There is no final exam. Students' final grades will be determined as follows:
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ll}
+			Component & Percentage \\ \hline
+			Data Analysis Assignments & 30\% \\
+			Final Project & 25\% \\ 
+			Team Project I & 17.5\% \\
+			Team Project II & 17.5\% \\
+			Participation & 10\% \\ \hline 
+		\end{tabular}
+	\end{table}
+\end{itemize}
+
+
+\section{Descriptions of Graded Work}
+\subsection{Data Analysis Assignments}
+Data analysis assignments will be posted on the course website. The assignments include questions that ask students to apply the statistical modeling skills discussed during the semester, as well as questions on the computational aspects of the methods. Students must turn in these assignments on the due date. 
+
+You are encouraged to talk to each other about general concepts, or to the instructor/TAs. However, the write-ups, solutions, and code MUST be entirely your own work. The assignments must be typed up using \textsf{R} Markdown, \LaTeX \ or another word processor, and submitted on Gradescope under ``Assignments''. Note that you will not be able to make online submissions after the due date, so be sure to submit before or by the Gradescope-specified deadline.
+
+Solutions to the assignments will be curated from student solutions with proper attribution. Every week the TAs will select one or two representative solutions for the assigned problems with each solution being attributed to the student who wrote it. \textbf{If you would like to OPT OUT of having your solutions used for as a representative solution, let the Instructor and TAs know in advance.}
+
+Finally, students may be asked to work in pairs for one or two of the data analysis assignments when possible. When that is the case, each pair need only submit one solution per assignment.
+
+%\subsection{Lab Assignments}
+%The objective of the lab assignments is to give you more hands-on experience with data analysis using R. The labs times also gives you an additional platform to ask for help for your team and individual projects. Lab attendance is not mandatory on days when team presentations will not hold, however, each lab assignment should be submitted in timely fashion on the due date. You are REQUIRED to use R Markdown to type up your lab reports.
+
+\subsection{Final Project}
+For the final project, you will apply the knowledge and skills learned throughout this course to analyze a dataset that interests you, subject to the instructor's approval. The project should be an in-depth statistical analysis of a question that interests you. It is quite common for this final project to be based on your research interests, or topics/questions from one of your other courses. Just about every discipline has questions that are amenable to statistical analyses, including economics, engineering, environmental studies, history, the natural sciences, psychology, and even sports, so there are many options to choose from. The data should comprise several variables amenable to statistical analyses via modeling. Students can bring in their own research data sets, or they can ask the instructor for assistance with identifying appropriate data. You will be expected to present the results of your analysis. Detailed instructions will be made available later.
+
+\subsection{Team Projects}
+For the team projects, students will work in teams to analyze data selected by the instructor. Each team will be expected to write a report with their data analysis findings. Students may also be given the opportunity to present their results in class. Detailed instructions will be made available later.
+
+\subsection{Participation}
+Each student will be assigned a participation grade based on their level of participation throughout the semester. Participation will be assessed based on performance on  PlayPosit and in-class quizzes, engagement during live meeting sessions and breakout rooms, and generally how each students engages with other students on Ed Discussion, especially regarding feedback on the project presentations.
+
+
+\section{Late Submission Policy} 
+You (or your team when applicable) will lose 50\% of the total points on each data analysis assignment, each team project, and the final project, if you submit within the first 24 hours after it is due. You will lose 100\% of the total points if you submit later than that.
+
+
+\section{Tentative Course Schedule} 
+We will cover the topics below. We may spend different amounts of time on each topic, depending on the interests of students. For a detailed and updated outline, check on the updated course schedule on the course page regularly. 
+\begin{enumerate}[label= {\color{darkblue}{\ArrowBoldRightStrobe}}]
+	\item Introduction to course % \dotfill ~$\approx$ 1 lecture
+	\item Linear regression % \dotfill ~$\approx$ 5 lectures
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Introduction to multiple linear regression
+		\item Inference and prediction
+		\item Model assessment and diagnostics
+			\item Transformations and multicollinearity
+		\item Model building and selection
+	\end{enumerate}
+	\item Logistic regression
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Introduction
+		\item Interpretation of coefficients
+		\item Inference vs prediction
+		\item Model assessment and validation
+	\end{enumerate}
+	\item Other generalized linear models
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Multinomial logistic regression
+		\item Proportional odds model
+		\item Poisson regression
+		\item Probit regression
+	\end{enumerate}
+	\item Introduction to multilevel models
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Fixed vs random effects
+		\item Multilevel linear models
+		\item Multilevel logistic regression
+	\end{enumerate}
+	\item Dealing with messy data
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Missing values, errors, and outliers
+		\item Single imputation methods
+		\item Multiple imputation
+	\end{enumerate}
+	\item Methods for causal inference
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item Introduction, association vs. causation, and confounding variables
+		\item Observational studies: regression, stratification and matching
+		\item Observational studies: propensity scores methods
+	\end{enumerate}
+	\item Basic time series models
+	\begin{enumerate}[label= {\color{cyan}{\Rectangle}}]
+		\item AR and MA models
+		\item ARMA and ARIMA models
+	\end{enumerate}
+	\item Random number generation, bootstrap and Monte Carlo
+	\item Random number generation, bootstrap and Monte Carlo
+	\item Wrap up and final projects
+\end{enumerate}
+
+
+\section{Academic Integrity}  
+Duke University is a community dedicated to scholarship, leadership, and service and to the principles of honesty, fairness, respect, and accountability. Citizens of this community commit to reflect upon and uphold these principles in all academic and nonacademic endeavors, and to protect and promote a culture of integrity. To uphold the \href{https://studentaffairs.duke.edu/conduct/about-us/duke-community-standard}{Duke Community Standard}:
+\begin{itemize}[label= {\color{darkred}{\Large \HandRight}}]
+	\item I will not lie, cheat, or steal in my academic endeavors;
+	\item I will conduct myself honorably in all my endeavors; and
+	\item I will act if the Standard is compromised.
+\end{itemize}
+
+Cheating or plagiarism on any graded assessments, lying about an illness or absence and other forms of academic dishonesty are a breach of trust with classmates and faculty, violate the Duke Community Standard, and will not be tolerated. Such incidences will result in a 0 grade for all parties involved. Additionally, there may be penalties to your final class grade along with being reported to the Office of Student Conduct. Review the academic dishonesty policies at \url{https://studentaffairs.duke.edu/conduct/z-policies/academic-dishonesty}.
+
+
+\section{Diversity \& Inclusiveness:}
+This course is designed so that students from all backgrounds and perspectives all feel welcome both in and out of class. Please feel free to talk to me (in person or via email) if you do not feel well-served by any aspect of this class, or if some aspect of class is not welcoming or accessible to you. My goal is for you to succeed in this course, therefore, let me know immediately if you feel you are struggling with any part of the course more than you know how to manage. Doing so will not affect your grades, but it will allow me to provide the resources to help you succeed in the course.
+
+
+\section{Disability Statement} 
+Students with disabilities who believe that they may need accommodations in the class are encouraged to contact the \href{https://access.duke.edu/students/staff.php}{Student Disabilities Access Office} at 919.668.1267 or \href{mailto:disabilities@aas.duke.edu}{disabilities@aas.duke.edu}  as soon as possible to better ensure that such accommodations are implemented in a timely fashion.
+
+
+\section{Other Information} 
+It can be a lot more pleasant oftentimes to get one-on-one answers and help. Make use of the teaching team's office hours, we're here to help! Do not hesitate to talk to me during office hours or by appointment to discuss a problem set or any aspect of the course.  Questions related to course assignments and honesty policy should be directed to me. When the teaching team has announcements for you we will send an email to your Duke email address. Be sure to check your email daily.
+
+%Most of the course components, including live meeting sessions and all office hours, will be held online using Zoom meetings. 
+If you have any concerns, issues or challenges, let the instructor know as soon as possible. Also, all students are strongly encouraged to rely on Ed Discussion, for interacting among yourself and asking other students questions. You can also ask the instructor or the TAs questions on there and we will try to respond as soon as possible.  If you experience any technical issues with joining or using Ed Discussion, let the instructor know.
+
+
+\section{Professionalism}
+Try as much as possible to refrain from texting or using your computer for anything other than coursework while watching the lecture videos or while in class. Again, the more engaged you are, the quicker you will be able to get through the materials. You are responsible for everything covered in the lecture videos, lecture notes/slides, and in the assigned readings.
+
+
+\end{document} 

@@ -1,0 +1,544 @@
+lessons:
+  
+  - title: "Conceptual review questions"
+    #hw: "hw-00.html"
+    ##hw: "hw-00-key.html"
+  
+  - week: "WEEK 1"
+    date: "Tue, Aug 24"
+    title: "Module 0.1: Course overview and introduction"
+    #slides: "0-1-course-overview.html"
+  
+  
+  - title: " "
+  - title: "MODULE 1: MULTIPLE LINEAR REGRESSION"
+    #reading: "1-reading.html"
+  - title: " "
+   
+  
+  - date: "Thur, Aug 26"
+    title: "Module 1.1: Motivating example"
+    #slides: "1-1-MLR-motivating-example.html"
+    #slidespdf: "1-1-MLR-motivating-example.pdf"
+    #video: "https://api.playposit.com/go/play/802440/1403540/929415/0/IDS-702--Module-11-Motivating-example"
+    
+  - title: "Module 1.2: Introduction to multiple linear regression"
+    #slides: "1-2-MLR-intro.html"
+    #slidespdf: "1-2-MLR-intro.pdf"
+    #video: "https://api.playposit.com/go/play/802494/1403540/929415/0/IDS-702--Module-12-Introduction-to-multiple-linear-regression"
+    
+  - title: "Module 1.3: Model fitting and interpretation of coefficients"
+    #slides: "1-3-MLR-interpreting-coefficients.html"
+    #slidespdf: "1-3-MLR-interpreting-coefficients.pdf"
+    #video: "https://api.playposit.com/go/play/802526/1403540/929415/0/IDS-702--Module-13-Model-fitting-and-interpretation-of-coefficients"
+    
+  - title: "In-class analysis 1: Beer consumption in Sao Paulo I"
+    #inClass: "0-1-beer-consumption-in-Sao-Paulo-I.html"
+    
+
+  
+  - week: "WEEK 2"
+    date: "Tue, Aug 31"
+    title: "Module 1.4: Hypothesis tests, confidence intervals, and predictions"
+    #slides: "1-4-MLR-hypothesis-test-confidence-intervals.html"
+    #slidespdf: "1-4-MLR-hypothesis-test-confidence-intervals.pdf"
+    #video: "https://api.playposit.com/go/play/812950/1403540/929415/0/IDS-702--Module-14-Hypothesis-tests-confidence-intervals-and-predictions"
+    
+  - title: "Module 1.5: Checking main regression assumptions"
+    #slides: "1-5-MLR-checking-assumptions.html"
+    #slidespdf: "1-5-MLR-checking-assumptions.pdf"
+    #video: "https://api.playposit.com/go/play/813025/1403540/929415/0/IDS-702--Module-15-Checking-main-regression-assumptions"
+    
+  - title: "In-class analysis 2: Beer consumption in Sao Paulo II"
+    #inClass: "0-2-beer-consumption-in-Sao-Paulo-II.html"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment I"
+    #hw: "hw-01.html"
+    
+    
+  - date: "Thur, Sept 2"
+    title: "Module 1.6: Outliers and influential points"
+    #slides: "1-6-MLR-outliers.html"
+    #slidespdf: "1-6-MLR-outliers.pdf"
+    #video: "https://api.playposit.com/go/play/818762/1403540/929415/0/IDS-702--Module-16-Outliers-and-influential-points"
+    
+  - title: "Module 1.7: Mean squared error and cross validation"
+    #slides: "1-7-MLR-validation.html"
+    #slidespdf: "1-7-MLR-validation.pdf"
+    #video: "https://api.playposit.com/go/play/818899/1403540/929415/0/IDS-702--Module-17-Mean-squared-error-and-cross-validation"
+    
+  - title: "Module 1.8: Transformations"
+    #slides: "1-8-MLR-transformations.html"
+    #slidespdf: "1-8-MLR-transformations.pdf"
+    #video: "https://api.playposit.com/go/play/820889/1403540/929415/0/IDS-702--Module-18-Transformations"
+    
+  - title: "In-class analysis 3: Beer consumption in Sao Paulo III"
+    #inClass: "0-3-beer-consumption-in-Sao-Paulo-III.html"
+    
+    
+    
+  - week: "WEEK 3"
+    date: "Tue, Sept 7"
+    title: "Module 1.9: Special predictors, F-tests, and multicollinearity"
+    #slides: "1-9-MLR-special-predictors.html"
+    #slidespdf: "1-9-MLR-special-predictors.pdf"
+    #video: "https://api.playposit.com/go/play/833661/1403540/929415/0/IDS-702--Module-19-Special-predictors-F-tests-and-multicollinearity"
+    
+  - title: "Module 1.10: Bringing the MLR pieces together I (illustration)"
+    #slides: "1-10-MLR-full-illustration-I.html"
+    #slidespdf: "1-10-MLR-full-illustration-I.pdf"
+    #video: "https://api.playposit.com/go/play/833748/1403540/929415/0/IDS-702--Module-110-Bringing-the-MLR-pieces-together-I-illustration"
+    
+  - title: "In-class: Q&A and discussion session"
+    
+  - date: "DELIVERABLES:"
+    title: "Data analysis assignment I due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment II"
+    #hw: "hw-02.html"
+    
+    
+  - date: "Thur, Sept 9"
+    title: "Module 1.11: Model building and selection"
+    #slides: "1-11-MLR-model-building.html"
+    #slidespdf: "1-11-MLR-model-building.pdf"
+    #video: "https://api.playposit.com/go/play/839757/1403540/929415/0/IDS-702--Module-111-Model-building-and-selection"
+    
+  - title: "Module 1.12: Bringing the MLR pieces together II (illustration)"
+    #slides: "1-12-MLR-full-illustration-II.html"
+    #slidespdf: "1-12-MLR-full-illustration-II.pdf"
+    #video: "https://api.playposit.com/go/play/839797/1403540/929415/0/Module-112-Bringing-the-MLR-pieces-together-II-illustration"
+    
+  - title: "In-class analysis 4: Beer consumption in Sao Paulo IV"
+    #inClass: "0-4-beer-consumption-in-Sao-Paulo-IV.html" 
+    
+  - date: "Fri, Sept 10"
+    title: "Final project outline"   
+    #project: "final-project.html"
+    
+    
+  
+  - title: " "
+  - title: "MODULE 2: LOGISTIC REGRESSION"
+    #reading: "2-reading.html"
+  - title: " "
+  
+  
+  - week: "WEEK 4"
+    date: "Tue, Sept 14"
+    title: "Module 2.1: Odds, odds ratios, and relative risks"
+    #slides: "2-1-logistic-intro.html"
+    #slidespdf: "2-1-logistic-intro.pdf"
+    #video: "https://api.playposit.com/go/play/855924/1403540/929415/0/IDS-702--Module-21-Odds-odds-ratios-and-relative-risks"
+    
+  - title: "Module 2.2: Logistic regression with one predictor"
+    #slides: "2-2-logistic-one-predictor.html"
+    #slidespdf: "2-2-logistic-one-predictor.pdf"
+    #video: "https://api.playposit.com/go/play/855938/1403540/929415/0/IDS-702--Module-22-Logistic-regression-with-one-predictor"
+    
+  - title: "Module 2.3: Logistic regression with one predictor (illustration)"
+    #slides: "2-3-logistic-one-predictor-illustration.html"
+    #slidespdf: "2-3-logistic-one-predictor-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/855968/1403540/929415/0/IDS-702--Module-23-Logistic-regression-with-one-predictor-illustration"
+    
+  - title: "In-class: Q&A and discussion session"
+    
+  - date: "DELIVERABLES:"
+    title: "Data analysis assignment II due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment III"
+    #hw: "hw-03.html"
+    
+    
+  - date: "Thur, Sept 16"
+    title: "Module 2.4: Model assessment and validation - binned residuals and roc curves"
+    #slides: "2-4-logistic-model-assessment.html"
+    #slidespdf: "2-4-logistic-model-assessment.pdf"
+    #video: "https://api.playposit.com/go/play/860851/1403540/929415/0/IDS-702--Module-24-Model-assessment-and-validation---binned-residuals-and-roc-curves"
+    
+  - title: "Module 2.5: Logistic regression with multiple predictors I"
+    #slides: "2-5-logistic-multiple-predictors-I.html"
+    #slidespdf: "2-5-logistic-multiple-predictors-I.pdf"
+    #video: "https://api.playposit.com/go/play/860920/1403540/929415/0/IDS-702--Module-25-Logistic-regression-with-multiple-predictors-I"
+    
+  - title: "In-class analysis 5: Predicting nba wins I"
+    #inClass: "0-5-predicting-nba-wins-I.html"
+  
+  
+  - week: "WEEK 5"
+    date: "Tue, Sept 21"
+    title: "Module 2.6: Logistic regression with multiple predictors II"
+    #slides: "2-6-logistic-multiple-predictors-II.html"
+    #slidespdf: "2-6-logistic-multiple-predictors-II.pdf"
+    #video: "https://api.playposit.com/go/play/877488/1403540/929415/0/IDS-702--Module-26-Logistic-regression-with-multiple-predictors-II"
+    
+  - title: "Module 2.7: Aggregated outcomes; Probit regression"
+    #slides: "2-7-aggregated-outcomes.html"
+    #slidespdf: "2-7-aggregated-outcomes.pdf"
+    #video: "https://api.playposit.com/go/play/877498/1403540/929415/0/IDS-702--Module-27-Aggregated-outcomes-Probit-regression"
+    
+  - title: "In-class analysis 6: Predicting nba wins II"
+    #inClass: "0-6-predicting-nba-wins-II.html"
+  
+  - date: "DELIVERABLES:"
+    title: "Data analysis assignment III due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Team project I"
+    #project: "team-project-01.html"
+    
+    
+  - title: " "
+  - title: "MODULE 3: OTHER GENERALIZED LINEAR MODELS"
+    #reading: "3-reading.html"
+  - title: " "
+  
+    
+  - date: "Thur, Sept 23"
+    title: "Module 3.1: Poisson regression"
+    #slides: "3-1-poisson-regression.html"
+    #slidespdf: "3-1-poisson-regression.pdf"
+    #video: "https://api.playposit.com/go/play/883707/1403540/929415/0/IDS-702--Module-31-Poisson-regression"
+    
+  - title: "Module 3.2: Poisson regression (illustration)"
+    #slides: "3-2-poisson-regression-illustration.html"
+    #slidespdf: "3-2-poisson-regression-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/884051/1403540/929415/0/IDS-702--Module-32-Poisson-regression-illustration"
+    
+  - title: "In-class: Q&A session and team meetings for project"
+  
+  
+  - week: "WEEK 6"
+    date: "Tue, Sept 28"
+    title: "Module 3.3: Multinomial logistic regression"
+    #slides: "3-3-multinomial-logistic.html"
+    #slidespdf: "3-3-multinomial-logistic.pdf"
+    #video: "https://api.playposit.com/go/play/899040/1403540/929415/0/IDS-702--Module-33-Multinomial-logistic-regression"
+    
+  - title: "Module 3.4: Multinomial logistic regression (illustration)"
+    #slides: "3-4-multinomial-logistic-illustration.html"
+    #slidespdf: "3-4-multinomial-logistic-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/899052/1403540/929415/0/IDS-702--Module-34-Multinomial-logistic-regression-illustration"
+    
+  - title: "In-class: Q&A session and team meetings for project"
+    
+    
+  - date: "Thur, Sept 30"
+    title: "Team project I presentations"
+    
+    
+  - week: "WEEK 7"
+    date: "Sun, Oct 3 | DELIVERABLES:"
+    title: "Team project I reports due"
+  
+  - date: "Mon, Oct 4 | DELIVERABLES:"
+    title: "Team project I evaluations due"
+    
+  - date: "Tue, Oct 5"
+    title: "Module 3.5: Proportional odds model"
+    #slides: "3-5-proportional-odds.html"
+    #slidespdf: "3-5-proportional-odds.pdf"
+    #video: "https://api.playposit.com/go/play/918805/1403540/929415/0/IDS-702--Module-35-Proportional-odds-model"
+    
+  - title: "Module 3.6: Proportional odds model (illustration)"
+    #slides: "3-6-proportional-odds-illustration.html"
+    #slidespdf: "3-6-proportional-odds-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/918814/1403540/929415/0/IDS-702--Module-36-Proportional-odds-model-illustration"
+    
+  - title: "In-class: Q&A and discussion session"
+  
+    
+  - title: " "
+  - title: "MODULE 4: MULTILEVEL/HIERARCHICAL MODELS"
+    #reading: "4-reading.html"
+  - title: " "
+  
+  
+  - date: "Thur, Oct 7"
+    title: "Module 4.1: Introduction to multilevel/hierarchical models"
+    #slides: "4-1-hierarchical-models-intro.html"
+    #slidespdf: "4-1-hierarchical-models-intro.pdf"
+    #video: "https://api.playposit.com/go/play/922920/1403540/929415/0/IDS-702--Module-41-Introduction-to-multilevel-hierarchical-models"
+  
+  - title: "Module 4.2: Multilevel/hierarchical linear models"
+    #slides: "4-2-hierarchical-linear-models.html"
+    #slidespdf: "4-2-hierarchical-linear-models.pdf"
+    #video: "https://api.playposit.com/go/play/922971/1403540/929415/0/IDS-702--Module-42-Multilevel-hierarchical-linear-models"
+    
+  - title: "In-class analysis 7: Do more beautiful professors get higher evaluations I"
+    #inClass: "0-7-beautiful-professors-I.html"
+  
+  - date: "Fri, Oct 8"
+    title: "Instructions for final project proposals"   
+    #project: "final-project-proposal.html"
+
+  - week: "WEEK 8"
+    date: "Tue, Oct 12"
+    title: "Module 4.3: Multilevel/hierarchical linear models (illustration I)"
+    #slides: "4-3-hierarchical-linear-models-illustration-I.html"
+    #slidespdf: "4-3-hierarchical-linear-models-illustration-I.pdf"
+    #video: "https://api.playposit.com/go/play/937523/1403540/929415/0/IDS-702--Module-43-Multilevel-hierarchical-linear-models-illustration-I"
+  
+  - title: "Module 4.4: Multilevel/hierarchical linear models (illustration II)"
+    #slides: "4-4-hierarchical-linear-models-illustration-II.html"
+    #slidespdf: "4-4-hierarchical-linear-models-illustration-II.pdf"
+    #video: "https://api.playposit.com/go/play/937530/1403540/929415/0/IDS-702--Module-44-Multilevel-hierarchical-linear-models-illustration-II"
+    
+  - title: "In-class analysis 8: Do more beautiful professors get higher evaluations II"
+    #inClass: "0-8-beautiful-professors-II.html"
+  
+  - date: "NEW ASSIGNMENT:"
+    title: "Team project II"
+    #project: "team-project-02.html"
+  
+  
+  - date: "Thur, Oct 14"
+    title: "Module 4.5: Multilevel/hierarchical logistic models"
+    #slides: "4-5-hierarchical-logistic-models.html"
+    #slidespdf: "4-5-hierarchical-logistic-models.pdf"
+    #video: "https://api.playposit.com/go/play/942823/1403540/929415/0/IDS-702--Module-45-Multilevel-hierarchical-logistic-models"
+  
+  - title: "Module 4.6: Multilevel/hierarchical logistic models (illustration)"
+    #slides: "4-6-hierarchical-logistic-models-illustration.html"
+    #slidespdf: "4-6-hierarchical-logistic-models-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/942833/1403540/929415/0/IDS-702--Module-46-Multilevel-hierarchical-logistic-models-illustration"
+    
+  - title: "In-class analysis 9: Do more beautiful professors get higher evaluations III"
+    #inClass: "0-9-beautiful-professors-III.html"
+  
+  
+  - title: " "
+  - title: "MODULE 5: HANDLING MISSING DATA"
+    #reading: "5-reading.html"
+  - title: " "
+  
+  
+  - week: "WEEK 9"
+    date: "Tue, Oct 19"
+    title: "Module 5.1: Introduction to missing data"
+    #slides: "5-1-missing-data-intro.html"
+    #slidespdf: "5-1-missing-data-intro.pdf"
+    #video: "https://api.playposit.com/go/play/954606/1403540/929415/0/IDS-702--Module-51-Introduction-to-missing-data"
+  
+  - title: "Module 5.2: Imputation methods I"
+    #slides: "5-2-imputation-methods-I.html"
+    #slidespdf: "5-2-imputation-methods-I.pdf"
+    #video: "https://api.playposit.com/go/play/954611/1403540/929415/0/IDS-702--Module-52-Imputation-methods-I"
+    
+  - title: "In-class: Q&A session and team meetings for project"
+    
+  - date: "Thur, Oct 21"
+    title: "Team project II presentations"
+    
+  
+  
+  - week: "WEEK 10"
+    date: "Sun, Oct 24 | DELIVERABLES:"
+    title: "Team project II reports due"
+  
+  
+  - date: "Mon, Oct 25 | DELIVERABLES:"
+    title: "Team project II evaluations due!"
+  
+  
+  - date: "Tue, Oct 26"
+    title: "Module 5.3: Imputation methods II"
+    #slides: "5-3-imputation-methods-II.html"
+    #slidespdf: "5-3-imputation-methods-II.pdf"
+    #video: "https://api.playposit.com/go/play/970546/1403540/929415/0/IDS-702--Module-53-Imputation-methods-II"
+    
+  - title: "Module 5.4: Multiple imputation in R"
+    #slides: "5-4-imputation-methods-III.html"
+    #slidespdf: "5-4-imputation-methods-III.pdf"
+    #video: "https://api.playposit.com/go/play/970549/1403540/929415/0/IDS-702--Module-54-Multiple-imputation-in-R"
+    
+  - title: "In-class: Discussion session"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment IV"
+    #hw: "hw-04.html"
+    
+  - date: "Wed, Oct 27 | DELIVERABLES:"
+    title: "Final project proposal due!"
+    
+    
+  - title: " "
+  - title: "MODULE 6: INTRODUCTION TO CAUSAL INFERENCE"
+    #reading: "6-reading.html"
+  - title: " "
+  
+    
+  - date: "Thur, Oct 28"
+    title: "Module 6.1: The potential outcomes framework and causal estimands"
+    #slides: "6-1-causal-inference-intro.html"
+    #slidespdf: "6-1-causal-inference-intro.pdf"
+    #video: "https://api.playposit.com/go/play/974972/1403540/929415/0/IDS-702--Module-61-The-potential-outcomes-framework-and-causal-estimands"
+  
+  - title: "Module 6.2: Assignment mechanisms and the role of randomization"
+    #slides: "6-2-causal-inference-assignment-mechanisms.html"
+    #slidespdf: "6-2-causal-inference-assignment-mechanisms.pdf"
+    #video: "https://api.playposit.com/go/play/974981/1403540/929415/0/IDS-702--Module-62-Assignment-mechanisms-and-the-role-of-randomization"
+  
+  - title: "In-class: Q&A and discussion session"
+  
+  - week: "WEEK 11"
+    date: "Tue, Nov 2"
+    title: "Module 6.3: Unconfoundedness and overlap"
+    #slides: "6-3-unconfoundedness-and-overlap.html"
+    #slidespdf: "6-3-unconfoundedness-and-overlap.pdf"
+    #video: "https://api.playposit.com/go/play/987110/1403540/929415/0/IDS-702--Module-63-Unconfoundedness-and-overlap"
+  
+  - title: "Module 6.4: Regression-based estimation and covariate balance"
+    #slides: "6-4-covariate-balance.html"
+    #slidespdf: "6-4-covariate-balance.pdf"
+    #video: "https://api.playposit.com/go/play/987119/1403540/929415/0/IDS-702--Module-64-Regression-based-estimation-and-covariate-balance"
+  
+  - title: "Module 6.5: Stratification and matching"
+    #slides: "6-5-stratification-and-matching.html"
+    #slidespdf: "6-5-stratification-and-matching.pdf"
+    #video: "https://api.playposit.com/go/play/987130/1403540/929415/0/IDS-702--Module-65-Stratification-and-matching"
+  
+  - title: "In-class analysis 10: Right Heart Catheterization I"
+    #inClass: "1-0-rhc-I.html"
+  
+  - date: "DELIVERABLES:"
+    title: "Data analysis assignment IV due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment V"
+    #hw: "hw-05.html"
+    
+  - date: "Thur, Nov 4"
+    title: "Module 6.6: Propensity scores"
+    #slides: "6-6-propensity-scores.html"
+    #slidespdf: "6-6-propensity-scores.pdf"
+    #video: "https://api.playposit.com/go/play/992494/1403540/929415/0/IDS-702--Module-66-Propensity-scores"
+    
+  - title: "Module 6.7: Causal inference using propensity scores"
+    #slides: "6-7-causal-inference-with-propensity-scores.html"
+    #slidespdf: "6-7-causal-inference-with-propensity-scores.pdf"
+    #video: "https://api.playposit.com/go/play/992502/1403540/929415/0/IDS-702--Module-67-Causal-inference-using-propensity-scores"
+  
+  - title: "Module 6.8: The minimum wage analysis"
+    #slides: "6-8-minimum-wage-analysis.html"
+    #slidespdf: "6-8-minimum-wage-analysis.pdf"
+    #video: "https://api.playposit.com/go/play/992503/1403540/929415/0/IDS-702--Module-68-The-minimum-wage-analysis"
+  
+  - title: " "
+  - title: "MODULE 7: INTRODUCTION TO TIME SERIES MODELS"
+    #reading: "7-reading.html"
+  - title: " "
+  
+  - week: "WEEK 12"
+    date: "Tue, Nov 9"
+    title: "Module 7.1: Introduction to time series analysis"
+    #slides: "7-1-time-series-intro.html"
+    #slidespdf: "7-1-time-series-intro.pdf"
+    #video: "https://api.playposit.com/go/play/1004050/1403540/929415/0/IDS-702--Module-71-Introduction-to-time-series-analysis"
+  
+  - title: "Module 7.2: Stationarity and autocorrelation"
+    #slides: "7-2-stationarity-autocorrelation.html"
+    #slidespdf: "7-2-stationarity-autocorrelation.pdf"
+    #video: "https://api.playposit.com/go/play/1004055/1403540/929415/0/IDS-702--Module-72-Stationarity-and-autocorrelation"
+  
+  - title: "In-class analysis 11: Right Heart Catheterization II"
+    #inClass: "1-1-rhc-II.html"
+  
+  - date: "Wed, Nov 10 | DELIVERABLES:"
+    title: "Data analysis assignment V due!"
+    
+  - date: "Thur, Nov 11"
+    title: "Module 7.3: AR and MA models"
+    #slides: "7-3-ar-ma-model.html"
+    #slidespdf: "7-3-ar-ma-model.pdf"
+    #video: "https://api.playposit.com/go/play/1010854/1403540/929415/0/IDS-702--Module-73-AR-and-MA-models"
+  
+  - title: "Module 7.4: Time series analysis (illustration)"
+    #slides: "7-4-time-series-illustration.html"
+    #slidespdf: "7-4-time-series-illustration.pdf"
+    #video: "https://api.playposit.com/go/play/1010862/1403540/929415/0/IDS-702--Module-74-Time-series-analysis-illustration"
+  
+  - title: "In-class: Q&A and discussion session"
+  
+   
+  - title: " "
+  - title: "MODULE 8: RANDOM NUMBER GENERATION, BOOTSTRAP AND MONTE CARLO"
+    #reading: "8-reading.html"
+  - title: " "
+  
+   
+  - week: "WEEK 13"
+    date: "Tue, Nov 16"
+    
+  - title: "Module 8.1: Random number generation"
+    #slides: "8-1-random-number-generation.html"
+    #slidespdf: "8-1-random-number-generation.pdf"
+    #video: 
+    
+  - title: "Module 8.2: Bootstrap"
+    #slides: "8-2-boostrap.html"
+    #slidespdf: "8-2-boostrap.pdf"
+    #video: "https://api.playposit.com/go/play/1019722/1403540/929415/0/IDS-702--Module-82-Bootstrap"
+    
+  - title: "Module 8.3: Monte Carlo"
+    #slides: "8-3-monte-carlo.html"
+    #slidespdf: "8-3-monte-carlo.pdf"
+    #video: 
+  
+  - title: "In-class: "
+  
+  - title: " "
+  - title: "MODULE 9: INTRODUCTION TO TREE-BASED METHODS"
+    #reading: "9-reading.html"
+  - title: " "
+    
+  - date: "Thur, Nov 18"
+    title: "Module 9.1: Classification and regression trees"
+    #slides: "9-1-cart.html"
+    #slidespdf: "9-1-cart.pdf"
+    #video: "https://api.playposit.com/go/play/1019726/1403540/929415/0/IDS-702--Module-91-Classification-and-regression-trees"
+  
+  - title: "Module 9.2: Ensemble tree methods"
+    #slides: "9-2-ensemble-tree-methods.html"
+    #slidespdf: "9-2-ensemble-tree-methods.pdf"
+    #video: "https://api.playposit.com/go/play/1019728/1403540/929415/0/IDS-702--Module-92-Ensemble-tree-methods"
+    
+  - title: "In-class: Q&A and discussion session"
+    
+  
+  - week: "WEEK 14"
+    date: "Mon, Nov 22 | DELIVERABLES:"
+    title: "Upload final project presentations"
+  
+  - date: "Tue, Nov 23"
+    title: "In-class: wrap-up and open OH for final projects"
+    
+  - date: "Thur, Nov 25"
+    title: "Reading week: work on final projects"
+    
+    
+  - week: "WEEK 15"
+    date: "Tue, Nov 30"
+    title: "Reading week: work on final projects"
+    
+  - date: "Thur, Dec 2"
+    title: "Reading week: work on final projects"
+    
+    
+  - week: "WEEK 16"
+    date: "Tue, Dec 7"
+    title: "Reading week: work on final projects"
+    
+    
+  - week: "WEEK 17"
+    date: "Sun, Dec 12 | DELIVERABLES:"
+    title: "Final project reports due"
+  
+  
+  
+    
+  
+    
