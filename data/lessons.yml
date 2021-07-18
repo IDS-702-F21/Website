@@ -472,8 +472,7 @@ lessons:
    
   - week: "WEEK 13"
     date: "Tue, Nov 16"
-    
-  - title: "Module 8.1: Random number generation"
+    title: "Module 8.1: Random number generation"
     #slides: "8-1-random-number-generation.html"
     #slidespdf: "8-1-random-number-generation.pdf"
     #video: 
