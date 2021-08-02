@@ -7,3 +7,9 @@
 gss2016.csv
 gss2010.csv
 *.key
+
+Syllabus.aux
+Syllabus.log
+Syllabus.tex
+Syllabus.out
+Syllabus.synctex.gz

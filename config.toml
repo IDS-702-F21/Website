@@ -82,22 +82,28 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [[menu.footer]]
   weight = 1
-  identifier = "Duke"
-  name = "Duke MIDS"
+  identifier = "Duke SSRI"
+  name = "Duke SSRI"
   pre = "<i class=\"button-icon fa fa-2x fa-map-marker\"></i>"
-  url = "https://datascience.duke.edu"
+  url = "https://ssri.duke.edu"
+[[menu.footer]]
+  weight = 2
+  identifier = "Duke Stats"
+  name = "Statistical Science, Duke University"
+  pre = "<i class=\"button-icon fa fa-2x fa-map-marker\"></i>"
+  url = "https://stat.duke.edu"
 #[[menu.footer]]
 #  weight = 2
 #  name = "RStudio"
 #  pre = "<i class=\"icon-rlogo\" style=\"font-size:150%\"></i>"
 #  url = "https://rstudio.cloud/"
-#[[menu.footer]]
-#  weight = 3
-#  identifier = "GitHub"
-#  name = "GitHub"
-#  pre = "<i class=\"button-icon fa fa-2x fa-github\"></i>"
-#  url = "https://github.com/Sta199-S18/"
-#[[menu.footer]]
+[[menu.footer]]
+  weight = 3
+  identifier = "GitHub"
+  name = "GitHub"
+  pre = "<i class=\"button-icon fa fa-2x fa-github\"></i>"
+  url = "https://github.com/IDS-702-F21"
+[[menu.footer]]
 
 
 [params]

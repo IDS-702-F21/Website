@@ -44,8 +44,8 @@ To gain access to the pre-recorded lecture videos, you will have to create a Pla
 <span></span>     | <span></span>     | <span></span>    | <span></span>    |  <span></span>      
 ------------------|-------------------|------------------|------------------|------------------ 
 Instructor        | [Dr. Olanrewaju Michael Akande](https://olanrewajuakande.com) | <a href="mailto:olanrewaju.akande@duke.edu" title="email"><i class="fa fa-envelope"></i></a> &nbsp; <a href="https://github.com/akandelanre" title="GitHub"><i class="fa fa-github"></i></a> | Wednesdays and Fridays (9am -- 10am) | 256 Gross Hall
-TAs               | TBD | TBD | TBD | 257 Gross Hall
-                  | TBD | TBD | TBD | 257 Gross Hall
+TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu) | <a href="mailto:jiaman.wu@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | TBD | 257 Gross Hall
+                  | [Xinyi (Iris) Pan](https://datascience.duke.edu/xinyi-iris-pan) | <a href="mailto:xinyi.pan@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | TBD | 257 Gross Hall
                   
 
 
