@@ -79,7 +79,7 @@ Sunday, October 24 | Team project II reports due
 Wednesday, October 27 | Final project proposal due
 Monday, November 22 | Upload final project presentations
 Tuesday, November 23 |	End of semester
-Saturday, December 12 |	Final project reports due (tentative)
+Sunday, December 12 |	Final project reports due (tentative)
 
 
 ### Green Classroom
