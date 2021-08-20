@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 7.2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 7.2
+## Stationarity and autocorrelation
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Stationarity
+
+- The most common time series models usually assume .hlight[stationarity].
+  
+--
+
+- .hlight[Stationarity] of a time series process means that the marginal distribution of any part of the series does not depend on time.
+  
+--
+
+- Basically, the locations in time themselves does not matter in the marginal and joint distributions; however, the differences in locations, that is, the lags, do matter!
+  
+--
+
+- Put a different way, a stationary time series is one whose properties do not depend on the particular time at which the series is observed. 
+  
+--
+
+- Examples of non stationary series:
+  + Steadily increasing trend (like the melanoma example).
+  + Known seasonal trends, like increase in sales before Christmas.
+  + Break in trend due to some external event.
+  
+
+---
+## Stationarity
+
+- Denote the times series for the outcome by `\(y_t\)`.
+  
+--
+
+- Stationarity `\(\Rightarrow\)`
+  + `\(\mathbb{Pr}(y_t)\)` is the same for all `\(t\)`, 
+--
+
+  + `\(\mathbb{Pr}(y_t,y_{t+1})\)` is the same for all `\(t\)`,  
+  and so on...
+  
+--
+
+- .hlight[Weak stationarity] requires that only marginal moments, that is, means, variances and covariances are the same.
+  
+--
+
+- Stationarity `\(\Rightarrow\)` weak stationarity, but .hlight[the converse need not hold].
+  
+--
+
+- For a normal distribution, the mean and variance completely characterizes the distribution, so that stationarity and weak stationarity will be equivalent. 
+  
+--
+
+- Why does that matter?
+
+--
+
+- When dealing with linear models, what distribution do we assume??
+  
+---
+## Popular stationary models
+
+- We will mainly focus on two types of stationary time series models:
+  
+--
+
+  + Autoregressive models (AR models)
+      - Value of outcome at time `\(t\)` is correlated with value at previous times.
+        
+--
+  + Moving average models (MA models)
+      - Value of outcome at time `\(t\)` is correlated with value of prediction errors at previous times.
+        
+--
+
+  
+- Note: autoregressive moving average models (ARMA models)
+    - Combination of AR and MA.
+      
+--
+
+- There are many more types of time series models (see STA 642/942).
+
+
+---
+## Autocorrelation
+
+- .hlight[Autocorrelation] (serial correlation) measures the strength of the linear relationship between `\(y_t\)` and its lagged values.
+  
+--
+
+- The lag `\(k\)` autocorrelation `\(\rho_k\)` measures the correlation in outcomes at time `\(t\)` and at time `\(t-k\)`, where `\(k\)` indicates how far back to go; `\(k\)` is called a lag.
+  
+--
+
+- The sample lag `\(k\)` autocorrelation `\(r_k\)` can be calculated using
+.block[
+.small[
+`$$r_k = \dfrac{\sum_{t=k+1}^T(y_t - \bar{y})(y_{t-k} - \bar{y})}{\sum_{t=1}^T(y_t - \bar{y})^2}.$$`
+]
+]
+
+
+---
+## Partial autocorrelation
+
+- Autocorrelation `\(\rho_k\)` (and the sample version `\(r_k\)`) between `\(y_t\)` and `\(y_{t-k}\)` will also include the linear relationships between `\(y_t\)`  and each of `\(y_{t-1}, y_{t-2}, \ldots, y_{t-k+1}\)`.
+  
+--
+
+- As you will see, we will need to be able to assess the correlation between `\(y_t\)` and `\(y_{t-k}\)` without interference from the other lags.
+  
+--
+
+- .hlight[Partial autocorrelation] lets us do just that.
+
+--
+
+- It is the autocorrelation between `\(y_t\)` and `\(y_{t-k}\)`, with all the linear relationships between `\(y_t\)`  and each of `\(y_{t-1}, y_{t-2}, \ldots, y_{t-k+1}\)` removed.
+  
+--
+
+- In `R`, use `acf` to compute and plot autocorrelations and `pacf` to compute and plot partial autocorrelations.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

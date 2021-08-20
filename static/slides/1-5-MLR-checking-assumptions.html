@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 1.5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 1.5
+## Checking main regression assumptions
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Assumptions for MLR
+
+- Inference (CIs, p-values, or predictions) can only be meaningful when the regression assumptions are plausible.
+
+--
+
+- The main assumptions follow directly from SLR.
+
+--
+
+- They are:
+  
+  1. Linearity (response variable vs. each predictor)
+  
+  2. Independence of errors (really just independence in the observations)
+  
+  3. Equal variance (in the error term `\(\Rightarrow\)` in the response variable)
+
+  4. Normality (in the error term `\(\Rightarrow\)` in the response variable)
+
+
+
+---
+## First, think about validity of the model
+
+- Validity is about whether the data and model are even suitable for answering the research question. 
+
+--
+
+- To quote the Gelman and Hill book,
+
+  .block[
+  "Optimally, this means that the outcome measure should accurately reflect the phenomenon of interest, the model should include all relevant predictors, and the model should generalize to cases to which it will be applied. 
+  
+  For example, a model of earnings will not necessarily tell you about pattern of total assets, neither will a model of test scores necessarily tell you about child intelligence or cognitive development."
+  ]
+
+--
+
+- You should always keep in mind the types of questions you can and cannot answer reliably from both the data and model.
+
+
+---
+## Checking assumptions
+
+- Checking all four assumptions usually requires examining the residuals after model fitting.
+
+--
+
+- For .hlight[linearity], a plot of the residuals versus each predictor will often do.
+
+--
+
+  &lt;div class="question"&gt;
+What should we look out for in such a plot?
+&lt;/div&gt;
+
+--
+
+- Note that the residuals contain information about the response variable variable `\(y\)` that has not been explained by the covariates in the model.
+
+--
+
+- Thus, when we plot the residuals against each predictor, we should NOT expect to see any pattern.
+
+--
+
+- .block[
+Some pattern in any of the plots is usually an indication of a relationship (often nonlinear) between `\(y\)` and that predictor, which has not been captured yet in the model.
+]
+
+
+---
+## Checking assumptions
+
+- To check both .hlight[independence] of the errors and the .hlight[equal variance] assumption, usually a plot of the residuals versus the fitted values will do.
+
+--
+
+- Can also do a plot of the residuals versus the indexes of the observations.
+
+--
+
+- .block[
+The points in the plot should look random (for independence) and be "roughly" equally spread out around zero (for equal variance).
+]
+
+--
+
+- To check .hlight[normality], it is often sufficient to look at a qq-plot (quantile-quantile plot) which compares the distribution of the standardized residuals to the theoretical quantiles of a standard normal distribution.
+
+--
+
+- .block[
+Clustering of the points around the 45 degree line of the qq-plot usually implies the normality assumption is not violated.
+]
+
+--
+
+- One can also look at a histogram of the residuals, but it is much harder to judge deviations from normality through histograms.
+
+--
+
+- Can also do a test of normality: Shapiro–Wilk, Kolmogorov–Smirnov, etc.
+
+
+---
+## Checking assumptions
+
+Let's revisit the same data from last class. Recall the model we fit to the data and the results:
+.small[
+`$$\textrm{bsal}_i = \beta_0 + \beta_1 \textrm{sex}_i + \beta_2 \textrm{senior}_i + \beta_3 \textrm{age}_i + \beta_4 \textrm{educ}_i + \beta_5 \textrm{exper}_i + \epsilon_i$$`
+]
+
+```r
+regwagec &lt;- lm(bsal~ sex + seniorc + agec + educc + experc, data= wages)
+summary(regwagec)
+```
+
+```
+## 
+## Call:
+## lm(formula = bsal ~ sex + seniorc + agec + educc + experc, data = wages)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1217.36  -342.83   -55.61   297.10  1575.53 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 5924.0072    99.6588  59.443  &lt; 2e-16
+## sexFemale   -767.9127   128.9700  -5.954 5.39e-08
+## seniorc      -22.5823     5.2957  -4.264 5.08e-05
+## agec           0.6310     0.7207   0.876 0.383692
+## educc         92.3060    24.8635   3.713 0.000361
+## experc         0.5006     1.0553   0.474 0.636388
+## 
+## Residual standard error: 508.1 on 87 degrees of freedom
+## Multiple R-squared:  0.5152,	Adjusted R-squared:  0.4873 
+## F-statistic: 18.49 on 5 and 87 DF,  p-value: 1.811e-12
+```
+
+---
+## Checking linearity
+
+Now, let's plot the residuals against each predictor. First, let's look at .hlight[senior].
+
+```r
+ggplot(wages,aes(x=seniorc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Seniority",x="Seniority (centered)",y="Residuals")
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any clear violations of the linearity assumption?
+&lt;/div&gt;
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[age].
+
+```r
+ggplot(wages,aes(x=agec, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Age",x="Age (centered)",y="Residuals")
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any clear violations of the linearity assumption?
+&lt;/div&gt;
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[educ].
+
+```r
+ggplot(wages,aes(x=educc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Education",x="Education (centered)",y="Residuals")
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Education is an odd one to visualize this way. We will revisit this issue later.
+&lt;/div&gt;
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[exper].
+
+```r
+ggplot(wages,aes(x=experc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Experience",x="Experience (centered)",y="Residuals")
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any clear violations of the linearity assumption?
+&lt;/div&gt;
+
+
+---
+## Checking independence and equal variance
+
+
+```r
+plot(regwagec,which=1,col=c("blue4"))
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any clear violations of the independence and equal variance assumptions?
+&lt;/div&gt;
+
+
+---
+## Checking normality
+
+
+```r
+plot(regwagec,which=2,col=c("blue4"))
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any clear violations of the normality assumption?
+&lt;/div&gt;
+
+
+---
+## Takeaways from residual plots
+
+- Looks like we may have to worry about the assumption of linearity being violated for age and experience.
+
+--
+
+- There appears to be some quadratic trend for both variables and possible non-constant variance, so let's improve the model by adding the squared term for each variable. 
+
+--
+
+--
+
+- Let's add the squared terms of the centered age and centered experience predictors to the dataset and refit the model. 
+  
+  ```r
+  wages$agec2 &lt;- wages$agec^2
+  wages$experc2 &lt;- wages$experc^2
+  ```
+
+
+---
+## Re-fitting the model
+
+
+```r
+regwagecsquares &lt;- lm(bsal~sex+seniorc+agec+agec2+educc+experc+experc2,data=wages)
+summary(regwagecsquares)
+```
+
+```
+## 
+## Call:
+## lm(formula = bsal ~ sex + seniorc + agec + agec2 + educc + experc + 
+##     experc2, data = wages)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1086.84  -267.84    -8.71   304.92  1642.44 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  6.098e+03  1.123e+02  54.313  &lt; 2e-16
+## sexFemale   -7.684e+02  1.211e+02  -6.343 1.04e-08
+## seniorc     -1.764e+01  5.265e+00  -3.351  0.00120
+## agec        -3.473e-01  7.814e-01  -0.444  0.65783
+## agec2        7.195e-04  4.045e-03   0.178  0.85925
+## educc        7.561e+01  2.406e+01   3.142  0.00231
+## experc       4.035e+00  1.479e+00   2.729  0.00772
+## experc2     -2.298e-02  7.592e-03  -3.027  0.00326
+## 
+## Residual standard error: 477 on 85 degrees of freedom
+## Multiple R-squared:  0.5825,	Adjusted R-squared:  0.5481 
+## F-statistic: 16.94 on 7 and 85 DF,  p-value: 8.011e-14
+```
+
+
+---
+## How well does the model fit the data. 
+
+The first model: .hlight[NO quadratic term]
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## How well does the model fit the data.
+
+Now the latest model: .hlight[add quadratic term]
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Interpreting the new model
+
+Clearly, .hlight[experc2] is an important predictor given all other predictors. However, it can be tough to interpret its effect using the coefficient. Instead, let's visualize the effect of changing experience.
+
+
+```r
+#First, make the 20 values of experience that you want to examine
+newexper &lt;- seq(from=0,to=400,by=5)
+newexperc &lt;- newexper - mean(wages$exper)
+newexperc2 &lt;- newexperc^2
+newdata &lt;- data.frame(matrix(0, nrow=length(newexper), ncol=7))
+names(newdata) &lt;- c("sex","seniorc","agec","agec2","educc","experc","experc2")
+newdata$experc &lt;- newexperc; newdata$experc2 &lt;- newexperc2; newdata$sex &lt;- "Male"
+#Since we use mean-centered predictors, the rows in the new dataset correspond to 
+#people with average values of seniority, age, and education. 
+preds_male &lt;- predict(regwagecsquares,newdata,interval="confidence"); preds_male[1:3,]
+```
+
+```
+##        fit      lwr      upr
+## 1 5457.022 4983.617 5930.426
+## 2 5499.822 5049.929 5949.715
+## 3 5541.473 5114.091 5968.854
+```
+
+```r
+newdata$sex &lt;- "Female"; 
+preds_female &lt;- predict(regwagecsquares,newdata,interval="confidence");
+preds_female[1:3,]
+```
+
+```
+##        fit      lwr      upr
+## 1 4688.582 4269.895 5107.269
+## 2 4731.382 4337.545 5125.219
+## 3 4773.033 4403.057 5143.009
+```
+
+
+---
+## Interpreting the new model
+
+
+```r
+plot(y=preds_male[,"fit"],x=newexper,xlab="Experience",ylab="Predicted Wages",
+     main="Expected Change in B.Wages with Experience",col="darkblue",ylim=c(4700,6300))
+points(y=preds_female[,"fit"], x=newexper,col="orange")
+legend("bottomright",c("Male","Female"),col=c("darkblue","orange"),lty=c(2,2))
+#Remember that this is with average values of other predictors.
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Why do we have the exact same trend for male and female?
+&lt;/div&gt;
+
+
+---
+## Interpreting the new model
+
+
+```r
+#if you want to get the 95% confidence bands on the plot as well, you can do the following
+plot(y=preds_male[,"fit"], x=newexper, xlab="Experience", ylab="Predicted Wages",
+     main="Expected Change in B.Wages with Experience",col="darkblue",ylim=c(4200,6700))
+points(y=preds_female[,"fit"], x=newexper,col="orange")
+legend("bottomright",c("Male","Female"),col=c("darkblue","orange"),lty=c(1,1))
+lines(y=preds_male[,"lwr"],x=newexper,col="darkblue",lty=2)
+lines(y=preds_male[,"upr"],x=newexper,col="darkblue",lty=2)
+lines(y=preds_female[,"lwr"],x=newexper,col="orange",lty=2)
+lines(y=preds_female[,"upr"],x=newexper,col="orange",lty=2)
+```
+
+&lt;img src="1-5-MLR-checking-assumptions_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Final notes
+
+- .block[
+  Generally it is a good idea to start with exploratory data analysis (which we did a bit of in the last class) rather than jumping right into modeling.
+  ]
+  
+--
+
+- After fitting your model, model assessment is A MUST! 
+
+--
+
+- In this class and outside of it, you MUST always assess your models!
+
+--
+
+- Later, we will continue with model assessment by exploring leverage, influence, and standardized residuals.
+
+--
+
+- We will also dive into model validation.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+---
+title: "Module 6: introduction to causal inference"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Optional:
+
+### Book sections
+
+- [Basic Concepts of Statistical Inference for Causal Effects in Experiments
+and Observational Studies (course materials used in Quantitative Reasoning (QR) 33)](http://www.stat.columbia.edu/~cook/qr33.pdf) by Donald B. Rubin.
+
+<!-- - [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) by Gelman A., and Hill, J.: -->
+<!--     + Section 14: Multilevel logistic regression -->
+
+<!-- - [An Introduction to Categorical Data Analysis, Second Edition](https://www.amazon.com/Introduction-Categorical-Analysis-Probability-Statistics/dp/1119405262) by Alan Agresti: -->
+<!--     + Section 10: Random Effects: Generalized Linear Mixed Models   -->
+<!--     Download pdf versions of individual chapters, including this one, via Duke library [here](https://find.library.duke.edu/catalog/DUKE005142588). Let me know if you have trouble downloading the chapter. -->
+
+
+### Articles
+
+- Donald B Rubin (2011), ["Causal Inference Using Potential Outcomes"](https://amstat.tandfonline.com/doi/abs/10.1198/016214504000001880#.XcBMAC-ZNTa), *Journal of the American Statistical Association*, 100:469, 322-331.

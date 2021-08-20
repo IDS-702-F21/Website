@@ -1,0 +1,101 @@
+---
+title: "Data Analysis Assignment 5"
+date: "Due: 11:59pm, Wednesday, Nov 10"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    fig_caption: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+## Instructions
+
+This assignment involves causal inference. Note that this is an individual assignment, so you must work alone. You can discuss basic details with classmates but your final work must be yours alone!
+<!-- The datasets (for question 2) can be found on Sakai: go to Resources $\rightarrow$ Datasets $\rightarrow$ Homework Datasets $\rightarrow$ Methods and Data Analysis 2.  -->
+Please type your solutions using R Markdown, LaTeX or any other word processor but YOU MUST knit or convert the final output file to ".pdf". Submissions should be made on gradescope: go to Assignments $\rightarrow$ Data Analysis Assignment 5.
+
+<font color="red">**DO NOT INCLUDE R CODE OR OUTPUT IN YOUR SOLUTIONS/REPORTS** *All R code can be included in an appendix, and R outputs should be converted to nicely formatted tables. Feel free to use R packages such as `kable`, `xtable`, `stargazer`, etc.*</font>
+
+<font color="red">*Also, you can round up ALL numbers/estimates to 2 decimal places (4 decimal places at the most to avoid exact zeros when possible).*</font>
+
+**Reminder: You are allowed and even encouraged to talk to each other about general concepts, or to the instructor/TAs. However, the write-ups, solutions, and code MUST be entirely your own work.**
+
+## Questions
+
+1. <font color="blue">ASTHMA PATIENTS IN CALIFORNIA</font>.  
+    *The data for this question can be found in the file "Asthma.txt" on Sakai.*  
+The data set is from a study to compare the quality of services provided by two physician groups for asthma patients in California. Specifically, for patient i, let *Y<sub>i</sub>(w)* be the quality of service as judged by the patient (1=satisfactory, 0=not satisfactory), if the patient is served by physician group $w$, for $w = 1,2$. The patients who visit the two groups can differ, and so a set of covariates are measured. The variables in the data are:
+
+    Variable       |        Description
+    :------------- | :-------------------
+    pg (treatment assignment) | physician group; values = 1 and 2
+    i_age | age (continuous)
+    i_sex | sex (binary)
+    i_race | race (categorical)
+    i_educ | education (categorical)
+    i_insu | insurance status (categorical)
+    i_drug | drug coverage status (categorical)
+    i_seve | severity (categorical)
+    com_t | total number of comorbidity (numeric)
+    pcs_sd | standard physical comorbidity scale (continuous)
+    mcs_sd | standard mental comorbidity scale (continuous)
+    i_aqoc (outcome) | satisfaction status of patient (binary)
+
+    Let *pr(Y(w) = 1) = p<sub>w</sub>* be the fraction of patients who would be satisfied with the service provided if all patients were to be served by physician group *w* (again, *w=1* or *2*). The target estimand is the average causal effect *Q = p<sub>2</sub> - p<sub>1</sub>*.
+    - Are the covariates in this data balanced between the two groups? If no, which covariates are not? How did you assess balance?
+    - Estimate the propensity score *e* using a logistic regression with all pre-treatment variables entering in the model as <font color="green">main effects</font>.
+      + <font color="blue">(a)</font> Are there any observations with an estimated propensity score *e* that is out of the range of *e* in the other group? If there are only a few such outliers (less than 5), keep them; If many, discard them and report the number of the discarded observations. <font color="green">Note that this is to ensure overlap!</font>
+      + <font color="blue">(b)</font> Using one-to-one, nearest neighbor matching on the estimated propensity scores, check balance again. Are the covariates balanced now? If no, which ones are not?
+      + <font color="blue">(c)</font> Estimate the average causal effect $Q$ "directly" <font color="green">using the matched sample</font> obtained above. Also, report a standard error for your estimate (use the formula for computing standard error for difference in proportions; if you are not familiar with this, check page 280 of the third edition of the [OIS](https://drive.google.com/file/d/0B-DHaDEbiOGkc1RycUtIcUtIelE/view) book we used for the online summer review). Construct a 95% confidence interval and interpret your findings.
+      + <font color="blue">(d)</font> Fit a logistic regression to the response variable using the main effects of all pre-treatment variables on the matched data. Also include the treatment variable and the propensity score *e* as predictors. Report the estimated **causal odds ratio**. If it is significant, interpret the effect in context of the problem. <font color="green">Note that this estimated effect is not an estimate of *Q = p<sub>2</sub> - p<sub>1</sub>* but intuitively, it still makes sense to look at it.</font>
+      + <font color="blue">(e)</font> Repeat parts (b) to (d) using one-to-many (five) nearest neighbor matching with replacement, instead of one-to-one nearest neighbor matching. How do your results compare to what you had before?
+    - Which of the methods do you consider most reliable (or feel most comfortable with) for estimating the causal effect? Why?
+    
+    - <font color="green">Notes</font>: 
+      + You must answer each question directly.
+      + You should consider converting the treatment variable `pg` to a binary variable with values 0 and 1.
+      + Center the three variables `com_t`, `pcs_sd`, and `mcs_sd` and use the centered versions for all analyses.
+      + The data dictionary does not contain enough details about the predictors (for example, there are no names for the levels of the categorical variables in the data). That is fine here! Do not focus on trying to interpret those predictors, just controlling for them. The two most important variables are `pg` and `i.aqoc`, and the meaning of both are very clear here.
+      + Relevel `i_sex`, `i_educ` and `i_seve` by doing  `Data$i_sex <- relevel(factor(Data$i_sex), ref = 1)`, `Data$i_educ <- relevel(factor(Data$i_educ), ref = 5)`, and `Data$i_seve <- relevel(factor(Data$i_seve), ref = 3)`.
+      + *<font color="red">Note that the estimated average causal effect computed on the matched sample is in some sense ATT (where the treated group is `pg = 1`) and not really ATE, because we will discard observations in the control group for which we cannot find matches for.</font>*
+      
+    - <font color="green">You may find the following code useful.</font>  
+      ```{r eval = FALSE}
+#Fit the model
+cov_names <- names(Data)
+p_formula <- as.formula(paste("pg ~",
+                              paste(cov_names[!cov_names %in% c("i_aqoc","pg")],
+                                    collapse = " + ")))
+pscorereg <- glm(p_formula,......)
+pscores <- ...... #predict propensity scores here
+
+#Check number of observations outside of the overlap region between the two groups
+#First the left tails
+sum(pscores < max(min(pscores[Data$pg==1]),
+                  min(pscores[Data$pg==2])))
+#Next the right tails
+sum(pscores > min(max(pscores[Data$pg==1]),
+                  max(pscores[Data$pg==2])))
+
+#If there are "outliers",
+#get row index for observations that violate overlap.
+index <- which((pscores < max(min(pscores[Data$pg==1]),
+                             min(pscores[Data$pg==2])) |
+             pscores > min(max(pscores[Data$pg==1]),
+                               max(pscores[Data$pg==2]))) == TRUE)
+Data <- Data[-index,]; pscores <- pscores[-index]
+```
+
+
+
+
+
+
+## Grading
+
+20 points.
+  

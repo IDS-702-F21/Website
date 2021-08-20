@@ -1,0 +1,22 @@
+---
+title: "Module 5: handling missing data"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Articles
+
+- Joseph L Schafer (1999), ["Multiple imputation: a primer"](https://journals.sagepub.com/doi/pdf/10.1177/096228029900800102), *Statistical Methods in Medical Research*, 8, 3-15.
+
+- Sterne, J. A. C., White, I. R., Carlin, J. B., Spratt, M., Royston, P., Kenward, M. G., Wood, A. M. and Carpenter, J. R. [Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls](https://www.bmj.com/content/338/bmj.b2393), *BMJ*; 338:b2393.
+
+- van Buuren, S., and Groothuis-Oudshoorn, K. (2011), [mice: Multivariate Imputation by Chained Equations in R](https://www.jstatsoft.org/index.php/jss/article/view/v045i03/v45i03.pdf), *Journal of Statistical Software*, 45-3.
+
+*Download free pdf versions of the articles, via [Duke library](https://library.duke.edu). Let me know if you run into problems downloading them.*

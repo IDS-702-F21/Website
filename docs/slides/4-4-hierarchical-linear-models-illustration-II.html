@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 4.4</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 4.4
+## Multilevel/hierarchical linear models (illustration II)
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+
+
+## The radon analysis cont'd
+
+Variable    | Description
+:------------- | :------------
+radon | radon levels for each house
+log_radon | log(radon)
+state | state
+floor | lowest living area of each house: 0 for basement, 1 for first floor
+countyname | county names
+countyID | ID for the county names (1-85)
+fips | state + county fips code
+uranium | county-level soil uranium
+log_uranium | log(uranium)
+
+
+---
+## Including group-level predictors
+
+-  We should also control for uranium since radon occurs naturally as an indirect decay product of uranium.
+
+--
+
+- However, since each county has one single value for `uranium`, each house within that county has the exact same value. 
+
+--
+
+- Turns out that including group-level predictors is quite straightforward in R, as long as the predictor is properly represented in the data as repeated values for all observations in the same group.
+
+--
+
+-   &lt;div class="question"&gt;
+One can ask the question: with 85 counties in the dataset, how are we able to fit a regression with 85 different intercepts for each county as well as a county-level coefficient for uranium?
+&lt;/div&gt;
+
+--
+
+- 
+.block[
+The simple answer is that we are actually using all the observations within each county (along with all observations from other counties in fact), when estimating each random intercept, but yes we only use 85 distinct values to estimate the effect of uranium.
+]
+
+
+---
+## The radon analysis: varying-intercepts
+
+- Word of caution: be careful when including random slopes. You should really include them if you absolutely have to and if you have enough data to estimate them accurately.
+
+--
+
+- `lme4` in R uses the frequentist approach which is not fully reliable here as it uses an approximation for inference and it does not fully account for uncertainty in the estimated variance parameters. Personally, I prefer to use Bayesian models for multilevel regressions.
+
+--
+
+- If you want to fit a multilevel model for your final project, I would suggest taking a look at the `brms` package in R for a Bayesian approach.
+
+--
+
+- Let's use AIC to see if we can exclude the random slopes.
+  
+  ```r
+  Model1 &lt;- lmer(log_radon ~ floor + (floor | countyname), data = Radon) 
+  Model2 &lt;- lmer(log_radon ~ floor + (1 | countyname), data = Radon) 
+  AIC(Model2); AIC(Model1) #same overall conclusions using BIC
+  ```
+  
+  ```
+  ## [1] 2179.305
+  ```
+  
+  ```
+  ## [1] 2180.325
+  ```
+
+--
+
+- No real difference. We will exclude them going forward. You should be able to interpret the updated coefficients of the new model.
+
+
+---
+## The radon analysis: including uranium
+
+Turns out that it also often makes sense to use `log_uranium` instead of `uranium`.
+.small[
+
+```r
+Model3 &lt;- lmer(log_radon ~ floor + log(uranium) + (1 | countyname), data = Radon) ; summary(Model3)
+```
+
+```
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: log_radon ~ floor + log(uranium) + (1 | countyname)
+##    Data: Radon
+## 
+## REML criterion at convergence: 2134.2
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -4.9673 -0.6117  0.0274  0.6555  3.3848 
+## 
+## Random effects:
+##  Groups     Name        Variance Std.Dev.
+##  countyname (Intercept) 0.02446  0.1564  
+##  Residual               0.57523  0.7584  
+## Number of obs: 919, groups:  countyname, 85
+## 
+## Fixed effects:
+##                  Estimate Std. Error t value
+## (Intercept)       1.46576    0.03794  38.633
+## floorFirst Floor -0.66824    0.06880  -9.713
+## log(uranium)      0.72027    0.09176   7.849
+## 
+## Correlation of Fixed Effects:
+##             (Intr) flrFrF
+## florFrstFlr -0.357       
+## log(uranim)  0.145 -0.009
+```
+]
+
+--
+
+For any house in Minnesota with a basement as the lowest living area, every unit increase in log(uranium) increases radon levels by a multiplicative effect of `\(e^{0.72} = 2.05\)`.
+
+
+---
+## How much data and how many groups?
+
+- When `\(J\)`, that is the number of groups, is small, it is difficult to estimate the across-group variation.
+
+--
+
+- Multi-level modeling often adds little in such scenarios.
+
+--
+
+- However, .hlight[it should not do any worse than including the grouping variable as a factor variable], and it can still be easier to interpret since we need not drop any level as baseline.
+
+--
+
+- Small sample sizes within the groups can be enough to fit a multilevel model when only the intercept is varying.
+
+--
+
+- With varying slopes, one can easily run into convergence issues.
+
+--
+
+- When groups do not have that many data points, .hlight[the random intercepts and slopes may not be estimated accurately] but the data within each group will still provide information that allows estimation of fixed effects and overall variance parameters.
+
+
+---
+## Extra nested levels
+
+- It is easy to envision applications where there might be more than one level of hierarchy.
+
+--
+
+- For example 
+  + students within schools within counties within states
+  + patients within hospitals within states
+  + voters within voting districts within states
+
+--
+
+- In those applications, it is straightforward to extend these ideas and create extra levels of hierarchy in the multi-level models.
+
+--
+
+- When that is the case, I once again prefer to rely on Bayesian methods to fit those models.
+
+
+---
+## Non-nested models
+
+- In other applications, there can be complicated grouping structures, where observations fall into two or more different non-nested grouping variables.
+
+--
+
+- For example
+  + patients within `\(J\)` hospitals receiving `\(K\)` different treatments
+  + students within `\(J\)` schools taking classes based on `\(K\)` different teaching techniques.
+
+--
+ 
+- Once again, it is straightforward to incorporate these within the context of multi-level models.
+  
+  
+---
+## Non-nested models
+- Suppose we want to fit a multi-level model with varying-intercepts by each grouping variable but with a fixed slope for one predictor, we would have
+.block[
+.small[
+$$
+`\begin{split}
+y_{ijk} &amp; = (\beta_{0} + \gamma_{0j} + \eta_{0k}) + \beta_1 x_{1ijk} + \epsilon_{ijk} \\
+\gamma_{0j} &amp; \sim N(0, \tau_{\gamma(0)}^2) \\
+\eta_{0k} &amp; \sim N(0, \tau_{\eta(0)}^2) \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+i &amp; = 1, \ldots, n_{jk}; \ \ \ j = 1, \ldots, J; \ \ \ k = 1, \ldots, K. \\
+\end{split}`
+$$
+]
+]
+
+--
+
+- In R, we can fit the model above as follows:
+  
+  ```r
+  M1 &lt;- lmer(y ~ x + (1 | GroupVar1) + (1 | GroupVar2)) ; summary(M1)
+  ```
+
+--
+
+- Adding more predictors is trivial.
+
+--
+
+- It is easy to add more group variables but it can be hard to fit the model without enough data points.
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

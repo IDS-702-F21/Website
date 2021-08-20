@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 4.2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 4.2
+## Multilevel/hierarchical linear models
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Mativating example: the radon analysis
+
+- As a motivating example, we will look at data on radon levels of houses within each of 85 counties in Minnesota.
+
+--
+
+- The data is in the file `Radon.txt` on Sakai.
+
+--
+
+- The full data actually includes data for more states but we will focus on just Minnesota like the textbook. 
+
+--
+
+- The U.S. Environmental Protection Agency and the Surgeon General’s Office have estimated that as many as 20,000 lung cancer deaths are caused each year by exposure to radon (reference [here](https://www.radon.com/radon_facts/)). 
+
+--
+
+- Radon is a cancer-causing radioactive gas and is the second leading cause of lung cancer. Unfortunately, you cannot see, smell or taste it. The most commonly used device for making short-term radon measurements in homes is the charcoal canister
+
+--
+
+- Radon occurs naturally as an indirect decay product of uranium.
+
+--
+
+- Given that counties are nested within states, thinking about a hierarchical model here makes sense.
+
+
+---
+## Mativating example: the radon analysis
+
+Variable    | Description
+:------------- | :------------
+radon | radon levels for each house
+log_radon | log(radon)
+state | state
+floor | lowest living area of each house: 0 for basement, 1 for first floor
+countyname | county names
+countyID | ID for the county names (1-85)
+fips | state + county fips code
+uranium | county-level soil uranium
+log_uranium | log(uranium)
+
+--
+
+The response variable, radon (or log_radon) is continuous, so we need a (hierarchical/multilevel) regression framework.
+
+--
+
+To ascertain that we need a multilevel model here, we should check for differences across counties during EDA.
+
+
+---
+## Hierarchical linear models
+
+- Hierarchical models (like the model for the school data) can be applied to regression contexts where observations are grouped
+
+--
+
+- First we will only focus on models for linear regression.
+
+--
+
+- However, the same ideas apply to logistic regression (as we will see soon), Poisson regression, etc.
+
+--
+
+- Recall that a standard linear model with one predictor can be written as
+.block[
+.small[
+`$$y_i = \beta_0 + \beta_1 x_{i1} + \epsilon_i; \ \ \epsilon_i \sim N(0, \sigma^2); \ \ \ i = 1, \ldots, n.$$`
+]
+]
+
+- Now suppose that the observations fall into `\(J\)` groups, indexed by `\(j\)`.
+
+--
+
+- Then there are several ways to take advantage of the group within the context of hierarchical models.
+
+
+
+---
+## Random intercepts model
+
+- First, we can let the intercept alone vary by group, if we think that the predictor has the same effect on each group, but the overall intercept (grand mean of the response) is different for each group.
+
+--
+
+- This is known as the .hlight[random intercepts model] or the .hlight[varying-intercept model], and is often written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = \beta_{0j} + \beta_1 x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+\beta_{0j} &amp; \sim N(\beta_{0}, \tau_0^2).
+\end{split}`
+$$
+]
+]
+
+  where `\(i\)` indexes observations and `\(j\)` indexes groups.
+
+--
+  
+- The model can also be written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = (\beta_{0} + \gamma_{0j}) + \beta_1 x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+\gamma_{0j} &amp; \sim N(0, \tau_0^2).
+\end{split}`
+$$
+]
+]
+
+
+---
+## Random intercepts model
+
+- Allows separate intercepts for each group, but shrinks estimates towards common value.
+&lt;img src="4-2-hierarchical-linear-models_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Useful for repeated measurements, when the "groups" are individuals, e.g., we take a subject's blood pressure three times and include all three measurements in the model).
+
+--
+  
+- Also useful when some groups have small sample sizes, so that estimation of individual group means is highly variable.
+
+
+---
+## Random slopes model
+
+- We may want to let only the slopes vary by group, if we think that the predictor has a different effect on each group, but the overall intercept is the same for each group.
+
+--
+
+- This is known as the .hlight[random slopes model] or the .hlight[varying-slope model], and is often written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = \beta_{0} + \beta_{1j} x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+\beta_{1j} &amp; \sim N(\beta_{1}, \tau_1^2).
+\end{split}`
+$$
+]
+]
+
+--
+  
+- The model can also be written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = \beta_{0} + (\beta_1 + \gamma_{1j}) x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+\gamma_{1j} &amp; \sim N(0, \tau_1^2).
+\end{split}`
+$$
+]
+]
+
+
+---
+## Random slopes model
+
+--
+
+- Allows separate slopes for each group, but shrinks estimates towards common value.
+
+--
+  
+- Also useful when some groups have small sample sizes, so that estimation of slopes is highly variable.
+
+--
+
+- The model implies the same intercept for each group.
+&lt;img src="4-2-hierarchical-linear-models_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Random slopes and intercepts model
+
+- We can also combine both ideas, that is, allow for the slopes and intercepts to both vary by group, if we think that the predictor has a different effect on each group, and the overall intercept is also different for each group.
+
+--
+
+- This is known as the .hlight[random slopes and intercepts model] or the .hlight[varying-slope, varying-intercept model], and is often written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = \beta_{0j} + \beta_{1j} x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+(\beta_{0j},\beta_{1j}) &amp; \sim N_2((\beta_{0},\beta_{1}), \Sigma).
+\end{split}`
+$$
+]
+]
+
+  where `\(N_2(\boldsymbol{\mu},\Sigma)\)` is the bivariate normal distribution with mean `\(\boldsymbol{\mu}\)` and covariance matrix `\(\Sigma\)`.
+
+--
+  
+- The model can also be written as
+.block[
+.small[
+$$
+`\begin{split}
+y_{ij} &amp; = (\beta_{0} + \gamma_{0j}) + (\beta_1 + \gamma_{1j}) x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J \\
+\epsilon_{ij} &amp; \sim N(0, \sigma^2) \\
+(\gamma_{0j},\gamma_{1j}) &amp; \sim N_2(\boldsymbol{0}, \Sigma).
+\end{split}`
+$$
+]
+]
+
+
+---
+## Random slopes and intercepts model
+
+- Allows for separate slopes and intercepts for each group, but shrinks estimates towards common value
+
+--
+
+- Useful when some groups have small sample sizes, so that estimation of slopes and intercepts is highly variable
+
+--
+
+- `\((\gamma_{0j},\gamma_{1j})\)` are called .hlight[random effects] while `\((\beta_{0},\beta_{1})\)` are called .hlight[fixed effects]. Models with fixed and random effects are often called .hlight[mixed effects models].
+
+&lt;img src="4-2-hierarchical-linear-models_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Mixed effects model
+
+- Use the .hlight[lmer] command in the .hlight[lme4] package in R to estimate the parameters using maximum likelihood (ML) or restricted maximum likelihood (REML) estimation.
+
+--
+
+- Take STA 601/602 and/or STA 610 for information on fitting these models using Bayesian methods.
+
+--
+
+- Also, note that the terms fixed effects, random effects, and mixed effects can have (very) different meanings in different fields.
+
+--
+
+- So, we will not get too carried away with the terminology.
+
+--
+
+- For us, the important thing will be to be able to distinguish between parameters that vary by group and those that do not.
+
+
+
+---
+## Model assessment and validation
+
+- Model assessment and validation from linear regression carries over.
+
+--
+
+- You should still have linearity (by each group for varying slopes), independence of the errors (and also of the varying effects for each predictor), equal variance, and normality.
+
+--
+
+- You should still look out for outliers and check for multicollinearity.
+
+--
+
+- Model comparison between two multi-level models does not quite work the same way.
+
+--
+
+- We will not dive deeply into estimation but basically, ML produces unbiased estimates for the fixed effects but not the random effects whereas REML produces unbiased estimates for the random effects.
+
+--
+
+- When using the `anova` function in R, keep the random effects part the same when comparing two models (so you'll be comparing fixed effects). Use AIC or BIC to decide the form of the random effects.
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

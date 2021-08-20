@@ -1,0 +1,289 @@
+---
+title: "IDS 702: Module 2.7"
+subtitle: "Aggregated outcomes; Probit regression"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(arm)
+library(xtable)
+library(stargazer)
+```
+
+
+
+## Aggregated binary outcomes
+
+- In the datasets we have seen so far under logistic regression, we observe the binary outcomes for each observation, that is, each $y_i \in \{0,1\}$. 
+
+--
+
+- This is not always the case. Sometimes, we get an aggregated version, with the outcome summed up by combinations of other variables.
+
+--
+
+- For example, for individual-level data, suppose we had
+  ```{r results ='asis',message = FALSE,echo=F}
+  set.seed(10); n <- 100; y <- sample(c(0,1),n,replace=T); x <- factor(sample(c(1:3),n,replace=T))
+Data <- data.frame(response=y,predictor=x);
+stargazer(Data[1:25,],type = "html", summary=FALSE, colnames=FALSE, rownames=T,flip=TRUE)
+```
+  where .hlight[predictor] is a factor with 3 levels: 1,2,3.
+--
+
+- The aggregated version of the same data could look like
+  ```{r results ='asis',message = FALSE,echo=F}
+Data_agg <- aggregate(Data$response,by=list(Data$predictor),FUN=sum)
+colnames(Data_agg) <- c("predictor","successes")
+Data_agg$n <- aggregate(Data$response,by=list(Data$predictor),FUN=length)$x
+stargazer(Data_agg[,c("predictor","n","successes")],type = "html", summary=FALSE, rownames=F)
+```
+
+
+
+
+---
+## Aggregated binary outcomes
+
+- Recall that if $Y \sim \textrm{Bin}(n,p)$ (that is, $Y$ is a random variable that follows a binomial distribution with parameters $n$ and $p$), then $Y$ follows a $\textrm{Bernoulli}(p)$ distribution  when $n = 1$.
+
+--
+
+- Alternatively, we also have that if $Z_1, \ldots, Z_n \sim \textrm{Bernoulli}(p)$, then $Y = \sum_i^n Z_i \sim \textrm{Bin}(n,p)$.
+
+--
+
+- That is, the sum of $n$ "iid" $\textrm{Bernoulli}(p)$ random variables gives a random variable with the $\textrm{Bin}(n,p)$ distribution.
+
+--
+
+- The logistic regression model can be used either for Bernoulli data (as we have done so far) or for data summarized as binomial counts (that is, aggregated counts).
+
+--
+
+- In the aggregated form, the model is
+.block[
+.small[
+$$y_i | x_i \sim \textrm{Bin}(n_i,\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip},$$
+]
+]
+
+
+---
+## Bernoulli versus binomial outcomes
+
+Normally, for individual-level data, we would have
+.small[
+```{r echo=F}
+head(Data)
+```
+]
+
+.small[
+```{r}
+M1 <- glm(response~predictor,data=Data,family=binomial)
+summary(M1)
+```
+]
+
+
+---
+## Bernoulli versus binomial outcomes
+
+But we could also do the following with the aggregate level data instead
+.small[
+```{r}
+M2 <- glm(cbind(successes,n-successes)~predictor,data=Data_agg,family=binomial)
+summary(M2)
+```
+]
+
+--
+
+Same results overall! Deviance and AIC are different because of the different likelihood functions.
+
+--
+
+Note that some glm functions use .hlight[n] in the formular instead of .hlight[n-successes].
+
+
+---
+class: center, middle
+
+# Probit regression
+
+
+
+---
+## Probit regression
+
+- Recall the "Bernoulli" .hlight[logistic regression model]:
+.block[
+.small[
+$$y_i | x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip},$$
+]
+]
+
+  for $i=1,\ldots,n$.
+
+--
+
+- Here the link function is the .hlight[logit function], which ensures that the probabilities lie between 0 and 1.
+
+--
+
+- We can also use the .hlight[probit function] $\Phi^{-1}$, which is the quantile function associated with the standard normal distribution $N(0,1)$, as the link.
+
+
+
+---
+## Probit regression
+
+- That is, suppose $H$ follows a standard normal distribution, that is, $H \sim N(0,1)$.
+
+--
+
+- Then $\Phi$ is the CDF, that is, $\Pr[H \leq h] = \Phi(h)$.
+
+--
+
+- Formally, the .hlight[probit regression model] can be written as
+.block[
+.small[
+$$y_i | x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \Phi^{-1}\left(\pi_i\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}.$$
+]
+]
+
+--
+
+- It is then easy to see that
+.block[
+.small[
+$$
+\begin{split}
+\Pr[y_i = 1 | x_i] = \pi_i & = \Phi\left(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}\right)\\
+\\
+& = \Pr[H \leq \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}].
+\end{split}
+$$
+]
+]
+
+
+---
+## Latent variable representation
+
+- It turns out that we can rewrite the .hlight[probit regression model] as
+.block[
+.small[
+$$
+\begin{split}
+y_i & = \mathbb{1}[z_i > 0];\\
+z_i & = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i; \ \ \ \epsilon_i  \sim N(0,1) \\
+\end{split}
+$$
+]
+]
+
+  where $y_i = \mathbb{1}[z_i > 0]$ means $y_i = 1$ if $z_i > 0$ and $y_i = 0$ if $z_i < 0$.
+
+--
+  
+- To see that the two representations are equivalent, note that
+.block[
+.small[
+$$
+\begin{split}
+\Pr[y_i = 1 | x_i] & = \Pr[z_i > 0] \\
+ & = \Pr[\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i > 0] \\
+ & = \Pr[\epsilon_i  > -(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip})] \\
+ & = \Pr[\epsilon_i  < (\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip})] \ \ \ [\textrm{since} \ \ \ \epsilon_i  \sim N(0,1)] \\
+ & = \Phi\left(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}\right) = \pi_i
+\end{split}
+$$
+]
+]
+
+--
+
+- Clearly, we do not observe $Z = (z_1, z_2, \ldots, z_n)$ and it is thus referred to as an .hlight[auxiliary variable].
+
+
+---
+## Probit vs logit functions?
+
+- The plots below compares the inverse logit function $\pi_i  = \dfrac{e^{x}}{1 + e^{x}}$ and the CDF function (inverse probit) $\pi_i = \Phi(x)$.
+
+```{r fig.height=3.5,echo=F}
+curve(invlogit(x),xlim=c(-5,5),col="blue3",ylim=c(0,1),ylab="probability",
+      main="Probit vs logit functions")
+curve(pnorm(x),xlim=c(-5,5),ylim=c(0,1),col="red3",add=T)
+legend("bottomright",col=c("blue3","red3"),lty=1,
+       c("Inverse Logit","CDF"))
+```
+
+--
+
+- Notice that they are similar, but the CDF of the standard normal distribution has fatter tails (the inverse logit has thinner tails).
+
+---
+## Probit or logistic regression?
+
+- In practice, the decision to use one or the other is often based on preference: the overall conclusions from both are usually quite similar.
+
+--
+
+- The results based on logistic regression (using odds and odds ratio) can be more interpretable than those based on Probit regression.
+
+--
+
+- In some applications, interpreting the  $z_i$'s may be meaningful but that is not always the case.
+
+--
+
+- For example, suppose $y_i$ is a binary variable for whether or not person $i$ chooses to buy the new iPhone, then $z_i$ can be thought of as person $i$'s "utility" in a way. 
+
+--
+
+- Works in this example, but does not always work across different domains.
+
+--
+
+- In .hlight[R], use the `glm` command but set the option `family="binomial(link=probit)` instead of `family="binomial(link=logit)`.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

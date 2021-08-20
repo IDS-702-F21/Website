@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 1.6</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 1.6
+## Outliers and influential points
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Leverage, influence, and standardized residuals
+
+- Individual observations can have large impact on the estimates of coefficients and SEs.
+
+--
+
+- Sometimes these points are obvious from scatter plots, and sometimes they are not, especially in multivariate data.
+
+--
+
+- Concepts and metrics of leverage, influence, and standardized residuals can help identify impactful and unusual points.
+
+--
+
+- An .hlight[outlier] is a data point whose value does not follow the general trend of the rest of the data.
+
+--
+
+- &lt;div class="question"&gt;
+When does a data point have high leverage? When is a data point influential? How can we identify them?
+&lt;/div&gt;
+
+--
+
+- Those are the questions we seek to answer in this module.
+
+
+
+---
+## Leverage
+
+- Points with **extreme predictor/covariate/feature values** are called .hlight[high leverage] points. 
+
+--
+
+- That is, the predictor values for these points are far outside the range of values for most of the other points.
+
+--
+
+- Thus, leverage has nothing to do with values of the response variable `\(\boldsymbol{y}\)`.
+
+--
+
+- Leverage points POTENTIALLY have large impact on the estimates of coefficients and SEs.
+
+  &lt;div class="question"&gt;
+How?
+&lt;/div&gt;
+
+--
+
+- First, note that the leverage score `\(h_{ii}\)`, for observation `\(i\)`, is defined as the `\(i^\textrm{th}\)` diagonal element of the projection or hat matrix.
+.block[
+.small[
+`$$\boldsymbol{H} = \boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T.$$`
+]
+]
+
+
+
+---
+## Quick exercise
+
+- Just to see what the hat matrix (and leverage scores) looks like, you will compute it for a very simple example.
+
+- Open R/RStudio on your computer. Suppose the design matrix is
+.block[
+.small[
+$$
+\boldsymbol{X} =
+`\begin{bmatrix}
+1 &amp; 1.0 \\
+1 &amp; 2.0 \\
+1 &amp; 2.5 \\
+1 &amp; 3.5 \\
+1 &amp; 50.0 \\
+\end{bmatrix}`
+$$ 
+]
+]
+
+  that is, we have one predictor and an intercept. You can set this up in R using the .hlight[matrix] function.
+
+- Compute the corresponding hat matrix for this design matrix
+.block[
+.small[
+`$$\boldsymbol{H} = \boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T.$$`
+]
+]
+
+- Compare that leverage score to the original rows of `\(\boldsymbol{X}\)`.
+
+- &lt;div class="question"&gt;
+Which diagonal element is the largest? What do you think about that observation?
+&lt;/div&gt;
+
+
+---
+## Leverage
+
+- Recall that
+.block[
+.small[
+`$$\hat{\boldsymbol{y}} = \left[\boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \right] \boldsymbol{y} = \boldsymbol{H}\boldsymbol{y}.$$`
+]
+]
+
+--
+
+- The leverage score `\(h_{ii}\)` for observation `\(i\)` measures how far away the values of the independent variables for the `\(i^\textrm{th}\)` observation are from those of other observations.
+
+--
+
+- That leverage score then clearly impacts predictions since, again, `\(\hat{\boldsymbol{y}} = \boldsymbol{H}\boldsymbol{y}\)`. Think about the exercise you just completed.
+
+--
+
+- Some properties of `\(h_{ii}\)`:
+
+  - `\(0 \leq h_{ii} \leq 1\)`.
+  
+  - `\(\mathbb{Var}[e_i] = (1-h_{ii}) \sigma^2\)`.
+  
+  - High leverage points are often determined by paying attention to any observation for which `\(h_{ii} &gt; 2(p+1)/n\)`.
+  
+  - Points with `\(h_{ii}\)` close to 1 will have more of an impact on model fit.
+  
+
+---
+## Back to our example
+
+Let's identify any high leverage points. Here, `\(2(p+1)/n = 16/93 \approx 0.17\)`.
+
+
+```r
+n &lt;- nrow(model.matrix(regwagecsquares)); p &lt;- ncol(model.matrix(regwagecsquares))
+lev_scores &lt;- hatvalues(regwagecsquares) #can also use influence(regwagecsquares)$hat 
+plot(lev_scores,col=ifelse(lev_scores &gt; (2*p/n), 'red2', 'navy'),type="h",
+     ylab="Leverage score",xlab="Index",main="Leverage Scores for all observations")
+text(x=c(1:n)[lev_scores &gt; (2*p/n)]+c(rep(2,4),-2,2),y=lev_scores[lev_scores &gt; (2*p/n)],
+     labels=c(1:n)[lev_scores &gt; (2*p/n)])
+```
+
+&lt;img src="1-6-MLR-outliers_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## High leverage: what to do?
+
+- Points with high leverage deserve special attention:
+  
+--
+
+  - Make sure that they do not result from data entry errors.
+  
+--
+
+  - Make sure that they are in scope for the types of individuals for which you want to make predictions.
+  
+--
+
+  - Make sure that you look at the impact of those points on estimates, especially when you have interactions in the model.
+
+--
+
+- Just because a point is a high leverage point does not mean it will have a large effect on regression.
+
+--
+
+- When a point has a large effect on the regression, we say that the observation is .hlight[influential].
+
+--
+
+- Whether or not a high leverage point actually affects the regression line depends on the value of the response variable `\(y\)`.
+
+
+---
+## Cook's distance
+
+- What if a point has a large impact on the estimates of the regression coefficients?
+
+--
+
+  - Dropping that point should change the coefficients significantly.
+
+--
+
+  - Consequently, a significant change in the coefficients should also change that point's predicted `\(y_i\)` value by a lot.
+  
+--
+
+- For every point, we could delete it, re-run the regression, and see which points lead to big changes in the predicted `\(y_i\)`'s; very time consuming!
+
+--
+
+- However, .hlight[Cook's distance] gives a formula for quantifying the influence of the `\(i^\textrm{th}\)` observation, if it is removed from the sample. We have
+.block[
+.small[
+`$$D_i = \sum^n_{j=1} \dfrac{\left(\hat{y}_j - \hat{y}_{j(i)} \right)^2}{s_e^2(p+1)}$$`
+]
+]
+
+  where `\(\hat{y}_{j(i)}\)` is the predicted value after excluding the `\(i^\textrm{th}\)` observation.
+
+
+---
+## Big Cook's distances: what to do?
+
+- Examine Cook's distances to look for large values.
+
+--
+
+  - Make sure there are no data entry errors in those points.
+
+--
+
+  - For each point with high Cook's distance, fit the model with and without that point, and compare the results.
+  
+--
+
+- The consensus seems to be that `\(D_i &gt;1\)` indicates an observation is an influential value, but we generally pay attention to observations with `\(D_i &gt;0.5\)`.
+
+--
+
+- If the results (predictions or scientific interpretations) do not change much, just report the final model based on all data points and you don't really need to report anything about the Cook's distances.
+
+--
+
+- If results change a lot, you have several options...
+
+
+---
+## Back to our example
+
+Can we try to identify any influential points?
+
+
+```r
+plot(regwagecsquares,which=4,col=c("blue4"))
+```
+
+&lt;img src="1-6-MLR-outliers_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Let's compare to the leverage score
+
+Which of the potentially influential points actually have high leverage?
+
+
+```r
+plot(lev_scores,col=ifelse(lev_scores &gt; (2*p/n), 'red2', 'navy'),type="h",
+     ylab="Leverage score",xlab="Obs. number",main="Leverage Scores")
+text(x=c(1:n)[lev_scores &gt; (2*p/n)]+c(rep(2,4),-2,2),y=lev_scores[lev_scores &gt; (2*p/n)],
+     labels=c(1:n)[lev_scores &gt; (2*p/n)])
+```
+
+&lt;img src="1-6-MLR-outliers_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Cook's distance: What to do if large changes in results?
+
+- It is generally OK to drop observations based on PREDICTOR values if
+
+--
+
+  1. It is scientifically meaningful to do so; and
+  
+--
+  
+  2. You intended to fit a model over the smaller `\(X\)` range to begin with (and just forgot). When this is the case, you should mention this in your analysis write-up and be careful when making predictions to avoid extrapolation.
+
+--
+
+- It is generally NOT OK to drop an observation based on its RESPONSE value (assuming no data errors in that value). These are
+legitimate observations and dropping them is essentially cheating by changing the data to fit the model.
+
+--
+
+- You should try transformations or collect more data.
+
+
+---
+## Standardized residuals (also called internally studentized residuals)
+
+- How do we best identify outliers, i.e., points that don’t fit the pattern implied by the line? We look for points with relatively large residuals.
+
+--
+
+- It would be nice to have a common scale to interpret what a “big” residual is, across all problems.
+
+--
+
+- As with most metrics in statistics, we look at each residual divided by its standard error (hence the term standardized residual).
+
+--
+
+- The SE of any residual (that is, `\(e_i\)` and not `\(\epsilon_i\)`) depends on the values of the predictors.
+
+--
+
+- As such, it turns out that the residuals for high leverage predictors have smaller variance than residuals for low leverage predictors.
+
+--
+
+- .block[Intuition: the regression line tries to fit high leverage points as closely as possible, which results in smaller residuals for those points.]
+
+
+---
+## Standardized residuals (also called internally studentized residuals)
+
+- Standardized residuals have a Normal(0,1) distribution.
+
+--
+
+- Values with large standardized residuals are outliers.
+
+--
+
+- How large is large? Well, remember that 95% of any normal distribution should lie within 2 standard deviations of the mean...
+
+--
+
+- Values with large standardized residuals are not necessarily influential on the regression line. A point can be an outlier without impacting the line. We need to examine their Cook's distance to determine influence.
+
+--
+
+- It turns out that the Cook's distance `\(D_i\)` can also be expressed using the leverage score `\(h_{ii}\)` and square of the internally Studentized residuals.
+
+--
+
+- .block[Bottomline: make a plot of the standardized residuals to check for outliers, but also find a way to add leverage scores and investigate observations with high Cook's distance in the same plot.]
+
+--
+
+- Very easy to do in R.
+
+
+---
+## Standardized residuals: What to do if large outliers?
+
+
+```r
+plot(regwagecsquares,which=5,col=c("blue4"))
+```
+
+&lt;img src="1-6-MLR-outliers_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+Are there any outliers or influential points?
+&lt;/div&gt;
+
+
+---
+## Standardized residuals: What to do if large outliers?
+
+- As before, it is generally OK to drop observations based on PREDICTOR values if
+
+--
+
+  1. It is scientifically meaningful to do so; and
+  
+--
+  
+  2. You intended to fit a model over the smaller `\(X\)` range to begin with (and just forgot). When this is the case, you should mention this in your analysis write-up and be careful when making predictions to avoid extrapolation.
+
+--
+
+- It is generally NOT OK to drop an observation based on its RESPONSE value (assuming no data errors in that value). These are
+legitimate observations and dropping them is essentially cheating by changing the data to fit the model.
+
+--
+
+- You should try transformations or collect more data.
+
+--
+
+- Or just do nothing! It can be okay to have some outliers. Examine their influence on your results and report them.
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

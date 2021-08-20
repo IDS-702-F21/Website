@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 4.1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 4.1
+## Introduction to multilevel/hierarchical models
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+## Multilevel, clustered or grouped data
+
+- Often data are grouped or clustered naturally, for example 
+  + students within schools,
+  + patients within hospitals,
+  + voters within counties or states, or
+  + repeated measurements on same person, as is often the case in .hlight[longitudinal studies].
+
+--
+
+- For such clustered data, we may want to infer or estimate the relationship between a response variable and certain predictors collected across all the groups.
+
+--
+
+- Ideally, we should do so in a way that takes advantage of the relationship between observations in the same group, but we should also look to borrow information across groups.
+
+--
+
+- .hlight[Hierarchical or multilevel models] provide a principled way to do so. We will start with simpler cases to elucidate the main ideas.
+
+
+---
+## Hypothetical school testing example
+
+- Suppose we wish to estimate the distribution of test scores for students at `\(J\)` different high schools.
+
+--
+
+- In each school `\(j\)`, where `\(j = 1, \ldots, J\)`, suppose we test a random sample of `\(n_j\)` students.
+
+--
+
+- Let `\(y_{ij}\)` be the test score for the `\(i\)`th student in school `\(j\)`, with `\(i = 1,\ldots, n_j\)`.
+
+--
+
+- .hlight[Option I]: estimation can be done separately in each group, where we assume
+.block[
+.small[
+`$$y_{ij} | \mu_j, \sigma^2_j \sim N \left( \mu_j, \sigma^2_j\right)$$`
+]
+]
+
+  where for each school `\(j\)`, `\(\mu_j\)` is the school-wide average test score, and `\(\sigma^2_j\)` is the school-wide variance of individual test scores.
+
+
+---
+## Hypothetical school testing example
+
+- We can do classical inference for each school based on large sample 95% CI: `\(\bar{y}_j \pm 1.96 \sqrt{s^2_j/n_j}\)`, where `\(\bar{y}_j\)` is the sample average in school `\(j\)`, and `\(s^2_j\)` is the sample variance in school `\(j\)`.
+
+--
+
+- Clearly, we can overfit the data within schools, for example, what if we only have 4 students from one of the schools?
+
+--
+
+- .hlight[Option II]: alternatively, we might believe that `\(\mu_j = \mu\)` for all `\(j\)`; that is, all schools have the same mean. This is the assumption (null hypothesis) in ANOVA models for example.
+
+--
+
+- Option I ignores that the `\(\mu_j\)`'s should be reasonably similar, whereas option II ignores any differences between them.
+
+--
+
+- It would be nice to find a compromise!
+
+--
+
+- This is what we are able to do with .hlight[hierarchical modeling].
+
+
+---
+## Hierarchical model
+
+- Once again, suppose
+.block[
+.small[
+`$$y_{ij} | \mu_j, \sigma^2_j \sim N \left( \mu_j, \sigma^2_j\right); \ \ \ i = 1,\ldots, n_j; \ \ \ j = 1, \ldots, J.$$`
+]
+]
+
+- We can assume that the `\(\mu_j\)`'s are drawn from a distribution based on the following: .hlight[conceive of the schools themselves as being a random sample from all possible school.]
+
+--
+
+- Suppose `\(\mu_0\)` is the .hlight[overall mean of all school's average scores (a mean of the means)], and `\(\tau^2\)` is the .hlight[variance of all school's average scores (a variance of the means)].
+
+--
+
+- Then, we can think of each `\(\mu_j\)` as being drawn from a distribution, e.g.,
+.block[
+.small[
+`$$\mu_j | \mu_0, \tau^2 \sim N \left( \mu_0, \tau^2 \right),$$`
+]
+]
+
+  which gives us one more level, resulting in a hierarchical specification.
+
+--
+  
+- Usually, `\(\mu_0\)` and `\(\tau^2\)` will also be unknown so that we need to estimate them (think maximum likelihood or Bayesian methods).
+
+
+
+---
+## Hierarchical model: school testing example
+
+- Back to our example, it turns out that the multilevel estimate is
+.block[
+.small[
+`$$\hat{\mu}_j \approx \dfrac{ \dfrac{n_j}{\sigma^2_j} \bar{y}_j + \dfrac{1}{\tau^2} \mu_0 }{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  },$$`
+]
+]
+
+--
+
+ but since the unknown parameters have to be estimated, we actually have
+.block[
+.small[
+`$$\hat{\mu}_j \approx \dfrac{ \dfrac{n_j}{s^2_j} \bar{y}_j + \dfrac{1}{\hat{\tau}^2} \bar{y}_{\textrm{all}} }{ \dfrac{n_j}{s^2_j} + \dfrac{1}{\hat{\tau}^2}  },$$`
+]
+]
+ 
+ where `\(\bar{y}_{\textrm{all}}\)` is the completely pooled estimate (the overall sample mean of all test scores).
+
+---
+## Hierarchical model: school testing example
+
+- We will only scratch the surface of hierarchical modeling. Take a look at the readings for hierarchical linear models on the website for more resources.
+
+--
+
+- If you want to take a course that explores hierarchical models in much more detail, consider taking STA 610 (after taking STA 602).
+
+--
+
+- .hlight[For those interested in Bayesian inference] (feel free to skip this if you are not!), it turns out that the posterior distribution of `\(\mu_j\)`, `\(p(\mu_j | Y, \sigma^2_j, \mu_0, \tau^2) = N(\mu_j^\star, \nu_j^\star)\)`, where 
+.block[
+.small[
+$$
+`\begin{split}
+\mu_j^\star &amp; = \dfrac{ \dfrac{n_j}{\sigma^2_j} \bar{y}_j + \dfrac{1}{\tau^2} \mu_0 }{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  } \\
+\nu_j^\star &amp; = \dfrac{1}{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  }
+\end{split}`
+$$
+]
+]
+
+
+
+---
+## Hierarchical model: implications
+
+- Our estimate for each `\(\mu_j\)` is a weighted average of `\(\bar{y}_j\)` and `\(\mu_0\)`, ensuring that we are borrowing information across all levels through `\(\mu_0\)` and `\(\tau^2\)`.
+
+--
+
+- The weights for the weighted average is determined by relative precisions (.hlight[the inverse of variance is often referred to as precision]) from the data and from the second level model.
+
+--
+  
+- Suppose all `\(\sigma^2_j \approx \sigma^2\)`. Then the schools with smaller `\(n_j\)` have estimated `\(\mu_j\)` closer to `\(\mu_0\)` than schools with larger `\(n_j\)`.
+
+--
+
+- Thus, the hierarchical model shrinks estimates with high variance towards the grand mean.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

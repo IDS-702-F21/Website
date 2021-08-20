@@ -1,0 +1,208 @@
+---
+title: "IDS 702: Module 2.3"
+subtitle: "Logistic regression with one predictor (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(ggplot2)
+library(stargazer)
+```
+
+
+
+## Predicting nba wins
+
+- Let's fit a logistic regression with one predictor to NBA data for four seasons from the 2014/2015 season to the 2017/2018 season.
+
+--
+
+- Suppose we want to see how the amount of points a team let's the opponents score, affects their odds of winning.
+
+--
+
+- For this simple example, we will focus on data from one team: SAS (San Antonio Spurs).
+
+--
+
+- The data is in the file `nba_games_stats_reduced.csv` on Sakai.
+
+--
+
+- Ideally, we should use more information (and that data is actually available) to predict wins but let's continue for illustrative purposes.
+
+--
+
+- You will get to practice with the full data soon.
+
+
+---
+## Predicting nba wins
+
+```{r fig.height=3}
+nba <- read.csv("data/nba_games_stats_reduced.csv",header=T)
+nba <- nba[nba$Team=="SAS",]
+colnames(nba)[3] <- "Opp"
+nba$win <- rep(0,nrow(nba)); nba$win[nba$WINorLOSS=="W"] <- 1
+nba$win <- as.factor(nba$win)
+head(nba); dim(nba)
+summary(nba)
+```
+
+
+---
+## Predicting nba wins
+
+Only one predictor so not much to do in terms of EDA. We can look at
+```{r fig.height=3.4}
+ggplot(nba,aes(x=win, y=Opp, fill=win)) +
+  geom_boxplot() + coord_flip() +
+  scale_fill_brewer(palette="Blues") +
+  labs(title="Opposition Points against SAS vs Winning",y="Opposition Points",x="Win") + 
+   theme_classic() + theme(legend.position="none")
+```
+
+
+
+
+
+
+
+
+---
+## Predicting nba wins
+
+.block[
+.small[
+$$
+\textrm{win}_i | \textrm{Opp}_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 \textrm{Opp}_i
+$$
+]
+]
+
+```{r fig.height=3}
+nbareg <- glm(win~Opp,family=binomial(link=logit),data=nba); summary(nbareg)
+```
+
+  
+
+---
+## Predicting nba wins
+
+Same output re-presented:
+
+```{r fig.height=3,results ='asis',message = FALSE}
+stargazer(nbareg,type = "html", header = FALSE,single.row = TRUE)
+```
+
+  .block[For every additional point an opponent scores against SAS in a game, the odds of winning decreases by approximately 12%, since exp(-0.126) = 0.88.]
+
+
+
+---
+## Predicting nba wins
+
+```{r fig.height=3,results ='asis',message = FALSE}
+#Let's mean-center the opposition points for interpretation.
+nba$Opp_cent <- nba$Opp - mean(nba$Opp)
+nbareg <- glm(win~Opp_cent,family=binomial(link=logit),data=nba)
+stargazer(nbareg,type = "html", header = FALSE,single.row = TRUE)
+```
+
+
+  .block[The odds of SAS winning an nba game during this period, when the opposition scores approximately 97 points, is approximately 3.11, that is, exp(1.134).]
+
+
+---
+## Predicting nba wins
+
+Confidence intervals for the coefficients. Remember that this is on the log-odds scale.
+```{r fig.height=3.4}
+confint.default(nbareg) #Asymptotic
+confint(nbareg) #Based on the profile-likelihood
+```
+
+--
+<div class="question">
+Can you interpret the intervals?
+</div>
+
+---
+## Predicting nba wins
+
+Let's transform to the odds scale.
+```{r fig.height=3.4}
+exp(confint.default(nbareg)) #Asymptotic
+exp(confint(nbareg)) #Based on the profile-likelihood
+```
+
+--
+<div class="question">
+Can you interpret the intervals?
+</div>
+
+
+
+---
+## Predicting nba wins
+
+We can get the predicted probabilities for the observed cases.
+
+```{r fig.height=3.4}
+nba$predprobs <- predict(nbareg,type="response")
+#use predict(logreg, type="link") for the logit scale
+nba[1:20,]
+```
+
+
+---
+## Predicting nba wins
+
+Useful to examine a plot of predicted probabilities by $x$, that is, opposition points.
+
+```{r fig.height=3.4,message=F}
+ggplot(nba,aes(x=Opp, y=predprobs)) +
+  geom_point(alpha = .5,colour="blue2") +
+  geom_smooth(col="red3") + theme_classic() +
+  labs(title="Predicted Prob. of Winning vs Opposition Points",x="Opposition Points",y="Pred. Probability of Winning")
+```
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

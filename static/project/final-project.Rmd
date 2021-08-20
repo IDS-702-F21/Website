@@ -1,0 +1,113 @@
+---
+title: "Final Project Outline"
+#date: "Proposal due: Nov 4, project report due: Dec 10"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+<!-- </br> -->
+
+<!-- <div style= "float:right;position: relative; margin-left: 20px"> -->
+<!-- ```{r setup, echo=FALSE, fig.align="right"} -->
+<!-- knitr::include_graphics("img/laptop-3190194_1920.jpg") -->
+<!-- ``` -->
+<!-- </div> -->
+
+<!-- </br> </br> </br> -->
+
+For the final project, you will apply the knowledge and skills that you have learned throughout this course to analyze a dataset that interests you.
+
+## Due dates
+
+- Project proposals are due Wednesday, October 28.
+- Each student will present their project (pre-recorded presentations) in class either on Tuesday, November 17, or Thursday, November 19.
+- Final project reports are due Tuesday, November 24.
+
+
+## Scope
+
+The project should be an in-depth statistical analysis of a question that interests you. It is quite common for this final project to be based on your research interests, or topics/questions from one of your other courses. Just about every discipline has questions that are amenable to statistical analyses, including economics, engineering, environmental studies, history, the natural sciences, psychology, and even sports, so there are many options to choose from.
+
+
+## No data, what to do?
+
+If you do not have a dataset or an inferential problem in mind that you might be interested in, please come talk to me AT LEAST TWO WEEKS before the proposal due date, so we can explore ideas.
+
+
+### GitHub
+
+Each student MUST use GitHub. A blank repository will be created for this project. Follow this link: https://classroom.github.com/a/YoXp3I7x to gain access. Feel free to create other folders within the repository as needed but you must push your final reports and presentation slides to the corresponding folders already created for you. Your repository must include your R code. Do not worry if you are not very familiar with working with GitHub. More instructions will be provided later.
+
+## Format
+
+The final report should be concise, well written and MUST NOT exceed 5 pages (excluding references and the appendix). Your report should be written according to the following outline:
+
+- ### Summary  
+A few sentences describing the inferential question(s), the method used and the most important results.
+
+- ### Introduction
+A more in-depth introduction to the inferential question(s) of interest. 
+
+- ### Data  
+You should describe the data in this section: how you obtained the data, the variables included, dealing with missing/erroneous values, exploratory data analysis etc. 
+
+- ### Model
+A detailed description of the model used, how you selected the model, how you selected the variables, model assessment, model validation, and presentation of the model results. What are your overall conclusions in context of the inferential problem(s)?
+
+- ### Conclusions
+In this section, you should present the importance of your findings, and describe any limitations of the study. You can also address future work here if there are extensions of your analysis you find interesting, especially those that may address some of the limitations already mentioned.
+
+
+## Grading
+
+Grading will take into account the following:
+
+- ### Clarity  
+Is it easy for your reader to understand what you did and the arguments you made?
+
+- ### Consistency   
+Did you answer your question(s) of interest? You must be clear about what the questions are and how your model results directly answer the questions.
+
+- ### Content/Interest
+What is the quality of research question and relevancy of the data selected to those questions? Did you tackle a challenging, interesting question (good), or did you just collect and publish descriptive statistics (bad)?
+
+- ### Correctness  
+Are the statistical methods carried out and explained correctly? 
+
+- ### Relevancy  
+Did you use statistical techniques wisely when addressing your question? That is, did you use an appropriate statistical method for the question(s) and data, or did you just select a very complicated model even though it clearly cannot answer the question(s) posed?
+
+- ### Writing  
+Quality of writing and explanation.
+
+
+</br>
+Some suggestions for scoring highly on these criteria, and suggestions to keep in mind whenever you write anything, include the following:
+
+  + Know your audience. In this case, you should be writing for fellow IDS 702 students but you should also write a report that can be read and understood by a reader without a solid statistics background. You may want to have other students in the class review your report to make sure that they understand what you are doing.
+  + State your question(s) up front, and use statistics to help answer it. The statistics should not drive the question; the question should drive the statistics.
+  + Don’t just collect data and publish them; rather, have a specific question in mind. Otherwise, you wind up being hard pressed to come up with something challenging and interesting.
+  + Most importantly, talk to your professors for advice. You can ask me, for example, about your methods and analyses, and ask professors in the subject you are covering about background and other issues that can help improve your analyses.
+  + Be selective with computer output to help clarity.
+  + If you are using a technique we learned in the course, you don’t have to explain that technique. That hurts clarity. If you are using a technique that we did not cover in class, you should definitely explain that technique. That is clarity!
+
+
+## Group work?
+
+No, each person should work individually. However, I do encourage you all to discuss what you are doing with classmates. This will improve your final products.
+
+
+## Same data, different project?
+
+Can you use data that you are already using for a project in another class? Well that depends on the particulars of your proposed project. Come talk to me.
+
+</br> </br>
+
+Any additional details will be communicated later.
+
+

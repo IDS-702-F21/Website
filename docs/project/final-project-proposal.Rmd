@@ -1,0 +1,41 @@
+---
+title: "Instructions for final project proposals"
+date: "Due date for project proposals: 11:59pm, Wednesday, October 27"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+<!-- </br> -->
+
+<!-- <div style= "float:right;position: relative; margin-left: 20px"> -->
+<!-- ```{r setup, echo=FALSE, fig.align="right"} -->
+<!-- knitr::include_graphics("img/laptop-3190194_1920.jpg") -->
+<!-- ``` -->
+<!-- </div> -->
+
+<!-- </br> </br> </br> -->
+
+## Outline
+
+Your project proposal should be concise, well written and MUST NOT exceed one page. Your proposal should "roughly" follow the outline below:
+
+### Overview
+
+Provide a quick summary, background and scope of your analysis. 
+
+### Research questions
+
+Outline the goals of the project and the inferential questions you will be trying to answer. If previous work has been done on the same data, you should summarize one or two of the previous research here, and outline what you intend to do differently.
+
+### Data
+
+You should describe the data in this section, that is, the source of the data, the variables included, the size of the dataset (for example, how many observations are in your dataset), potential problems, and so on.
+
+### Project plan
+
+Finally, outline your analysis plan: which models do you plan to explore, what milestones have you set for ensuring that you complete the project in time, and so on.

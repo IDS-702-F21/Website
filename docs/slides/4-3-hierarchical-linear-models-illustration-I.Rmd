@@ -1,0 +1,475 @@
+---
+title: "IDS 702: Module 4.3"
+subtitle: "Multilevel/hierarchical linear models (illustration I)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+#library(lmerTest)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## The radon analysis
+
+There are 919 total observations in the data. The data is in the file `Radon.txt` on Sakai.
+
+Variable    | Description
+:------------- | :------------
+radon | radon levels for each house
+log_radon | log(radon)
+state | state
+floor | lowest living area of each house: 0 for basement, 1 for first floor
+countyname | county names
+countyID | ID for the county names (1-85)
+fips | state + county fips code
+uranium | county-level soil uranium
+log_uranium | log(uranium)
+
+
+---
+## The radon analysis
+
+```{r fig.height=4,message=F}
+Radon <- read.csv("data/Radon.txt", header = T,sep="")
+Radon$floor <- factor(Radon$floor,levels=c(0,1),labels=c("Basement","First Floor"))
+str(Radon)
+head(Radon)
+summary(Radon[,-c(2,7)])
+```
+
+
+---
+## The radon analysis
+
+.midsmall[
+```{r message=F}
+table(Radon$countyname) #we don't have enough data in some counties, so we should look to borrow information across counties.
+```
+]
+
+
+---
+## The radon analysis
+
+The raw radon levels can only take on positive values.
+
+```{r fig.height=3.2,message=F}
+ggplot(Radon,aes(radon)) +
+  geom_histogram(aes(y=..density..),color="black",linetype="dashed",
+                 fill=rainbow(15),bins=15) + theme(legend.position="none") +
+  geom_density(alpha=.25, fill="lightblue") + scale_fill_brewer(palette="Blues") +
+  labs(title="Distribution of Radon Levels",y="Radon") + theme_classic() 
+```
+
+--
+.block[Obviously very skewed.]
+
+
+---
+## The radon analysis
+
+Let's look at `log_radon` instead.
+
+```{r fig.height=3.2,message=F}
+ggplot(Radon,aes(log_radon)) +
+  geom_histogram(aes(y=..density..),color="black",linetype="dashed",
+                 fill=rainbow(15),bins=15) + theme(legend.position="none") +
+  geom_density(alpha=.25, fill="lightblue") + scale_fill_brewer(palette="Blues") +
+  labs(title="Distribution of Log Radon Levels",y="Log Radon") + theme_classic() 
+```
+
+--
+
+.block[Much better! Let's go with log radon for now.]
+
+
+
+---
+## The radon analysis
+
+Are there any variations of radon levels by county? There are too many counties, so, let's do it for a random sample of counties.
+```{r fig.height=3.5,message=F,eval=F}
+set.seed(1000)
+sample_county <- sample(unique(Radon$countyname),25,replace=F)
+ggplot(Radon[is.element(Radon$countyname,sample_county),],
+       aes(x=countyname, y=log_radon, fill=countyname)) +
+  geom_boxplot() +
+  labs(title="Log radon levels by county",
+       x="County",y="Log Radon") + theme_classic() + 
+  theme(legend.position="none",axis.text.x = element_text(angle = 90))
+```
+
+
+---
+## The radon analysis
+
+```{r fig.height=4.5,message=F,echo=F}
+set.seed(1000)
+sample_county <- sample(unique(Radon$countyname),30,replace=F)
+ggplot(Radon[is.element(Radon$countyname,sample_county),],
+       aes(x=countyname, y=log_radon, fill=countyname)) +
+  geom_boxplot() +
+  labs(title="Log radon levels by county",
+       x="County",y="Log Radon") + theme_classic() + 
+  theme(legend.position="none",axis.text.x = element_text(angle = 90))
+```
+
+--
+
+.block[Looks like the levels vary by county. However, there are many counties with very little data.]
+
+
+
+---
+## The radon analysis
+
+Let's focus on counties with at least 11 houses.
+
+```{r fig.height=3.2,message=F,eval=F}
+sample_county <- which(table(Radon$countyID) > 10)
+ggplot(Radon[is.element(Radon$countyID,sample_county),],
+       aes(x=countyname, y=log_radon, fill=countyname)) +
+  geom_boxplot() +
+  labs(title="Log radon levels by county",
+       x="County",y="Log Radon") + theme_classic() + 
+  theme(legend.position="none",axis.text.x = element_text(angle = 90))
+```
+
+
+
+---
+## The radon analysis
+
+```{r fig.height=4.5,message=F,echo=F}
+sample_county <- which(table(Radon$countyID) > 10)
+ggplot(Radon[is.element(Radon$countyID,sample_county),],
+       aes(x=countyname, y=log_radon, fill=countyname)) +
+  geom_boxplot() +
+  labs(title="Log radon levels by county",
+       x="County",y="Log Radon") + theme_classic() + 
+  theme(legend.position="none",axis.text.x = element_text(angle = 90))
+```
+
+<div class="question">
+What can you conclude from this plot?
+</div>
+
+
+
+---
+## The radon analysis
+
+Next, the relationship with `floor`, the only individual-level (different observation for each house) variable we have.
+
+```{r fig.height=3,message=F}
+ggplot(Radon,aes(x=floor, y=log_radon, fill=floor)) +
+  geom_boxplot() + scale_fill_brewer(palette="Greens") +
+  labs(title="Log radon vs floor", x="Lowest living area of each house",y="Log Radon") + 
+  theme_classic() + theme(legend.position="none")
+```
+
+--
+
+.block[Looks like radon levels are higher for houses with the basement as the lowest living area.]
+
+---
+## The radon analysis
+
+Let's look at the same relationship for a random sample of counties.
+
+```{r fig.height=3.5,message=F,eval=F}
+sample_county <- sample(unique(Radon$countyname),8,replace=F)
+ggplot(Radon[is.element(Radon$countyname,sample_county),],
+       aes(x=floor, y=log_radon, fill=floor)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Greens") +
+  labs(title="Log radon vs floor by county",
+       x="Lowest living area of each house",y="Log Radon") + 
+  theme_classic() + theme(legend.position="none") +
+  facet_wrap( ~ countyname,ncol=4)
+```
+
+
+---
+## The radon analysis
+
+```{r fig.height=4.5,message=F,echo=F}
+sample_county <- sample(unique(Radon$countyname),8,replace=F)
+ggplot(Radon[is.element(Radon$countyname,sample_county),],
+       aes(x=floor, y=log_radon, fill=floor)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Greens") +
+  labs(title="Log radon vs floor by county",
+       x="Lowest living area of each house",y="Log Radon") + 
+  theme_classic() + theme(legend.position="none") +
+  facet_wrap( ~ countyname,ncol=4)
+```
+
+Again, not enough data for some counties.
+
+
+---
+## The radon analysis
+
+Let's focus on counties with at least 16 houses.
+
+```{r fig.height=3.2,message=F,eval=F}
+sample_county <- which(table(Radon$countyID) > 15)
+ggplot(Radon[is.element(Radon$countyID,sample_county),],
+       aes(x=floor, y=log_radon, fill=floor)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Greens") +
+  labs(title="Log radon vs floor by county",
+       x="Lowest living area of each house",y="Log Radon") + 
+  theme_classic() + theme(legend.position="none") +
+  facet_wrap( ~ countyname,ncol=4)
+```
+
+
+---
+## The radon analysis
+
+```{r fig.height=4.3,message=F,echo=F}
+sample_county <- which(table(Radon$countyID) > 15)
+ggplot(Radon[is.element(Radon$countyID,sample_county),],
+       aes(x=floor, y=log_radon, fill=floor)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette="Greens") +
+  labs(title="Log radon vs floor by county",
+       x="Lowest living area of each house",y="Log Radon") + 
+  theme_classic() + theme(legend.position="none") +
+  facet_wrap( ~ countyname,ncol=4)
+```
+
+--
+
+.block[Even though the overall direction is the same, it looks like the actual differences between floor = 0 and floor = 1 differs for some counties.]
+
+
+---
+## The radon analysis
+
+- Let's start by only focusing on `floor`. 
+
+--
+
+- We will try a  varying-slope, varying-intercept linear model.
+
+--
+
+- Let $y_{ij}$ and $x_{1ij}$ be the log radon level and indicator variable `floor` respectively for house $i$ in county $j$.
+
+--
+
+- Mathematically, we have
+.block[
+.small[
+$$
+\begin{split}
+y_{ij} & = (\beta_{0} + \gamma_{0j}) + (\beta_1 + \gamma_{1j}) x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, 85\\
+\epsilon_{ij} & \sim N(0, \sigma^2) \\
+(\gamma_{0j},\gamma_{1j}) & \sim N_2(\boldsymbol{0}, \Sigma).
+\end{split}
+$$
+]
+]
+
+--
+
+- Alternative representation:
+.block[
+.small[
+$$
+\begin{split}
+\text{log(radon}_{ij}\text{)} & = (\beta_{0} + \gamma_{0j}) + (\beta_1 + \gamma_{1j}) \text{ floor}_{ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, 85 \\
+\epsilon_{ij} & \sim N(0, \sigma^2) \\
+(\gamma_{0j},\gamma_{1j}) & \sim N_2(\boldsymbol{0}, \Sigma).
+\end{split}
+$$
+]
+]
+
+
+
+---
+## The radon analysis
+
+- We skipped this before but $\Sigma$ actually takes the form
+.block[
+.small[
+$$
+\Sigma =
+\begin{bmatrix}
+\tau_0^2 & \rho \tau_0\tau_1  \\
+\rho \tau_0\tau_1 & \tau_1^2 \\
+\end{bmatrix}
+$$
+]
+]
+
+  where
+  + $\tau_0^2$ describes the across county variation attributed to the random/varying intercept,
+  
+  + $\tau_1^2$ describes the across county variation attributed to the random/varying slope (that is, floor), and
+  
+  + $\rho$ describes the correlation between $\gamma_{0j}$ and $\gamma_{1j}$.
+
+
+---
+## The radon analysis
+
+In R, we have
+```{r fig.height=3.2,message=F}
+Model1 <- lmer(log_radon ~ floor + (floor | countyname), data = Radon) 
+summary(Model1)
+```
+
+---
+## Interpretation of fixed effects
+
+- Intuitively, we have an overall "average" regression line for all houses across all counties in Minnesota which has slope -0.68 and intercept 1.46.
+
+--
+
+- That is, the general estimated line for any of the houses in Minnesota is: 
+.block[
+.small[
+$$ \widehat{\text{log(radon}_{i}\text{)}} = 1.46 - 0.68 \times \textrm{floor}_i $$
+]
+]
+
+- For .hlight[any house in Minnesota with a basement as the lowest living area, the baseline radon level is] $e^{1.46} = 4.31$.
+
+--
+
+- Then, for any house in Minnesota, .hlight[having a first floor as the lowest living area, instead of a basement], reduces the radon level by a multiplicative effect of $e^{-0.68} = 0.51$, that is, about a 49% reduction.
+
+--
+
+- However, if the house is in Dakota county for example, we also need to add on the random intercepts and slopes for that county.
+
+
+
+---
+## Interpretation of fixed effects
+
+- For Dakota county, we have
+  ```{r fig.height=3.2,message=F}
+(ranef(Model1)$countyname)["DAKOTA",]
+```
+
+  so that the estimated regression line for Dakota county is actually
+.block[
+.small[
+$$ \widehat{\text{log(radon}_{i}\text{)}} = (1.46 - 0.11) + (-0.68-0.09) \times \textrm{floor}_i = 1.35 - 0.77 \times \textrm{floor}_i $$
+]
+]
+
+--
+
+- Thus, for any house in Dakota county in Minnesota with a basement as the lowest living area, the baseline radon level is actually $e^{1.35} = 3.86$, which is .hlight[lower than the overall state wide average].
+
+--
+
+- And for any house in Dakota county in Minnesota, having the first floor be the lowest living area then reduces the radon level by a multiplicative effect of $e^{-0.77} = 0.46$, that is about a 54% reduction, .hlight[more than the overall state wide effect].
+
+
+---
+## The radon analysis
+
+Again,
+```{r fig.height=3.2,message=F}
+summary(Model1)
+```
+
+
+---
+## Interpretation of random effects
+
+- The estimated standard error $\hat{\sigma} = 0.75$ describes the within-county or remaining unexplained variation.
+
+--
+
+- The estimated $\hat{\tau_0} = 0.35$ describes the across-county variation attributed to the random intercept.
+
+--
+
+- The estimated $\hat{\tau_1} = 0.34$ describes the across-county variation attributed to the random slope (the predictor, floor).
+
+--
+
+- Those two sources of county variation are actually quite similar.
+
+--
+
+- The estimated correlation between $\gamma_{0j}$ and $\gamma_{1j}$ is $\hat{\rho} = -0.34$.
+
+--
+
+- You can visualize the random effects by typing `dotplot(ranef(Model1, condVar=TRUE))$countyname` in R.
+
+--
+
+- So many counties! So, you will need to zoom out on your computer.
+
+
+
+---
+## Interpretation of random effects
+
+```{r fig.height=5.3,message=F,echo=F}
+dotplot(ranef(Model1, condVar=TRUE))$countyname
+```
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

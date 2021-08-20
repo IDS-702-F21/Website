@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 7.1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 7.1
+## Introduction to time series analysis
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Introduction
+
+- When data are ordered in time, responses and errors from one period may influence responses and errors from another period.
+
+--
+
+- For example, it is reasonable to expect unemployment rate in a month to be correlated with unemployment rate in previous month(s).
+
+--
+
+- Another example: weather events in current time period may depend on weather events in previous time period.
+
+--
+
+- These are called .hlight[time series] data.
+
+--
+
+- Correlation due to time is called serial correlation or autocorrelation.
+
+--
+
+- We will only scratch the surface in this course.
+
+
+---
+## Goals of time series analysis
+
+- .hlight[Forecasting outcomes]
+
+--
+
+  + Given a series of outcomes ordered in time, predict the values of the outcomes in the future.
+
+--
+  
+  + Examples:
+      - forecasting future price of oil given historical oil prices.
+      - predicting future price of a particular stock price given past prices of the same stock.
+
+--
+
+  + When forecasting, it is important to also report an interval estimate to incorporate uncertainty about future values.
+  
+
+---
+## Goals of time series analysis
+
+- .hlight[Forecasting outcomes]
+  
+--
+
+  + Forecasting outcomes using predictors may involve building a model for the predictors as well, since we can't observe them in the future.
+  
+--
+
+  + For example, predicting inflation rate given employment rate requires estimating future values for the employment rate as well.
+  
+--
+
+- .hlight[Learning relationships with data ordered in time].
+  
+--
+
+  + How are outcomes correlated over time? Are there periodic relationships in outcomes?
+  
+--
+
+  + Regressions of outcomes on predictors, accounting for correlated errors due to time series.
+  
+
+---
+## Motivating example: FTSE 100
+
+- The FTSE (Financial Times Stock Exchange) 100 Index is a share index of the 100 companies listed on the London Stock Exchange with the highest market capitalization.
+  
+--
+
+- A share index is essentially a form of weighted average of prices of selected stocks.
+  
+--
+
+- To motivate our discussions on time series, let's look at data for FTSE 100 returns in 2018.
+  
+  ```r
+  ftse100 &lt;- read.csv("data/ftse2018.csv", header = T)
+  head(ftse100)
+  ```
+  
+  ```
+  ##         Date    Open    High     Low   Close
+  ## 1  11/7/2018 7040.68 7136.75 7040.68 7117.28
+  ## 2  11/6/2018 7103.84 7117.50 7027.45 7040.68
+  ## 3  11/5/2018 7094.12 7140.37 7077.40 7103.84
+  ## 4  11/2/2018 7114.66 7196.39 7094.12 7094.12
+  ## 5  11/1/2018 7128.10 7165.61 7085.74 7114.66
+  ## 6 10/31/2018 7035.85 7161.54 7035.85 7128.10
+  ```
+
+- Can we forecast closing prices for the next five days from 11/7/2018?
+
+---
+## Motivating example: FTSE 100
+
+Notice that the data go from latest to earliest date, so let's invert the order of the rows to make the time series increasing in date.
+  
+--
+
+
+```r
+ftse100 &lt;- ftse100[nrow(ftse100):1,]
+dim(ftse100)
+```
+
+```
+## [1] 211   5
+```
+
+```r
+head(ftse100)
+```
+
+```
+##          Date    Open    High     Low   Close
+## 211 1/10/2018 7731.02 7756.11 7716.21 7748.51
+## 210 1/11/2018 7748.51 7768.96 7734.64 7762.94
+## 209 1/12/2018 7762.94 7792.56 7752.63 7778.64
+## 208 1/15/2018 7778.64 7783.61 7763.43 7769.14
+## 207 1/16/2018 7769.14 7791.83 7740.55 7755.93
+## 206 1/17/2018 7755.93 7755.93 7711.11 7725.43
+```
+
+---
+## Motivating example: FTSE 100
+
+Plot the closing prices to see what a simple time series data looks like.
+
+```r
+tsClose &lt;- ts(ftse100$Close); ts.plot(tsClose,col="red3")
+```
+
+&lt;img src="7-1-time-series-intro_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+  
+--
+
+- It is reasonable to expect closing prices for a particular day to be correlated with closing prices for previous days. 
+  
+--
+
+- How many of the previous days? We will have to investigate!
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+- We will revisit that data but let's look at different example, where we also have a predictor.
+  
+--
+
+- Incidence of melanoma (skin cancer) may be related to solar radiation.
+  
+--
+
+- Annual data from Connecticut tumor registry on age adjusted melanoma incidence rates (per 100000 people).
+
+--
+
+- Treat these rates as without error.
+  
+--
+
+- We also have annual data on relative sunspot (dark spots on the sun caused by intense magnetic activity) activity.
+  
+--
+
+- Data go from 1936 to 1972.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+
+```r
+cancersun &lt;- read.csv("data/melanoma.csv", header = T)
+names(cancersun) = c("year", "melanoma", "sunspot")
+str(cancersun)
+```
+
+```
+## 'data.frame':	37 obs. of  3 variables:
+##  $ year    : int  1936 1937 1938 1939 1940 1941 1942 1943 1944 1945 ...
+##  $ melanoma: num  1 0.9 0.8 1.4 1.2 1 1.5 1.9 1.5 1.5 ...
+##  $ sunspot : num  40 115 100 80 60 40 23 10 10 25 ...
+```
+
+```r
+head(cancersun)
+```
+
+```
+##   year melanoma sunspot
+## 1 1936      1.0      40
+## 2 1937      0.9     115
+## 3 1938      0.8     100
+## 4 1939      1.4      80
+## 5 1940      1.2      60
+## 6 1941      1.0      40
+```
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+
+```r
+ggplot(cancersun, aes(x=sunspot, y=melanoma)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") +
+  labs(title="Melanoma Incidence Rate vs Sunspots") +
+  theme_classic()
+```
+
+&lt;img src="7-1-time-series-intro_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+Weak positive (maybe!) relationship between them.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's look at melanoma incidence rate in time
+
+```r
+tsMelanoma &lt;- ts(cancersun$melanoma); ts.plot(tsMelanoma,col="blue4")
+```
+
+&lt;img src="7-1-time-series-intro_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+Trend in time, some of which we might be able to explain using `sunspots`.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's fit a linear model to the relationship between the two variables.
+
+```r
+regmelanoma = lm(melanoma ~ sunspot, data = cancersun)
+ggplot(cancersun, aes(x=sunspot, y=regmelanoma$residual)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") + labs(title="Residuals vs Sunspots") +
+  theme_classic()
+```
+
+&lt;img src="7-1-time-series-intro_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+Residuals look fine here.
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's plot the residuals versus year.
+
+```r
+ggplot(cancersun, aes(x=year, y=regmelanoma$residual)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") + labs(title="Residuals vs Year") +
+  theme_classic()
+```
+
+&lt;img src="7-1-time-series-intro_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+Huge trend! What to do???
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

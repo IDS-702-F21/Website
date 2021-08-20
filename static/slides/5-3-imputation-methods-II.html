@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 5.3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 5.3
+## Imputation methods II
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## MI recap
+
+- Fill in dataset `\(m\)` times with imputations.
+
+--
+
+- Analyze repeated datasets separately, then combine the estimates from each one.
+
+--
+
+- Imputations drawn from probability models for missing data.
+
+--
+
+&lt;img src="img/MultipleImp.png" width="450px" height="370px" style="display: block; margin: auto;" /&gt;
+
+
+---
+## MI recap
+
+Rubin (1987)
+
+- Population estimand: `\(Q\)`
+
+- Sample estimate: `\(q\)`
+
+- Variance of `\(q\)`: `\(u\)`
+
+- In each imputed dataset `\(d_j\)`, where `\(j = 1,\ldots,m\)`, calculate
+`$$q_j = q(d_j)$$`
+`$$u_j = u(d_j).$$`
+
+
+
+
+---
+## MI recap
+
+- MI estimate of `\(Q\)`:
+.block[
+`$$\bar{q}_m = \sum\limits_{i=1}^m \dfrac{q_i}{m}.$$`
+]
+
+--
+
+- MI estimate of variance is:
+.block[
+`$$T_m = (1+1/m)b_m + \bar{u}_m.$$`
+]
+
+  where
+.block[
+`$$b_m = \sum\limits_{i=1}^m \dfrac{(q_i - \bar{q}_m)^2}{m-1}; \ \ \ \ \bar{u}_m = \sum\limits_{i=1}^m \dfrac{u_i}{m}.$$`
+]
+--
+	
+- Use t-distribution inference for `\(Q\)`
+.block[
+`$$\bar{q}_m \pm t_{1-\alpha/2} \sqrt{T_m}.$$`
+]
+
+
+---
+## MI: pros and cons
+
+- Advantages
+
+--
+
+  + Straightforward estimation of uncertainty
+
+--
+  
+  + Flexible modeling of missing data
+	
+--
+
+- Disadvantages (??)
+
+--
+
+  + Extra data sets to manage
+ 
+--
+ 
+  + Explicitly model-based
+  
+  
+---
+## Resources for learning more
+
+- Little and Rubin (2002), *Statistical Analysis with Missing Data*, Wiley
+
+- Schafer (1997), *Analysis of Incomplete Multivariate Data*, CRC Press
+
+- Reiter and Raghunathan (2007), "The multiple adaptations of multiple imputation," *JASA*.
+
+
+---
+class: center, middle
+
+# Where should the imputations come from?
+
+
+---
+## MI: where should the imputations come from?
+
+So where should we get reasonable replacements for the missing values from? There are two general approaches:
+
+--
+
+- Sequential modeling
+
+--
+
+  + Estimate a sequence of conditional models (think separate regressions for each variable!);
+ 
+--
+ 
+  + Impute from each model.
+
+--
+  
+- Joint modeling
+
+--
+
+  + Choose a multivariate model for all the data (we will not cover joint multivariate models in this class; we will in STA602);
+   
+--
+
+  + Estimate the model;
+  
+--
+
+  + Impute from the joint model.
+  
+
+---
+## MI: sequential regression models
+
+Suppose the data includes three variables `\(Y_1\)`, `\(Y_2\)`, `\(Y_3\)`. 
+
+--
+
++ Step 1: fill in missing values by simulating values from regressions based on complete cases;
+ 
+--
+ 
++ Step 2: regress `\(Y_1|Y_2,Y_3\)` using completed data;
+ 
+--
+ 
++ Step 3: impute new values of `\(Y_1\)` from this model;
+
+--
+  
++ Step 4: repeat for `\(Y_2|Y_1,Y_3\)` and `\(Y_3|Y_1,Y_2\)` (repeat for all variables with missing data);
+
+--
+  
++ Step 5: cycle through Steps 1 to Step 4 many times;
+  - Usually the default number is 5, but there is not theory underpinning this default.
+ 
+--
+ 
+Final dataset is one imputed dataset. Repeat entire process `\(m\)` times to get `\(m\)` multiply-imputed datasets.
+
+
+---
+## Existing software for sequential modeling
+
+Free software packages
+
+  + .hlight[MICE] for R and Stata (so many conditional models to pick from, for example, predictive mean matching, random forest, linear regression, logistic regression, and so on);
+  
+  + .hlight[statsmodels MICE] in python (only uses predictive mean matching);
+  
+  + .hlight[MI] for R;
+  
+  + .hlight[IVEWARE] for SAS.
+
+In sequential modeling, one can specify many types of conditional models and include constraints on values.
+
+
+---
+## Existing software for joint modeling
+
+- Multivariate normal data
+  + R: .hlight[NORM, Amelia II];
+  
+  + SAS: .hlight[proc MI];
+  
+  + Stata: .hlight[MI command.hlight[.
+  
+- Mixtures of multivariate normal distributions
+  + R: .hlight[EditImpCont] (also does editing of faulty values).
+  
+- Multinomial data:
+  + R: .hlight[CAT] (log-linear model), .hlight[NPBayesImpute] (latent class model).
+  
+
+---
+## Existing software for joint modeling
+
+- Nested Multinomial data:
+  + R: .hlight[NestedCategBayesImpute] (also generates synthetic data).  
+      *update coming soon to allow for editing of faulty values*
+  
+- Mixed data:
+  + R: .hlight[MIX] (general location model).
+  
+- Many other joint models, but often without open source software.
+
+
+
+---
+## Comparing sequential to joint modeling
+
+Advantages
+
+--
+
+- Often easier to specify reasonable conditionals than a joint model.
+
+--
+
+- Complex samplers not often needed.
+
+--
+
+- Can use machine learning methods for conditionals.
+
+--
+
+Disadvantages
+
+--
+
+- Labor intensive to specify models.
+
+--
+
+- Incoherent conditionals can cause odd behaviors (e.g., order matters).
+
+--
+
+- Theoretical properties difficult to assess.
+
+
+
+---
+## What if imputation and analysis model do not match?
+
+- Imputation model more general than analysis model: .hlight[conservative inferences].
+
+--
+
+- Imputation model less general than analysis model: .hlight[invalid inferences].
+
+--
+
+- For sequential modeling, include all variables related to outcome and missing data (Schafer 1997).
+
+--
+
+- Include design information in models (Reiter *et al.* 2006, *Survey Methodology*).
+
+
+
+---
+## Evaluating the fit of imputation models
+
+- Plots of imputed and observed values (Abayomi *et al*, 2008, *JRSS-C*)
+  + Imputed values that don't look like the observed values could *maybe* imply poor imputation models;
+
+--
+  
+  + Useful as a sensibility check
+  
+- Model-specific diagnostics (Gelman *et al*,  2005, *Biometrics*)
+  + Take a look at residual plots with marked observed and imputed values;
+
+--
+  
+  + Look for obvious abnormalities.
+
+
+---
+## Remarks
+
+- Ignoring missing data is risky.
+
+--
+
+- Single imputation procedures at best underestimate uncertainty and at worst fail to capture multivariate relationships.
+
+--
+
+- Multiple imputation recommended (or other model-based methods).
+
+--
+
+- We discussed MI for MAR data. When data are NMAR, analysis can be much harder.
+
+--
+
+- In those scenarios, get missing data experts on your team.
+
+
+
+---
+## Remarks
+
+- Incorporate all sources of uncertainty in imputations, including uncertainty in parameter estimates.
+
+--
+
+- Want models that accurately describe the distribution of missing values.
+
+--
+
+- Important to keep in mind that imputation model are only used for cases with missing data.
+
+--
+
+  + Suppose you have 30% missing values;
+
+--
+  
+  + Also, suppose your imputation model is "80% good" ("20% bad");
+
+--
+  
+  + Then, completed data are only "6% bad"!
+  
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

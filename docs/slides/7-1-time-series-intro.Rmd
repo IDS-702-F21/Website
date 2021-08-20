@@ -1,0 +1,271 @@
+---
+title: "IDS 702: Module 7.1"
+subtitle: "Introduction to time series analysis"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(ggplot2)
+#library(arm)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## Introduction
+
+- When data are ordered in time, responses and errors from one period may influence responses and errors from another period.
+
+--
+
+- For example, it is reasonable to expect unemployment rate in a month to be correlated with unemployment rate in previous month(s).
+
+--
+
+- Another example: weather events in current time period may depend on weather events in previous time period.
+
+--
+
+- These are called .hlight[time series] data.
+
+--
+
+- Correlation due to time is called serial correlation or autocorrelation.
+
+--
+
+- We will only scratch the surface in this course.
+
+
+---
+## Goals of time series analysis
+
+- .hlight[Forecasting outcomes]
+
+--
+
+  + Given a series of outcomes ordered in time, predict the values of the outcomes in the future.
+
+--
+  
+  + Examples:
+      - forecasting future price of oil given historical oil prices.
+      - predicting future price of a particular stock price given past prices of the same stock.
+
+--
+
+  + When forecasting, it is important to also report an interval estimate to incorporate uncertainty about future values.
+  
+
+---
+## Goals of time series analysis
+
+- .hlight[Forecasting outcomes]
+  
+--
+
+  + Forecasting outcomes using predictors may involve building a model for the predictors as well, since we can't observe them in the future.
+  
+--
+
+  + For example, predicting inflation rate given employment rate requires estimating future values for the employment rate as well.
+  
+--
+
+- .hlight[Learning relationships with data ordered in time].
+  
+--
+
+  + How are outcomes correlated over time? Are there periodic relationships in outcomes?
+  
+--
+
+  + Regressions of outcomes on predictors, accounting for correlated errors due to time series.
+  
+
+---
+## Motivating example: FTSE 100
+
+- The FTSE (Financial Times Stock Exchange) 100 Index is a share index of the 100 companies listed on the London Stock Exchange with the highest market capitalization.
+  
+--
+
+- A share index is essentially a form of weighted average of prices of selected stocks.
+  
+--
+
+- To motivate our discussions on time series, let's look at data for FTSE 100 returns in 2018.
+  ```{r}
+ftse100 <- read.csv("data/ftse2018.csv", header = T)
+head(ftse100)
+```
+
+- Can we forecast closing prices for the next five days from 11/7/2018?
+
+---
+## Motivating example: FTSE 100
+
+Notice that the data go from latest to earliest date, so let's invert the order of the rows to make the time series increasing in date.
+  
+--
+
+```{r}
+ftse100 <- ftse100[nrow(ftse100):1,]
+dim(ftse100)
+head(ftse100)
+```
+
+---
+## Motivating example: FTSE 100
+
+Plot the closing prices to see what a simple time series data looks like.
+```{r fig.height=2.8}
+tsClose <- ts(ftse100$Close); ts.plot(tsClose,col="red3")
+```
+  
+--
+
+- It is reasonable to expect closing prices for a particular day to be correlated with closing prices for previous days. 
+  
+--
+
+- How many of the previous days? We will have to investigate!
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+- We will revisit that data but let's look at different example, where we also have a predictor.
+  
+--
+
+- Incidence of melanoma (skin cancer) may be related to solar radiation.
+  
+--
+
+- Annual data from Connecticut tumor registry on age adjusted melanoma incidence rates (per 100000 people).
+
+--
+
+- Treat these rates as without error.
+  
+--
+
+- We also have annual data on relative sunspot (dark spots on the sun caused by intense magnetic activity) activity.
+  
+--
+
+- Data go from 1936 to 1972.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+```{r fig.height=3}
+cancersun <- read.csv("data/melanoma.csv", header = T)
+names(cancersun) = c("year", "melanoma", "sunspot")
+str(cancersun)
+head(cancersun)
+```
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+```{r fig.height=3, message=F}
+ggplot(cancersun, aes(x=sunspot, y=melanoma)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") +
+  labs(title="Melanoma Incidence Rate vs Sunspots") +
+  theme_classic()
+```
+
+Weak positive (maybe!) relationship between them.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's look at melanoma incidence rate in time
+```{r fig.height=3}
+tsMelanoma <- ts(cancersun$melanoma); ts.plot(tsMelanoma,col="blue4")
+```
+
+Trend in time, some of which we might be able to explain using `sunspots`.
+
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's fit a linear model to the relationship between the two variables.
+```{r fig.height=2.8 , message=F}
+regmelanoma = lm(melanoma ~ sunspot, data = cancersun)
+ggplot(cancersun, aes(x=sunspot, y=regmelanoma$residual)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") + labs(title="Residuals vs Sunspots") +
+  theme_classic()
+```
+
+Residuals look fine here.
+
+---
+## Motivating example: Sunspots and melanoma
+
+Let's plot the residuals versus year.
+```{r fig.height=2.8, message=F}
+ggplot(cancersun, aes(x=year, y=regmelanoma$residual)) +
+  geom_point(alpha = .5,colour="blue4") +
+  geom_smooth(method="lm",col="red3") + labs(title="Residuals vs Year") +
+  theme_classic()
+```
+
+Huge trend! What to do???
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

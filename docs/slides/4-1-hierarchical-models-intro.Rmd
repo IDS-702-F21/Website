@@ -1,0 +1,234 @@
+---
+title: "IDS 702: Module 4.1"
+subtitle: "Introduction to multilevel/hierarchical models"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+library(e1071)
+library(caret)
+library(pROC)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+## Multilevel, clustered or grouped data
+
+- Often data are grouped or clustered naturally, for example 
+  + students within schools,
+  + patients within hospitals,
+  + voters within counties or states, or
+  + repeated measurements on same person, as is often the case in .hlight[longitudinal studies].
+
+--
+
+- For such clustered data, we may want to infer or estimate the relationship between a response variable and certain predictors collected across all the groups.
+
+--
+
+- Ideally, we should do so in a way that takes advantage of the relationship between observations in the same group, but we should also look to borrow information across groups.
+
+--
+
+- .hlight[Hierarchical or multilevel models] provide a principled way to do so. We will start with simpler cases to elucidate the main ideas.
+
+
+---
+## Hypothetical school testing example
+
+- Suppose we wish to estimate the distribution of test scores for students at $J$ different high schools.
+
+--
+
+- In each school $j$, where $j = 1, \ldots, J$, suppose we test a random sample of $n_j$ students.
+
+--
+
+- Let $y_{ij}$ be the test score for the $i$th student in school $j$, with $i = 1,\ldots, n_j$.
+
+--
+
+- .hlight[Option I]: estimation can be done separately in each group, where we assume
+.block[
+.small[
+$$y_{ij} | \mu_j, \sigma^2_j \sim N \left( \mu_j, \sigma^2_j\right)$$
+]
+]
+
+  where for each school $j$, $\mu_j$ is the school-wide average test score, and $\sigma^2_j$ is the school-wide variance of individual test scores.
+
+
+---
+## Hypothetical school testing example
+
+- We can do classical inference for each school based on large sample 95% CI: $\bar{y}_j \pm 1.96 \sqrt{s^2_j/n_j}$, where $\bar{y}_j$ is the sample average in school $j$, and $s^2_j$ is the sample variance in school $j$.
+
+--
+
+- Clearly, we can overfit the data within schools, for example, what if we only have 4 students from one of the schools?
+
+--
+
+- .hlight[Option II]: alternatively, we might believe that $\mu_j = \mu$ for all $j$; that is, all schools have the same mean. This is the assumption (null hypothesis) in ANOVA models for example.
+
+--
+
+- Option I ignores that the $\mu_j$'s should be reasonably similar, whereas option II ignores any differences between them.
+
+--
+
+- It would be nice to find a compromise!
+
+--
+
+- This is what we are able to do with .hlight[hierarchical modeling].
+
+
+---
+## Hierarchical model
+
+- Once again, suppose
+.block[
+.small[
+$$y_{ij} | \mu_j, \sigma^2_j \sim N \left( \mu_j, \sigma^2_j\right); \ \ \ i = 1,\ldots, n_j; \ \ \ j = 1, \ldots, J.$$
+]
+]
+
+- We can assume that the $\mu_j$'s are drawn from a distribution based on the following: .hlight[conceive of the schools themselves as being a random sample from all possible school.]
+
+--
+
+- Suppose $\mu_0$ is the .hlight[overall mean of all school's average scores (a mean of the means)], and $\tau^2$ is the .hlight[variance of all school's average scores (a variance of the means)].
+
+--
+
+- Then, we can think of each $\mu_j$ as being drawn from a distribution, e.g.,
+.block[
+.small[
+$$\mu_j | \mu_0, \tau^2 \sim N \left( \mu_0, \tau^2 \right),$$
+]
+]
+
+  which gives us one more level, resulting in a hierarchical specification.
+
+--
+  
+- Usually, $\mu_0$ and $\tau^2$ will also be unknown so that we need to estimate them (think maximum likelihood or Bayesian methods).
+
+
+
+---
+## Hierarchical model: school testing example
+
+- Back to our example, it turns out that the multilevel estimate is
+.block[
+.small[
+$$\hat{\mu}_j \approx \dfrac{ \dfrac{n_j}{\sigma^2_j} \bar{y}_j + \dfrac{1}{\tau^2} \mu_0 }{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  },$$
+]
+]
+
+--
+
+ but since the unknown parameters have to be estimated, we actually have
+.block[
+.small[
+$$\hat{\mu}_j \approx \dfrac{ \dfrac{n_j}{s^2_j} \bar{y}_j + \dfrac{1}{\hat{\tau}^2} \bar{y}_{\textrm{all}} }{ \dfrac{n_j}{s^2_j} + \dfrac{1}{\hat{\tau}^2}  },$$
+]
+]
+ 
+ where $\bar{y}_{\textrm{all}}$ is the completely pooled estimate (the overall sample mean of all test scores).
+
+---
+## Hierarchical model: school testing example
+
+- We will only scratch the surface of hierarchical modeling. Take a look at the readings for hierarchical linear models on the website for more resources.
+
+--
+
+- If you want to take a course that explores hierarchical models in much more detail, consider taking STA 610 (after taking STA 602).
+
+--
+
+- .hlight[For those interested in Bayesian inference] (feel free to skip this if you are not!), it turns out that the posterior distribution of $\mu_j$, $p(\mu_j | Y, \sigma^2_j, \mu_0, \tau^2) = N(\mu_j^\star, \nu_j^\star)$, where 
+.block[
+.small[
+$$
+\begin{split}
+\mu_j^\star & = \dfrac{ \dfrac{n_j}{\sigma^2_j} \bar{y}_j + \dfrac{1}{\tau^2} \mu_0 }{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  } \\
+\nu_j^\star & = \dfrac{1}{ \dfrac{n_j}{\sigma^2_j} + \dfrac{1}{\tau^2}  }
+\end{split}
+$$
+]
+]
+
+
+
+---
+## Hierarchical model: implications
+
+- Our estimate for each $\mu_j$ is a weighted average of $\bar{y}_j$ and $\mu_0$, ensuring that we are borrowing information across all levels through $\mu_0$ and $\tau^2$.
+
+--
+
+- The weights for the weighted average is determined by relative precisions (.hlight[the inverse of variance is often referred to as precision]) from the data and from the second level model.
+
+--
+  
+- Suppose all $\sigma^2_j \approx \sigma^2$. Then the schools with smaller $n_j$ have estimated $\mu_j$ closer to $\mu_0$ than schools with larger $n_j$.
+
+--
+
+- Thus, the hierarchical model shrinks estimates with high variance towards the grand mean.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

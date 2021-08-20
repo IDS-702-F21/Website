@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 3.5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 3.5
+## Proportional odds model
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+## Ordinal responses
+
+- Suppose the categories of our response variable has a natural ordering.
+
+- Let's use data from Example 6.2.2 from Alan Agresti's [An Introduction to Categorical Data Analysis, Second Edition](https://find.library.duke.edu/catalog/DUKE005142588) to demonstrate this.
+
+- This data is from a General Social Survey. Clearly, political ideology has a five-point ordinal scale, ranging from very liberal to very conservative.
+
+.mini[
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;th colspan="5"&gt;Political Ideology&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th colspan="2"&gt;&lt;/th&gt;
+    &lt;td style="text-align:center"&gt;Very Liberal&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;Slightly Liberal&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;Moderate&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;Slightly Conservative&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;Very Conservative&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th rowspan="2"&gt;Female&lt;/th&gt;
+    &lt;td height="50px"&gt;Democratic&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;44&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;47&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;118&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;23&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;32&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="50px"&gt;Republican&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;18&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;28&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;86&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;39&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;48&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th rowspan="2"&gt;Male&lt;/th&gt;
+    &lt;td height="50px"&gt;Democratic&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;36&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;34&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;53&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;18&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;23&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="50px"&gt;Republican&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;12&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;18&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;62&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;45&lt;/td&gt;
+    &lt;td style="text-align:center"&gt;51&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+]
+  
+  
+
+---
+## Cumulative logits
+
+- When we have ordinal response with categories `\(1, 2, \ldots, J\)`, we still want to estimate
+.block[
+.small[
+`$$\Pr[y_i = 1 | \boldsymbol{x}_i] = \pi_{i1}, \ \Pr[y_i = 2 | \boldsymbol{x}_i] = \pi_{i2}, \ \ldots, \ \Pr[y_i = J | \boldsymbol{x}_i] = \pi_{iJ}.$$`
+]
+]
+
+--
+
+- However, we need to use models that can reflect the ordering
+.block[
+.small[
+`$$\Pr[y_i\leq 1 | \boldsymbol{x}_i] \leq \Pr[y_i\leq 2 | \boldsymbol{x}_i] \leq \ldots \leq \Pr[y_i\leq J | \boldsymbol{x}_i] = 1.$$`
+]
+]
+
+  *Notice that the ordering of probabilities is not for the actual marginal probabilities, but rather the cumulative probabilities.*
+
+--
+
+- The multinomial logistic regression does not enforce this.
+
+--
+
+- Instead, we can focus on building models for the cumulative logits, that is, models for 
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j | \boldsymbol{x}_i]}{\Pr[y_i &gt; j | \boldsymbol{x}_i]}\right) = \textrm{log}\left(\dfrac{\pi_{i1} + \pi_{i2} + \ldots + \pi_{ij}}{\pi_{i(j+1)} + \pi_{i(j+2)} + \ldots + \pi_{iJ}}\right), \ \ \ j = 1, \ldots, J-1.$$`
+]
+]
+
+
+
+
+---
+## Proportional odds model
+
+- This leads us to the .hlight[proportional odds model], written as:
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| \boldsymbol{x}_i]}{\Pr[y_i &gt; j| \boldsymbol{x}_i]}\right) = \beta_{0j} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip}, \ \ \ j = 1, \ldots, J-1.$$`
+]
+]
+
+  *There is no need for a model for `\(\Pr[y_i \leq J]\)` since it is necessarily equal to 1.*
+
+--
+
+- Notice that this model looks like a binary logistic regression in which we combine the first `\(j\)` categories to form a single category (say 1) and the remaining categories to form a second category (say 0).
+
+--
+
+- Since `\(\beta_0\)` is the only parameter indexed by `\(j\)`, the `\(J-1\)` logistic regression curves essentially have the same shapes but different "intercepts".
+
+--
+
+- That is, the effect of the predictors is identical for all `\(J - 1\)` cumulative log odds. This is therefore, a .hlight[more parsimonious model] (both in terms of estimation and interpretation) than the multinomial logistic regression, when it fits the data well.
+
+
+
+---
+## Proportional odds model
+
+- The probabilities we care about are quite easy to extract, since each
+.block[
+.small[
+`$$\Pr[y_i = j| \boldsymbol{x}_i] = \Pr[y_i \leq j| \boldsymbol{x}_i] - \Pr[y_i \leq j - 1| \boldsymbol{x}_i], \ \ \ j = 2, \ldots, J,$$`
+]
+]
+
+  with `\(\Pr[y_i \leq 1| \boldsymbol{x}_i] = \Pr[y_i = 1| \boldsymbol{x}_i]\)`.
+
+--
+
+- Let's focus first on a single continuous predictor, that is,
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i &gt; j| x_i]}\right) = \beta_{0j} + \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, J-1.$$`
+]
+]
+
+--
+
+  Here, `\(\beta_1 &gt; 0\)`, actually means that a 1 unit increase in `\(x\)` makes  the larger values of `\(Y\)` less likely. 
+  
+--
+
+- This can seem counter-intuitive, thus, many books and software packages (including the `polr` function in R) often write 
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i &gt; j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, J-1$$`
+]
+]
+
+  instead. We will stick with this representation.
+  
+
+---
+## Proportional odds model
+
+- Suppose we have `\(J=5\)`, `\(\beta_1 = 1.1\)`, and `\((\beta_{01},\beta_{02},\beta_{03},\beta_{04}) = (0.5,1,2,2.5)\)` in the first representation
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i &gt; j| x_i]}\right) = \beta_{0j} + \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$`
+]
+]
+
+  the cumulative probabilities would look like:
+
+&lt;img src="3-5-proportional-odds_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Proportional odds model
+
+- But with `\(J=5\)`, and the same values `\(\beta_1 = 1.1\)`, and `\((\beta_{01},\beta_{02},\beta_{03},\beta_{04}) = (0.5,1,2,2.5)\)` in the second representation
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i &gt; j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$`
+]
+]
+
+  the cumulative probabilities would look like:
+
+&lt;img src="3-5-proportional-odds_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Proportional odds model
+
+- Take our example on political ideology for instance. Suppose we fit the model 
+.block[
+.small[
+`$$\textrm{log}\left(\dfrac{\Pr[\textrm{ideology}_i \leq j| x_i]}{\Pr[\textrm{ideology}_i &gt; j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$`
+]
+]
+
+  where `\(x\)` is an indicator variable for political party, with `\(x = 1\)` for Democrats and `\(x = 0\)` for Republicans.
+
+--
+
+- Then,
+  + For any `\(j\)`, `\(\beta_{1}\)` is the log-odds of a Democrat, when compared to a Republican, of .hlight[being more conservative] than `\(j\)` .hlight[compared to being more liberal] than `\(j\)`.
+
+--
+
+  + For any `\(j\)`, `\(e^{\beta_{1}}\)` is the odds of a Democrat, when compared to a Republican, of .hlight[being more conservative] than `\(j\)` .hlight[compared to being more liberal] than `\(j\)`.
+
+--
+
+- If `\(\beta_{1} &gt; 0\)`, a Democrat's response ..hlight[is more likely than a Republican's response] to be in the conservative direction than in the liberal direction.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

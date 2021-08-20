@@ -1,0 +1,102 @@
+---
+title: "IDS 702: Module 3.4"
+subtitle: "Multinomial logistic regression (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+
+## Analysis of Sesame Street Data
+
+- The television series Sesame Street is concerned mainly with teaching preschool skills to children age 3-5, with special emphasis on reaching economically disadvantaged children.
+
+--
+
+- In the early 1970s, researchers at Educational Testing Service (the company that runs the SAT) ran a study to evaluate Sesame Street.
+
+--
+
+- To ensure the study contained a group of children that watched Sesame Street regularly, they randomly assigned children either to receive encouragement to watch Sesame Street or not to receive encouragement.
+
+--
+
+- Those assigned to encouragement were given promotional materials, and received weekly visits and phone calls from ETS staff.  Those assigned not to receive encouragement did not get this attention.
+
+--
+
+- The children were tested on a variety of cognitive variables, including knowledge of body parts, knowledge about letters, knowledge about numbers, etc., both before and after viewing the series.
+
+--
+
+- .hlight[Let's predict how often the kids watch sesame street, with focus on whether encouragement pushes them towards more viewing.]
+
+
+---
+## Analysis of Sesame Street Data
+
+The data is in the file `sesame.txt` on Sakai.
+
+.mini[
+Variable    | Description
+:------------- | :------------
+viewcat |  1=rarely watched the show <br/> 2=once or twice a week <br/> 3=three to five times a week <br/> 4=watched the show on average more than 5 times a week
+viewenc |   1=child encouraged to watch,  2=child not encouraged to watch
+site |   1 =Three to five year old disadvantaged children from inner city areas in various parts of the country. <br/> 2 = Four year old advantaged suburban children. <br/> 3 = Advantaged rural children. <br/> 4 = Disadvantaged rural children. <br/> 5 = Disadvantaged Spanish speaking children.
+sex  | male=1, female=2
+age  | age in months
+setting |   setting in which Sesame Street was viewed, 1=home 2=school
+prebody |  pretest on knowledge of body parts (scores range from 0-32)
+prelet |  pretest on letters (scores range from 0-58)
+preform |  pretest on forms (scores range from 0-20)
+prenumb | pretest on numbers (scores range from 0-54)
+prerelat | pretest on relational terms (scores range from 0-17)
+preclasf | pretest on classification skills
+]
+
+
+
+---
+class: center, middle
+
+# In-class analysis: move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Sesame.R)
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

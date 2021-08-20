@@ -1,0 +1,209 @@
+---
+title: "IDS 702 In-class analysis 6"
+subtitle: "Predicting nba wins II"
+#date: "September 15, 2020"
+output: 
+  tufte::tufte_html:
+    tufte_variant: "envisioned"
+    highlight: pygments
+    css: "in-class-analysis.css"
+    toc: true
+link-citations: yes
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tufte)
+library(knitr)
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  digits = 2
+  )
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+**Due:** 1 hour after class ends
+
+
+# Housekeeping
+## Structure and format
+You will work in your pre-assigned teams. Each team should submit ONLY ONE report for this exercise. You must write the names of all team members at the top of the report containing your responses. You all must do the work using one student's computer and R/RStudio. 
+
+Have one team member open R/RStudio on their computer and share their screen with the other team members within the breakout room. At the top of the team report, write **"host"** in parenthesis besides this student's name. Have another team member be responsible for documenting the responses. At the top of the team report, write **"writer"** in parenthesis besides this student's name. 
+
+**NOTE**: Generally, you will not be penalized for not taking on these roles many times during the semester. This is to simply ensure that you do switch the roles around a "decent number" of times within each team throughout the semester. That said, I will penalize any student who obviously dominates these roles over everyone else, so be sure to give other students an opportunity to do them.
+
+## R/RStudio
+You all should have R and RStudio installed on your computers by now. If you do not, first install the latest version of R here: https://cran.rstudio.com (remember to select the right installer for your operating system). Next, install the latest version of RStudio here: https://www.rstudio.com/products/rstudio/download/. Scroll down to the "Installers for Supported Platforms" section and find the right installer for your operating system.
+
+
+## Gradescope
+Gradescope will let you select your team mates when submitting, so make sure to do so. Only one person needs to submit the sheet on Gradescope. You can submit your document in the most common formats, but **pdf** files are preferred. Submit on Gradescope here: https://www.gradescope.com/courses/280392/assignments. Be sure to submit under the right assignment entry.
+
+
+
+# Introduction
+The purpose of this exercise is to give you additional practice working with logistic regression. The exercise is based on the NBA Team Game Stats dataset found here:  https://www.kaggle.com/ionaskel/nba-games-stats-from-2014-to-2018/. Read more about the problem and dataset under the description section of the link.
+
+Kaggle is a great online community of data scientists. To learn more about Kaggle, follow this link: https://www.kaggle.com/getting-started/44916.
+
+<font color="brown">**For this exercise, you will work with the same NBA team as last time. As before, you will need to set aside data for the 2017/2018 season as test data. Write the name of the team you selected at the top of your report.**</font>
+
+
+# The data
+This is the same data from the last in-class exercise. so you should already have it saved locally. Just in case you do not, follow the instructions below.
+
+Download the data (named `nba_games_stats.csv`) from Sakai and save it locally to the same directory as your R markdown file. To find the data file on Sakai, go to Resources $\rightarrow$ Datasets $\rightarrow$ In-Class Analyses. Once you have downloaded the data file into the SAME folder as your R markdown file, load and clean the data by using the following R code.
+
+```{marginfigure}
+Again, you are expected to select ONLY ONE NBA team in the data. Also, set aside data for the 2017/2018 season as test data.
+```
+
+```{r eval = FALSE}
+nba <- read.csv("nba_games_stats.csv",header = TRUE,sep = ",",stringsAsFactors = FALSE)
+
+# Set factor variables
+nba$Home <- factor(nba$Home)
+nba$Team <- factor(nba$Team)
+nba$WINorLOSS <- factor(nba$WINorLOSS)
+
+# Convert date to the right format
+nba$Date <- as.Date(nba$Date, "%Y-%m-%d")
+
+# Also create a binary variable from WINorLOSS. 
+# This is not always necessary but can be useful 
+#particularly for R functions that prefer numeric binary variables
+#to the original factor variables
+nba$Win <- rep(0,nrow(nba))
+nba$Win[nba$WINorLOSS=="W"] <- 1
+
+# I picked the Charlotte Hornets (CHO) as an example,
+#you should pick any team you want
+nba_reduced <- nba[nba$Team == "CHO", ]
+
+# Set aside the 2017/2018 season as your test data
+nba_reduced_train <- nba_reduced[nba_reduced$Date < "2017-10-01",]
+nba_reduced_test <- nba_reduced[nba_reduced$Date >= "2017-10-01",]
+```
+
+You will now use both the `nba_reduced_train` and `nba_reduced_test` datasets in this in-class exercise.
+
+## Code book  
+
+Variable       | Description
+:------------- | :------------ 
+Team | Abbreviation for the name of the team
+Game | Game index for the season. Each team plays 82 games per season
+Date | Date of the game
+Home | Home or away game?
+Opponent | Abbreviation for the name of the opposing team
+WinorLoss | Did the team win? W = win, L = loss
+Win | Binary re-coding of WinorLoss. 1 = win, 0 = loss
+TeamPoints | Number of total points scored in the game
+OpponentPoints | Number of total points scored by the opposing team in the game
+FieldGoals | Number of field goals made in the game (also includes 3 point shots but not free throws)
+FieldGoalsAttempted | Number of field goals attempted in the game (also includes 3 point shots but not free throws)
+FieldGoals. | FieldGoals/FieldGoalsAttempted
+X3PointShots | Number of 3 point shots made in the game
+X3PointShotsAttempted | Number of 3 point shots attempted in the game
+X3PointShots. | X3PointShots/X3PointShotsAttempted
+FreeThrows | Number of free throws made in the game
+FreeThrowsAttempted | Number of free throws attempted in the game
+FreeThrows. | FreeThrows/FreeThrowsAttempted
+OffRebounds | Number of offensive rebounds grabbed in the game
+TotalRebounds | Total number of rebounds grabbed in the game (includes OffRebounds)
+Assists | Total number of assists (passes leading to a made field goal) in the game
+Steals | Total number of steals (balls stolen from the opposing team while the opposing team has possession) in the game
+Blocks | Total number of blocks (direct prevention of a made field goal after the ball has been shot by an opposing player) in the game
+Turnovers | Total number of times the ball was lost back to the opposing team while the team had possession.
+TotalFouls | Total number of fouls committed on players on the opposing team
+Opp.FieldGoals | Number of field goals made by the opposing team in the game (also includes 3 point shots but not free throws)
+Opp.FieldGoalsAttempted | Number of field goals attempted by the opposing team in the game (also includes 3 point shots but not free throws)
+Opp.FieldGoals. | Opp.FieldGoals/Opp.FieldGoalsAttempted
+Opp.X3PointShots | Number of 3 point shots made by the opposing team in the game
+Opp.X3PointShotsAttempted | Number of 3 point shots attempted by the opposing team in the game
+Opp.X3PointShots. | Opp.X3PointShots/Opp.X3PointShotsAttempted
+Opp.FreeThrows | Number of free throws made by the opposing team in the game
+Opp.FreeThrowsAttempted | Number of free throws attempted by the opposing team in the game
+Opp.FreeThrows. | Opp.FreeThrows/Opp.FreeThrowsAttempted
+Opp.OffRebounds | Number of offensive rebounds grabbed by the opposing team in the game
+Opp.TotalRebounds | Total number of rebounds grabbed by the opposing team in the game (includes Opp.OffRebounds)
+Opp.Assists | Total number of assists (passes leading to a made field goal) by the opposing team in the game
+Opp.Steals | Total number of steals (balls stolen from the team while the team has possession) by the opposing team in the game
+Opp.Blocks | Total number of blocks (direct prevention of a made field goal after the ball has been shot by a player on the team) by the opposing team in the game
+Opp.Turnovers | Total number of times the ball was won back from the opposing team while the opposing team had possession.
+Opp.TotalFouls | Total number of fouls committed by players on the opposing team
+
+
+## Team abbreviations and acronyms
+
+Abbreviation/<br />Acronym	| Franchise
+|:-------------------- | :-------------------|
+ATL	| Atlanta Hawks
+BOS	| Boston Celtics
+BRK	| Brooklyn Nets
+CHO	| Charlotte Hornets
+CHI	| Chicago Bulls
+CLE	| Cleveland Cavaliers
+DAL	| Dallas Mavericks
+DEN	| Denver Nuggets
+DET	| Detroit Pistons
+GSW	| Golden State Warriors
+HOU	| Houston Rockets
+IND	| Indiana Pacers
+LAC	| Los Angeles Clippers
+LAL	| Los Angeles Lakers
+MEM	| Memphis Grizzlies
+MIA	| Miami Heat
+MIL	| Milwaukee Bucks
+MIN	| Minnesota Timberwolves
+NOP	| New Orleans Pelicans
+NYK	| New York Knicks
+OKC	| Oklahoma City Thunder
+ORL	| Orlando Magic
+PHI	| Philadelphia 76ers
+PHO	| Phoenix Suns
+POR	| Portland Trail Blazers
+SAC	| Sacramento Kings
+SAS	| San Antonio Spurs
+TOR	| Toronto Raptors
+UTA	| Utah Jazz
+WAS	| Washington Wizards
+
+
+# Exercises
+
+Once again, treat the variable <font color="green">Win (or WinorLoss)</font> as your response variable and the other variables as potential predictors. First fit the same model from the last in-class exercise using the <font color="green">nba_reduced_train</font> data.
+
+<!-- 1. Make exploratory plots to explore the relationships between `Win` and the following variables: `Home`, `TeamPoints`, `FieldGoals.`, `Assists`, `Steals`, `Blocks` and `Turnovers`. Don't include any of the plots, just briefly describe the relationships. -->
+
+<!-- 2. Just by looking at the code book, there are several combinations of variables we should not include as predictors in the logistic model. Identify at least two pairs and explain in at most two sentences, why we should not include them in the model at the same time. -->
+
+<!-- 3. Fit a logistic regression model for `Win` (or `WinorLoss`) using `Home`, `TeamPoints`, `FieldGoals.`, `Assists`, `Steals`, `Blocks` and `Turnovers`. as your predictors. Using the `vif` function, are there are any concerns regarding multicollinearity in this model? -->
+
+<!-- 4. Present the output of the fitted model and interpret the significant coefficients in terms of the odds of your team winning an NBA game. -->
+
+<!-- 5. Using 0.5 as your cutoff for predicting wins or losses (1 vs 0) from the predicted probabilities, what is the accuracy of this model? Plot the roc curve for the fitted model. What is the AUC value? -->
+
+1. Add <font color="green">Opp.FieldGoals.</font> as a predictor to the previous model from last time. Is the coefficient significant? If yes, interpret the coefficient in the context of the question.
+
+2. What is the accuracy of this new model? Plot the roc curve for the fitted model. What is the new AUC value? Which model predicts the odds of winning better? The model from Question 1 or the model from the last in-class exercise?
+
+3. Using the results of the model with the <font color="green">better predictive ability</font>, what suggestions do you have for the coach of your team trying to improve the odds of his team winning a regular season game?
+
+4. Use this <font color="green">"better" model</font> to predict out-of-sample probabilities for the <font color="green">nba_reduced_test</font> data. Using 0.5 as your cutoff for predicting wins or losses (1 vs 0) from the out-of-sample predicted probabilities, what is the out-of-sample accuracy? How well does your model do in predicting data for the 2017/2018 season?
+
+5. Using the change in deviance test (anova test), test whether including <font color="green">Opp.Assists</font> and <font color="green">Opp.Blocks</font> in this <font color="green">"better" model</font> at the same time would improve the model. Is there any other variable in this dataset which we did not consider that you think might improve our model? Which one and why?
+
+
+
+
+
+# Acknowledgement
+
+This exercise is based on ideas proposed by [Sam Voisin](https://stat.duke.edu/people/sam-voisin).
+
+
+

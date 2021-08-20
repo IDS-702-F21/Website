@@ -1,0 +1,27 @@
+---
+title: "Module 1: multiple linear regression"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Required:
+
+- [An Introduction to Statistical Learning with Applications in R](https://www.statlearning.com) by James, G., Witten, D., Hastie, T., and Tibshirani, R.:
+    + Section 3: Linear regression (you can skip section 3.5)
+    
+    
+## Optional:
+
+- [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) by Gelman A., and Hill, J.:
+    + Section 3: Linear regression: the basics
+    + Section 4: Linear regression: before and after fitting the model
+    
+- [Course Notes for IS 6489, Statistics and Predictive Analytics](https://bookdown.org/jefftemplewebb/IS-6489) by Jeff Webb.:
+    + Section 6: Linear regression

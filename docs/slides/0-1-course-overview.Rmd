@@ -1,0 +1,433 @@
+---
+title: "IDS 702: Module 0.1"
+subtitle: "Course overview and introduction"
+author: "Dr. Olanrewaju Michael Akande"
+date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(rvest)
+```
+
+
+class: center, middle
+
+# Welcome!
+
+
+
+---
+
+## What is this course about?
+
+<i class="fa fa-book fa-2x"></i> Learning the general work flow for building statistical models.
+
+--
+
+<i class="fa fa-tasks fa-2x"></i> Using statistical models to answer inferential questions.
+
+--
+
+<i class="fa fa-database fa-2x"></i> Working with real and messy datasets.
+
+--
+
+<i class="fa fa-group fa-2x"></i> Honing collaborative and presentations skills.
+
+--
+
+<i class="fa fa-refresh fa-spin fa-2x"></i> Nonstop analysis!!!
+
+--
+
+--- 
+<i class="fa fa-quote-left fa-2x fa-pull-left fa-border" aria-hidden="true"></i>
+<i class="fa fa-quote-right fa-2x fa-pull-right fa-border" aria-hidden="true"></i>
+Essentially, all models are wrong, but some are useful.
+
+-- Box, George E. P.
+
+
+
+---
+## Instructor
+
+[Dr. Olanrewaju Michael Akande](https://olanrewajuakande.com)
+
+<i class="fa fa-envelope"></i> &nbsp; [olanrewaju.akande@duke.edu](mailto:olanrewaju.akande@duke.edu) <br>
+<i class="fa fa-home"></i> &nbsp; [https://ids702-f21.olanrewajuakande.com](https://ids702-f21.olanrewajuakande.com) <br>
+<i class="fa fa-calendar"></i> &nbsp; Wednesdays and Fridays (9am - 10am) <br>
+<i class="fa fa-university"></i> &nbsp; Zoom Meeting ID: **See Sakai**
+
+
+---
+
+## TAs
+
+[Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu)
+
+<i class="fa fa-envelope"></i> &nbsp; [jiaman.wu@duke.edu](mailto:jiaman.wu@duke.edu) <br>
+<i class="fa fa-calendar"></i> &nbsp; Tuesdays and Thursdays (4pm - 5pm) <br>
+<i class="fa fa-university"></i> &nbsp; Virtual -- Zoom Meeting ID: **See Sakai**
+
+
+--
+
+<br>
+
+[Xinyi (Iris) Pan](https://datascience.duke.edu/xinyi-iris-pan)
+
+<i class="fa fa-envelope"></i> &nbsp; [xinyi.pan@duke.edu](mailto:xinyi.pan@duke.edu) <br>
+<i class="fa fa-calendar"></i> &nbsp; Mondays (8am - 9am) and Wednesdays (5pm - 6pm) <br>
+<i class="fa fa-university"></i> &nbsp; Virtual -- Zoom Meeting ID: **See Sakai**
+
+
+
+---
+
+## FAQs
+
+All materials and information will be posted on the course webpage:
+
+[https://ids702-f21.olanrewajuakande.com](https://ids702-f21.olanrewajuakande.com)
+
+--
+
+- Will we cover statistical theory? Yes, some, but for the most part, we will prioritize data analysis over rigorous theory.
+
+--
+
+- Am I prepared to take this course? Yes, if you are familiar with the topics covered in the MIDS summer statistics review.
+
+--
+
+- Will we be doing "very heavy" computing? Not exactly. We will mostly work with popular statistical packages and the datasets will be manageable, except maybe for your final projects.
+
+--
+
+- What computing language will we use? R.
+
+--
+
+- Why not python? Short answer: you will get enough python in your other courses.
+
+
+
+---
+
+class: center, middle
+
+# Course structure and policies
+
+
+
+---
+
+## Prerequisites
+
+- Students are expected to know all topics covered in the MIDS summer course review and boot camp. These include
+
+--
+
+  + Basic probability (including conditional probability, expectations and common probability distributions).
+
+--
+
+  + Basic statistical inference (including hypothesis testing, confidence intervals, linear regression with one predictor, and exploratory data analysis). 
+
+--
+
+  + Familiarity with R/Rstudio. 
+
+--
+
+- MIDS students automatically satisfy these requirements.
+
+--
+
+- If you are not a MIDS student and you are not sure you satisfy the requirements, come talk to me.
+
+
+
+---
+
+## Class meetings
+
+- Class attendance is compulsory! We will often engage in discussions outside/beyond (but related to) the contents of the lecture slides.
+
+--
+
+- You are **EXPECTED** to watch the pre-recorded lecture videos for corresponding modules **BEFORE** class meetings.
+
+--
+
+- Class meetings are designed to be interactive; try to engage and don't be shy.
+
+--
+
+- The methods we will cover are best learned by practical data analysis, so, there will be lots of "learn-by-doing".
+
+--
+
+- Always revisit in-class examples and re-run the R codes to be sure you understand each topic.
+
+
+
+---
+
+## Class meetings
+
+- If you cannot attend the synchronous classes for some reason (must be a very good one), please speak with me immediately.
+
+--
+
+- No need to print the course slides; let's keep the class green when possible. 
+
+--
+
+- Always bring your fully charged laptop (not a tablet/ipad) to class.
+
+--
+
+- Free free to ask me as many questions as possible during and outside classes; THERE ARE NO STUPID QUESTIONS!
+
+
+
+
+---
+
+## Grading
+
+Component             | Percentage
+----------------------|----------------
+Data Analysis Assignments | 30%
+Final Project | 25%
+Team Project 1 | 17.5%
+Team Project 2 | 17.5%
+Participation | 10%
+
+--
+
+- Participation will be accessed based on level of engagement throughout the semester.
+
+--
+
+- There are no make-ups for assignments or projects except for medical or familial emergencies or for reasons approved by the instructor before the due date.
+
+--
+
+- Exact ranges for letter grades may be curved and if they are, cutoffs will be determined after the final project.
+
+
+---
+
+## Methods and data analysis assignments
+
+- Assignments are posted on the course website. 
+
+--
+
+- Pay attention to the due date for each assignment.
+
+--
+
+- You can work with others on the assignments, but each person must write up and turn in her or his own answers. 
+
+--
+
+- You may be asked to work in pairs for one or two of the data analysis assignments when possible. When that is the case, each pair need only submit one solution per assignment.
+
+--
+
+- Assignments include questions on the computational and the mathematical aspects of the methods that we will learn during the semester, and questions that ask students to apply the modeling skills discussed during the semester. 
+
+--
+
+- The assignments MUST be typed up using R Markdown, LaTeX or another word processor, compiled to a pdf file, and submitted on [Gradescope](https://www.gradescope.com/courses/280392/assignments) under Assignments.
+
+
+
+---
+
+## Final project
+
+- Each student will analyze a data-based research question of their choosing, subject to approval. 
+
+--
+
+- The data should comprise several variables amenable to statistical analyses via modeling. 
+
+--
+
+- You can bring in their own research data sets, or you can ask me for assistance with identifying appropriate data. 
+
+--
+
+- All students present their results in class at the end of the semester. 
+
+--
+
+- Detailed instructions will be made available later.
+
+--
+
+- The time to start thinking about your final project is......now!
+
+
+
+---
+
+## Team projects
+
+- Students work in teams to analyze data selected by the instructor. 
+
+--
+
+- You will work within your preassigned MIDS groups for the team projects.
+
+--
+
+- Each group must write ONE team report with their data analysis findings. 
+
+--
+
+- Each group will also have the opportunity to present their results to the rest of the class.
+
+--
+
+- Detailed instructions will be made available later.
+
+
+
+---
+
+## Participation
+
+- Each student will be assigned a participation grade based on their level of participation throughout the semester.
+
+--
+
+- Participation will be accessed based on performance on
+  
+  + PlayPosit quizzes
+  
+--
+  + Level of engagement during class and breakout sessions.
+  
+--
+  + Level of engagement with other students, especially feedback on the project presentations.
+
+
+
+---
+
+## Academic integrity:
+
+- Remember the Duke Community Standard that you have agreed to abide by:
+
+  .large[
+  > To uphold the Duke Community Standard:
+
+  > - I will not lie, cheat, or steal in my academic endeavors;
+  > - I will conduct myself honorably in all my endeavors; and
+  > - I will act if the Standard is compromised.
+  ]
+
+--
+
+- Cheating on assessments or plagiarism on homework assignments, lying about an illness or absence and other forms of academic dishonesty are a breach of trust with classmates and faculty, violate the <a href="http://www.studentaffairs.duke.edu/conduct/resources/dcs">Duke Community Standard</a>, and will not be tolerated.
+
+--
+
+- Please review the Academic Dishonesty policies <a href="https://studentaffairs.duke.edu/conduct">here</a>.
+
+
+
+---
+
+## Diversity & inclusiveness:
+
+- This course is designed so that students from all backgrounds and perspectives all feel welcome both in and out of class. 
+
+--
+
+- Please feel free to talk to me (in person or via email) if you do not feel well-served by any aspect of this class, or if some aspect of class is not welcoming or accessible to you.
+
+--
+
+- My goal is for you to succeed in this course, therefore, please let me know immediately if you feel you are struggling with any part of the course more than you know how to manage. 
+
+--
+
+- Doing so will not affect your grades, but it will allow me to provide the resources to help you succeed in the course.
+
+
+
+---
+
+## Disability statement
+
+- Students with disabilities who believe that they may need accommodations in the class are encouraged to contact the <a href="https://access.duke.edu/students/staff.php">Student Disabilities Access Office</a> at 919-668-1267 or <a href="mailto:disabilities@aas.duke.edu">disabilities@aas.duke.edu</a> as soon as possible to better ensure that such accommodations are implemented in a timely fashion.
+
+
+
+---
+## Final notes
+
+- Make use of the teaching team's office hours, we're here to help!
+
+--
+
+- Do not hesitate to come to my office during office hours or by appointment to discuss a homework problem or any aspect of the course. 
+
+--
+
+- When the teaching team has announcements for you we will send an email to your Duke email address. Please make sure to check your email daily.
+
+--
+
+- Try as much as possible to refrain from texting or using your computer for anything other than coursework while watching the lecture videos or during the live sessions.
+
+--
+
+- You must attend the live session on a day when you are scheduled for a presentation; there are no make ups for presentations.
+
+
+---
+## Final notes
+
+- Time to split into groups.
+
+- By now, you must have completed the conceptual review questions on the website.
+
+- Discuss responses in 10 minutes: **which three or so questions (if any) are you most confused by and why?**
+
+- Now open the assessment key. On the website, just go back to the class schedule, refresh the page, and click the same assignment link. 
+
+
+
+

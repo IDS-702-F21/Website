@@ -1,0 +1,116 @@
+---
+title: "Conceptual review questions about hypothesis tests and confidence intervals"
+date: "Due: start of class, Tuesday, August 18"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    fig_caption: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+## Questions
+
+### Confidence Intervals 
+Decide whether the following statements are true or false.  Explain your reasoning.
+
+  1. For a given standard error, lower confidence levels produce wider confidence intervals.
+      
+      <font color="red">*False. To get higher confidence, we need to make the interval wider interval.  This is evident in the multiplier, which increases with confidence level.*</font>
+  
+  2. If you increase sample size, the width of confidence intervals will increase.
+      
+      <font color="red">*False. Increasing the sample size decreases the width of confidence intervals, because it decreases the standard error.*</font>
+  
+  3. The statement, "the 95% confidence interval for the population mean is (350, 400)", is equivalent to the statement, "there is a 95% probability that the population mean is between the numbers 350 and 400".
+      
+      <font color="red">*False. 95% confidence means that we used a procedure that works 95% of the time to get this interval.  That is, 95% of __all intervals__ produced by the procedure will contain their corresponding parameters.  For any __one particular interval__, the true population average is either inside the interval or outside  the interval.  In this case, it is either in between 350 and 400, or it is not in between 350 and 400.  Hence, the probability that the population average is in between those two exact numbers is either zero or one.*</font>
+  
+  4. To reduce the width of a confidence interval by roughly a factor of two (i.e., in half), you have to quadruple the sample size.
+      
+      <font color="red">*True, as long as we're talking about a CI for a population percentage.   The standard error for a population percentage has the square root of  the sample size in the denominator.  Hence, increasing the sample size by a factor of 4 (i.e., multiplying it by 4) is equivalent to multiplying the standard error by 1/2.  Hence, the interval will be half as wide.  This also works approximately for population averages as long as the multiplier from the t-curve doesn't change much when increasing the sample size (which it won't if the original sample size is large).*</font>
+  
+  5. The statement, "the 95% confidence interval for the population mean is (350, 400)" means that 95% of the population values are between 350 and 400.
+      
+      <font color="red">*False.  The confidence interval is a range of plausible values for the population average.   It does not provide a range for 95% of the data values from the population.  To find the percentage of values in the population between 350 and 400, we need to look at a histogram of the data values and determine what percentage of observations are between 350 and 400.*</font>
+  
+  6. If you take large random samples over and over again from the same population, and make 95% confidence intervals for the population average, about 95% of the intervals should contain the "population" average.
+      
+      <font color="red">*True.   This is the definition of confidence intervals. *</font>
+  
+  7. If you take large random samples over and over again from the same population, and make 95% confidence intervals for the population average, about 95% of the intervals should contain the "sample" average.
+      
+      <font color="red">*False.   The confidence interval is a range for the population average, not for the sample average.  In fact, every confidence interval contains its corresponding sample average, because CIs are of the form:  sample avg. +/- multiplier SE.  So, the sample average is right in the middle of the CI.*</font>
+  
+  8. When constructing a confidence interval for the population mean of a variable, it is necessary that the distribution of the variable itself follows a normal curve.
+      
+      <font color="red">*False.   It is necessary that the distribution of the __sample average__ follows a normal curve.  The data values of the variable, however, need not follow a normal curve, because if the sample size is large enough the central limit theorem for the sample average will apply.*</font>
+  
+  9. A 95% confidence interval obtained from a random sample of 1000 people has a better chance of containing the population percentage than a 95% confidence interval obtained from a random sample of 500 people.
+      
+      <font color="red">*False.  __All__ 95% confidence intervals have the property that they come from a procedure that has a 95% chance of yielding an interval that contains the true value.   The confidence interval method automatically accounts for sample size in the standard error.   A 95% CI with n=1000 will be narrower than a 95% CI with n=500, but both CIs will have 95% confidence of containing the population percentage.*</font>
+  
+  10. If you go through life making 99% confidence intervals for all sorts of population means, about 1% of the time the intervals won't cover their respective population means.
+      
+      <font color="red">*True.  Since 99% of the intervals should contain the corresponding population mean, 1% of them will not.*</font>
+  
+  
+### Hypothesis Testing
+Decide whether the following statements are true or false.  Explain your reasoning.
+
+  1. A p-value of .08 is more evidence against the null hypothesis than a p-value of .04.
+      
+      <font color="red">*False.  A small p-value means the value of the statistic we observed in the sample is unlikely to have occurred when the null hypothesis is true.  Hence, a .04 p-value means it is even more unlikely the observed statistic would have occurred when the null hypothesis is true than a .08 p-value.   The smaller the p-value, the stronger the evidence against the null hypothesis.*</font>
+  
+  2. The statement, "the p-value is .003", is equivalent to the statement, "there is a 0.3% probability that the null hypothesis is true".
+      
+      <font color="red">*False.   The null hypothesis is either true, or it is not true.  Hence, the probability that it is true equals either zero or one.  The p-value is not interpreted as a probability that the null hypothesis is true.   It is the probability of observing a value of the test statistic that is as or more extreme than what was observed in the sample, assuming the null hypothesis is true. *</font>
+  
+  3. Even though you rejected the null hypothesis,  it may still be true.
+      
+      <font color="red">*True.  Just by chance it is possible to get a sample that produces a small p-value, even though the null hypothesis is true.  This is called a Type I error.   A Type II error is when the null hypothesis is not rejected when it is in fact false.*</font>
+  
+  4. A researcher who tried to learn statistics without taking a formal course does a hypothesis test and gets a p-value of .014.   He says, "there is a 98.6% chance that the alternative hypothesis is false, so the null hypothesis is true."    What, if anything, is wrong with his statement?
+      
+      <font color="red">*False.  The researcher is claiming that (1 - p-value) is the probability that the alternative hypothesis is false.  The p-value is not a probability of an alternative (or null) hypothesis being true or false.  See the answer to question 12.*</font>
+  
+  5. You perform a hypothesis test using a sample size of four units, and you do not reject the null hypothesis.   Your research colleague says this statistical test provides conclusive evidence against the alternative hypothesis. Do you agree or disagree with his conclusion?  Explain your reasoning in three or less sentences.
+      
+      <font color="red">*With four units, the null hypothesis is unlikely to be rejected because the variability in the sample mean will be large, i.e. the standard error will be large.  Hence, all we can say is that there is not enough data to determine whether or not the null hypothesis is correct.  In fact, whenever you fail to reject a null hypothesis, essentially you are saying that the evidence in the data does not contradict the null hypothesis.  You never can conclude from a hypothesis test that the null hypothesis is true.*</font>
+  
+  6. You are the head of the Food and Drug Administration (F.D.A.), in charge of deciding whether new drugs are effective and should be allowed to be sold to people.   A pharmaceutical company trying to win approval for a new drug they manufacture claims that their drug is better than the standard drug at curing a certain disease.   The company bases this claim on a study in which they gave their drug to 1000 volunteers with the disease.   They compared these volunteers to a group of 1000 hospital patients who were treated with the standard drug and whose information is obtained from existing hospital records.  The company found a "statistically significant" difference between the percentage of volunteers who were cured and the percentage of the comparison group who were cured.   That is, they did a statistical hypothesis test and rejected the null hypothesis that the percentages are equal.  As director of the F.D.A., should you permit the new drug to be sold?  Explain your reasoning in three or less sentences.
+      
+      <font color="red">*You should not allow the drug to be manufactured based on this evidence.  The study was not a randomized study, which means there may be differences in the background characteristics of the people who got the new drug and the people who got the old drug.   Hypothesis tests cannot fix poorly designed studies.*</font>
+  
+  7. If you get a p-value of .13, it means there is a 13% chance that the sample average equals the population average.
+      
+      <font color="red">*False.  In fact, it's almost guaranteed that the sample average won't exactly equal the population average, because the process of taking a random sample guarantees variability in the sample average.  The p-value does not give the probability that the sample average equals the population average. *</font>
+  
+  8. If you get a p-value of .13, it means there is a 13% chance that the sample average does not equal the population average.
+      
+      <font color="red">*False.  See the answer to question 17.*</font>
+  
+  9. If you get a p-value of .13, it means there is an 87% chance that the sample average equals the population average.
+      
+      <font color="red">*False.  Computing (1 - p-value) does not give the probability that the sample average equals the population average. See the answer to question 17.*</font>
+  
+  10. If you get a p-value of .13, it means there is an 87% chance that the sample average does not equal the population average.
+      
+      <font color="red">*False.  See the answer to question 17.*</font>
+  
+  11. If you get a p-value of .13, it means that the null hypothesis is true in 13% of all samples.
+      
+      <font color="red">*False.  The null hypothesis is either true or false.  Truth does not change with different samples, only the test statistic (which is based on sample means and SEs) changes with different samples.*</font>
+  
+  12. If you get a p-value of .13, it means that when the null hypothesis is true, a value of the test statistic as or more extreme than what was observed occurs in about 13% of all samples.
+      
+      <font color="red">*True.  This is a re-expression of the definition of p-values.  That is, saying there is a 13% chance of observing results as or more extreme than what was observed is equivalent to saying that you'd observe results as or more extreme than what was observed in 13% of (random) samples.*</font>
+
+## Grading
+
+Check / no check
+  
+  

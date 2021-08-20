@@ -1,0 +1,29 @@
+---
+title: "Module 2: logistic regression"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Required:
+
+- [An Introduction to Statistical Learning with Applications in R](https://www.statlearning.com) by James, G., Witten, D., Hastie, T., and Tibshirani, R.:
+    + Section 4.3: Logistic regression
+    
+- S.K. Sarkar, Habshah Midi and Sohel Rana, 2011, *[Detection of Outliers and Influential Observations in Binary Logistic Regression: An Empirical Study](https://scialert.net/fulltextmobile/?doi=jas.2011.26.35)*, Journal of Applied Sciences, 11: 26-35.
+
+
+## Optional:
+
+- [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) by Gelman A., and Hill, J.:
+    + Section 5: Logistic regression
+    
+- [Course Notes for IS 6489, Statistics and Predictive Analytics](https://bookdown.org/jefftemplewebb/IS-6489) by Jeff Webb.:
+    + Section 8: Logistic regression
+

@@ -1,0 +1,115 @@
+---
+title: "Data Analysis Assignment 2"
+date: "Due: 11:59pm, Tuesday, Sept 14"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    fig_caption: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+## Instructions
+
+This assignment involves multiple linear regression. The data can be found on Sakai: go to Resources $\rightarrow$ Datasets $\rightarrow$ Data Analysis Assignments $\rightarrow$ Assignment 2. Please type your solutions using R Markdown, LaTeX or any other word processor but YOU MUST knit or convert the final output file to ".pdf". Submissions should be made on gradescope: go to Assignments $\rightarrow$ Data Analysis Assignment 2.
+
+<font color="red">**DO NOT INCLUDE R CODE OR OUTPUT IN YOUR SOLUTIONS/REPORTS** *All R code can be included in an appendix, and R outputs should be converted to nicely formatted tables. Feel free to use R packages such as `kable`, `xtable`, `stargazer`, etc.*</font>
+
+<font color="red">*Also, you can round up ALL numbers/estimates to 2 decimal places (4 decimal places at the most to avoid exact zeros when possible).*</font>
+
+**Reminder: You are allowed and even encouraged to talk to each other about general concepts, or to the instructor/TAs. However, the write-ups, solutions, and code MUST be entirely your own work.**
+
+## Questions
+
+Question 1 was taken and adapted from Chapter 7 of [Ramsey, F.L. and Schafer, D.W. (2013), "The Statistical Sleuth: A Course in Methods of Data Analysis (3rd ed)."](https://www.amazon.com/Statistical-Sleuth-Course-Methods-Analysis/dp/1133490670)
+
+1. <font color="blue">OLD FAITHFUL.</font>
+Old Faithful Geyser in Yellowstone National Park, Wyoming, derives its name and its considerable fame from the regularity (and beauty) of its eruptions. As they do with most [geysers](https://en.wikipedia.org/wiki/Geyser) in the park, rangers post the predicted times of eruptions on signs nearby, and people gather beforehand to witness the show. R.A. Hutchinson, a park geologist, collected measurements of the eruption durations (in minutes) and the subsequent intervals before the next eruption (also in minutes) over an 8-day period.  
+    *The data for this question can be found in the file "OldFaithful.csv" on Sakai.*  
+      + Fit a regression model for predicting the `interval` between eruptions from the `duration` of the previous one, to the data, and interpret your results.
+      + Include the 95% confidence interval for the slope, and explain what the interval reveals about the relationship between duration and waiting time. 
+      + Describe in a few sentences whether or not you think the regression assumptions are plausible based on residual plots (do not include any plots). 
+      + Fit another regression model for predicting `interval` from `duration` and `day`. Treat `day` as a categorical/factor variable. Is there a significant difference in mean intervals for any of the days (compared to the first day)? Interpret the effects of controlling for the days (do so only for the days with significant effects, if any).
+      + Perform an $F$-test to compare this model to the previous model excluding `day`. In context of the question, what can you conclude from the results of the $F$-test?
+      + Using $k$-fold cross validation (with k=10), compare the average RMSE for this model and the average RMSE for the previous model excluding `day`. Which model appears to have higher predictive accuracy based on the average RMSE values?  
+        *You should be able to leverage your team's code for doing cross validation.*
+      
+
+
+2. <font color="blue">MATERNAL SMOKING AND BIRTH WEIGHTS</font>.
+These days, it is widely understood that mothers who smoke during pregnancy risk exposing their babies to many health problems.  This was not common knowledge fifty years ago.  One of the first studies that addressed the issue of pregnancy and smoking was the Child Health and Development Studies, a comprehensive study of all babies born between 1960 and 1967 at the Kaiser Foundation Hospital in Oakland, CA.  The original reference for the study is Yerushalmy (1964, *American Journal of Obstetrics and Gynecology*, pp. 505-518).  The data and a summary of the study are in Nolan and Speed (2000, *Stat Labs*, Chapter 10) and can be found at the [book's website](https://www.stat.berkeley.edu/users/statlabs/).  
+    *The data for this question can be found in the file "babiesdata.csv" on Sakai.*
+    
+    There were about 15,000 families in the study.  We will only analyze a subset of the data, in particular 1236 male single births where the baby lived at least 28 days.  The researchers interviewed mothers early in their pregnancy to collect information on socioeconomic and demographic characteristics, including an  indicator of whether the mother smoked during pregnancy. The variables in the dataset are described in the code book at the end of this document.  
+    *Note that this is an observational study, because mothers decided whether or not to smoke during pregnancy; there was no random assignment to smoke or not to smoke. Thus, we cannot make causal inference statements from the results of a standard regression model.*
+    
+    In 1989, the Surgeon General asserted that mothers who smoke have increased rates of premature delivery (before 270 days) and low birth weights. We will analyze the data to see if there is an association between smoking and birth weight. To simplify analyses, we'll compare babies whose mothers smoke to babies whose mothers have never smoked.  The data file you have access to has only these people, although there were other types of smokers in the original dataset.  
+    <font color="green">Our questions of interest include the following.</font>
+      + Do mothers who smoke tend to give birth to babies with lower weights than mothers who do not smoke?
+      + What is a likely range for the difference in birth weights for smokers and non-smokers?
+      + Is there any evidence that the association between smoking and birth weight differs by mother's race? If so, characterize those differences.
+      + Are there other interesting associations with birth weight that are worth mentioning?
+      
+    <font color="blue">*First build your model, then do model assessment and validation. You should only proceed to answer the questions when you are satisfied with your final model; you should answer all the questions using that final model.*</font>
+      
+    <font color="green">Analyze the data and investigate these questions using a linear model.</font> Also, do the following.
+      + Write a report <font color="red">(maximum of 5 pages)</font> describing your findings. Code and additional plots can be placed in an appendix. You can start this report on a new page after Question 1.
+      + Make sure to provide direct answers to each question using your model.
+      + Be sure to also include the following in your report: 
+        - the model you ultimately decided to use,
+        - clear model building, that is, justification for the final model (e.g., why you chose certain transformations and why you decided the final model is reasonable),
+        - a justification for that model (e.g., why you chose certain transformations and why you decided the final model is reasonable to use based on residual diagnostics),
+        - the relevant regression output (includes: a table with coefficients and SEs, and p-values or confidence intervals; and somewhere in the text or table the estimated regression standard deviation and R-squared),
+        - and any potential limitations of the analysis.
+        
+    To help organize your thoughts, you should organize your report into sections as follows.
+      + <font color="brown">**Summary**</font>: a few sentences describing the inferential question(s), the method used and the most important results.
+      + <font color="brown">**Introduction**</font>: a short but more in-depth introduction to the inferential question(s) of interest. Here, you are basically writing the experiment and questions of interest given in your own words.
+      + <font color="brown">**Data**</font>: your EDA, interesting features of the data, and how you dealt with missing/erroneous values. Try to include one or two plots of your most interesting EDA findings.
+      + <font color="brown">**Model**</font>: a detailed description of the model used, how you selected the model, how you selected the variables, model assessment, model validation, and presentation of the model results. What are your overall conclusions in context of the inferential problem(s)? Try to include one or two plots that can help drive your point home.
+      + <font color="brown">**Conclusion**</font>: the importance of your findings and potential limitations of the study.
+    
+    <br />
+    <font color="red">*There are some complexities in the original dataset to be aware of. Some variables have missing values. In particular, you will see from the babiesdata.csv file that the height and weight of the father are missing quite frequently. This is typical in data on births, as it is often difficult to get data about the fathers. I recommend that you not consider father's height and weight when modeling. Some of the other variables have a few missing cases here and there. For this analysis, you can drop them from the modeling. This is not the ideal way to handle missing data in an analysis--and we will learn better methods later in the course--but for now it will move the analysis forward. I strongly recommend that you make a data file that has complete observations on every single case for all the variables you are thinking about including in the model, and run the regression using that file. For example, I posted such a file in the Sakai site that excludes all of the variables on the fathers. You are welcome to use this file, or make your own with complete cases if you really want to use fathers' data. **The modified data can be found in the file "smoking.csv" on Sakai.** *</font>
+    
+    <font color="red">*The data files also contain two outcome variables: gestational age and birth weight. Both of these could be affected by smoking, so both are outcomes rather than predictors. It does not make sense scientifically to include one as a predictor of the other; the two variables happen simultaneously and hence are a bivariate outcome. For this analysis, we exclude gestational age from the modeling. Of course, one could do a separate regression for gestational age to see if smoking has an effect on gestational ages. Even better, one could treat birth weight and gestational age as a bivariate outcome and fit a regression model that predicts the bivariate outcome. This is a model we won't have to time to learn about in our course, but come find the instructor if you want to learn more. The file also contains an indicator variable for Premature (gestational age < 270 days), which is just a recoding of gestational age; **we won't use that**.*</font>
+    
+      <font color="red">*The main file also includes information on the number of cigarettes smoked and about timing for mothers who quit smoking. For this analysis you do not have to use those variables, as we just compare smokers and non-smokers. Also, for this analysis, you can ignore the birth date variable, you can collapse education categories from 6-7 into one category for education = trade school, and you can also collapse race categories from 0 - 5 into one category for race = white.*</font>
+      
+      <font color="red">*Finally, regarding the fathers' data, you might pay attention to correlation among the mothers' and fathers' values. For example, the mothers' and fathers' races might tend to be similar (use a "table" command to see the contingency table of the two races), in which case you have to be concerned about effects of multicollinearity if you want to include both mother's and father's races in the model.*</font>
+      
+      **Code Book**
+      
+    Variable       |        Description
+    :------------- | :-------------------
+    Id             |        id number
+    birth          |       birth date where 1096 = January1, 1961 
+    gestation      |       length of gestation in days
+    bwt            |       birth weight in ounces (999 = unknown) <br /> *Response/outcome variable*
+    parity         |      total number of previous pregnancies, including fetal deaths and still births. (99=unknown)
+    mrace          |      mother's race or ethnicity <br /> 0-5=white <br /> 6=mexican <br /> 7=black <br /> 8=asian <br /> 9=mix <br /> 99=unknown
+    mage           |      mother's age in years at termination of pregnancy
+    med            |      mother's education <br /> 0 =  less than 8th grade <br /> 1 =  8th to 12th grade. did not graduate high school <br /> 2 = high school graduate, no other schooling <br /> 3 = high school graduate + trade school <br /> 4 = high school graduate + some college <br /> 5 = college graduate <br /> 6,7 = trade school but unclear if graduated from high school <br /> 9 = unknown
+    mht             |         mother's height in inches 
+    mpregwt         |      mother's pre-pregnancy weight in pounds 
+    drace           |         father's race or ethnicity <br /> 0-5 = white <br /> 6 = mexican <br /> 7 = black <br /> 8 = asian <br /> 9 = mix
+    dage            |          father's age in years at termination of pregnancy
+    ded             |          father's education  <br /> 0 =  less than 8th grade <br /> 1 =  8th to 12th grade. did not graduate high school <br /> 2 = high school graduate, no other schooling <br /> 3 = high school graduate + trade school <br /> 4 = high school graduate + some college <br /> 5 = college graduate <br /> 6,7 = trade school but unclear if graduated from high school <br /> 9 = unknown
+    dht              |        father's height
+    dwt              |       father's pre-pregnancy weight in pounds
+    marital          |    marital status of mother <br /> 1 = married <br /> 2 = legally separated <br /> 3 = divorced <br /> 4 = widowed <br /> 5 = never married
+    income           |    family yearly income in 2500 increments. 0 = under 2500, 1 = 2500-4999, ..., 9 = 15000+.   98=unknown, 99=not asked
+    smoke            |    does mother smoke? <br /> 0 = never <br /> 1 = smokes now <br /> 2 = until preg <br /> 3 = once did, not now
+    time             |       If mother quit, how long ago did she quit? <br /> 0 = never smoked, <br /> 1 = still smokes, <br /> 2 = quit during pregnancy, <br /> 3 = up to 1 yr ago, <br /> 4 = up to 2 yr ago, <br /> 5 = up to 3 yr ago, <br /> 6 = up to 4 yr ago, <br /> 7 = 5 to 9yr ago, <br /> 8 = 10+yr ago, <br /> 9 = quit and don't know, <br /> 98 = unknown
+    number           |      number of cigs smoked a day for past and current smokers <br /> 0 = never smoked <br /> 1 = 1-4 <br /> 2 = 5-9 <br /> 3 = 10-14 <br /> 4 = 15-19 <br /> 5 = 20-29 <br /> 6 = 30-39 <br /> 7 = 40-60 <br /> 8 = 60+, <br /> 9 = smoke but don't know
+    Premature       |        1 = baby born before gestational age of 270, and 0 = otherwise. <br /> *Ignore this for this assignment since it is just a dichotomized version of the gestational age*.
+
+
+## Grading
+
+30 points: 10 points for question 1, 20 points for question 2.
+  
+  

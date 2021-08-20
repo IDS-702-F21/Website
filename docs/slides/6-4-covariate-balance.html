@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 6.4</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 6.4
+## Regression-based estimation and covariate balance
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Estimation: regression-based
+
+- With unconfoundedness and overlap, we can move on to estimation.
+
+--
+
+- Clearly, we need to adjust for any difference in the outcomes due to the differences in pre-treatment characteristics.
+
+--
+
+- Commonly via a regression model for the potential outcome on covariates
+
+--
+
+- However,
+  1. validity of the analysis critically relies on the validity of the unconfoundedness assumption (which, remember is untestable); and
+  2. usually, model parameters do not directly correspond to the causal estimand of interest.
+
+
+---
+## Estimation: regression-based
+
+- For example, consider two regressions, one for each potential outcome. Write the mean functions as
+.block[
+.small[
+`$$\mathbb{E}[Y(1) | X=x] = \mu_1(x), \ \ \ \mathbb{E}[Y(0) | X=x] = \mu_0(x).$$`
+]
+]
+
+  This need not be two separate regressions, but could be a regression with `\(W\)` included as a predictor.
+
+--
+
+- Let `\(\hat{\mu}_w(X_i)\)` denote the fitted potential outcome for `\(Y_i(w)\)` based on the regression models.
+
+--
+
+- For ATE, the covariate-adjusted estimator is then 
+.block[
+.small[
+`$$\hat{\tau}_{\textrm{adj}} = \sum^N_{i=1} \dfrac{W_i (Y_i^{\text{obs}} - \hat{\mu}_0(X_i)) + (1-W_i) (\hat{\mu}_1(X_i) - Y_i^{\text{obs}}) }{N}$$`
+]
+]
+ 
+--
+ 
+- Unlike randomized experiments, the estimator is .hlight[not consistent] if the linear model is misspecified.
+
+
+---
+## Estimation: regression-based
+
+- Variance can be estimated using bootstrap.
+
+--
+
+- Note that regression itself does not take the lack of overlap into account.
+
+--
+
+- If the imbalance of the covariates between the two groups is large, the model-based results heavily relies on extrapolation in the non-overlap region, which is sensitive to the model specification assumption.
+
+--
+
+- .hlight[Take away]: Regression (or any model) here comes with a package. You need to know and acknowledge what
+assumptions—explicit or implicit—come with that model.
+
+
+
+---
+## Strategies for mitigating model dependence
+
+- To mitigate model dependence in the case of linear regression, there are two general strategies
+  1. Attempt to fix the design - balance covariates
+  2. Use more flexible model for analysis
+  
+--
+
+- .hlight[Best strategy is to actually use both jointly]: first balance covariates in the .hlight[design stage], then use .hlight[flexible models] in the analysis stage.
+
+--
+
+- However, in this class, we will not cover the kind of flexible models that would help, so we will focus on balancing the predictors/covariates instead.
+
+
+---
+## Strategies for mitigating model dependence
+
+- .hlight[Covariate balance] (our focus)
+  + Stratification
+  + Matching
+  + Propensity score methods
+ 
+--
+ 
+- .hlight[Flexible methods] (we won't cover these)
+  + Semiparametric models (e.g., power series)
+  + Machine learning methods (e.g., CART, random forest, boosting, bagging, etc)
+  + Bayesian non-parametric and semi-parametric models (e.g., Gaussian Processes, BART, Dirichlet Processes mixtures)
+  
+
+
+---
+## Covariate balance
+
+- Under unconfoundedness and overlap, valid causal inference can be obtained by comparing the observed distributions of `\(Y\)` under treatment and control **if the covariates are "balanced"**.
+
+--
+
+- Thus, a good practice is always to first check balance. That is, how similar are the two groups?
+
+--
+
+- What metric to use? The most common one is the .hlight[absolute standardized difference (ASD)]:
+.block[
+.small[
+`$$\textrm{ASD}_1 = \dfrac{\left| \dfrac{\sum_{i=1}^N X_iW_i}{N_1} - \dfrac{\sum_{i=1}^N X_i(1-W_i)}{N_0}  \right|}{\sqrt{\dfrac{s^2_1}{N_1} + \dfrac{s^2_0}{N_0}}},$$`
+]
+]
+
+  where `\(s^2_w\)` is the sample variance of the covariate in group `\(w\)` for `\(w = 0,1\)`, `\(N_1 = \sum_{i=1}^N W_i\)`, and `\(N_0 = \sum_{i=1}^N (1-W_i)\)`.
+
+
+---
+## Covariate balance
+
+- For a continuous covariate, `\(\textrm{ASD}_1\)` is the standard two-sample t-statistic, and the threshold is based on a t- or z- test (e.g. 1.96).
+
+--
+
+- There is some debate on whether `\(N_1\)` and `\(N_0\)` should be in the denominator.
+
+--
+
+- In some disciplines, the ASD is defined as
+.block[
+.small[
+`$$\textrm{ASD}_2 = \dfrac{\left| \dfrac{\sum_{i=1}^N X_iW_i}{N_1} - \dfrac{\sum_{i=1}^N X_i(1-W_i)}{N_0}  \right|}{\sqrt{s^2_1 + s^2_0}}.$$`
+]
+]
+
+--
+
+- The common threshold is 0.1.
+
+--
+
+- Limitation of ASD: only on the difference in means (1st moments), can not capture difference in higher order moments and interactions.
+
+
+
+---
+## Covariate balance
+
+- More general, multivariate, balance metrics are available.
+
+--
+
+- R package for balance assessment: `cobalt`.
+
+--
+
+- `cobalt` generates customizable balance tables, plots (marginal distribution and Love plots) for covariates, with balance metrics.
+
+--
+
+- Besides checking marginal balance, it is always good to also check higher order terms and interactions.
+
+--
+
+- However, most times ASD is still the only balance metric checked in practice...
+
+
+---
+## The minimum wage analysis
+
+- In 1992, New Jersey decided to raise it’s minimum wage from $4.25 an hour to $5.05 an hour. 
+
+--
+
+- What was the .hlight[causal effect] of this decision on employment in the fast food industry?
+
+--
+
+- To study this, economists from Princeton collected data from fast food restaurants along the New Jersey - Pennsylvania border, with the Pennsylvania restaurants acting as a control group for the New Jersey restaurants.
+
+--
+
+- They also collected data on several covariates for the restaurants. 
+
+--
+
+- The outcome is the employment rate after the minimum wage was raised in New Jersey.
+
+--
+
+- For more information, see the NY Times article [Supersize My Wage](https://www.nytimes.com/2013/12/22/magazine/supersize-my-wage.html?pagewanted=all&amp;_r=0).
+
+
+---
+## The minimum wage analysis
+
+- The data is in the file `MinimumWageData.csv` on Sakai.
+
+  .small[
+Variables    | Description
+:------------- | :------------
+NJ.PA | indicator for which state the restaurant is in (1 if NJ, 0 if PA)
+EmploymentPre | measures employment for each restaurant before the minimum wage raise in NJ
+EmploymentPost | measures employment for each restaurant after the minimum wage raise in NJ
+WagePre | measures the hourly wage for each restaurant before the minimum wage raise
+BurgerKing | indicator for Burger King
+KFC | indicator for KFC
+Roys | indicator for Roys
+Wendys | indicator for Wendys
+]
+
+
+---
+## The minimum wage analysis
+
+
+```r
+MinWage &lt;- read.csv("data/MinimumWageData.csv",header=T,
+                    colClasses=c("factor","numeric","numeric","numeric",
+                                 "factor","factor","factor","factor"))
+str(MinWage)
+```
+
+```
+## 'data.frame':	372 obs. of  8 variables:
+##  $ NJ.PA         : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ EmploymentPost: num  18 29.5 24 30.5 9 6.5 13.5 25 26.5 23 ...
+##  $ EmploymentPre : num  30 19 67.5 18.5 6 7 12.5 55 21.5 25.5 ...
+##  $ WagePre       : num  5 5.5 5 5 5.25 5 5 5 5 5.5 ...
+##  $ BurgerKing    : Factor w/ 2 levels "0","1": 1 1 2 2 1 1 1 2 2 2 ...
+##  $ KFC           : Factor w/ 2 levels "0","1": 1 1 1 1 2 2 1 1 1 1 ...
+##  $ Roys          : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 2 1 1 1 ...
+##  $ Wendys        : Factor w/ 2 levels "0","1": 2 2 1 1 1 1 1 1 1 1 ...
+```
+
+```r
+head(MinWage)
+```
+
+```
+##   NJ.PA EmploymentPost EmploymentPre WagePre BurgerKing KFC Roys Wendys
+## 1     0           18.0          30.0    5.00          0   0    0      1
+## 2     0           29.5          19.0    5.50          0   0    0      1
+## 3     0           24.0          67.5    5.00          1   0    0      0
+## 4     0           30.5          18.5    5.00          1   0    0      0
+## 5     0            9.0           6.0    5.25          0   1    0      0
+## 6     0            6.5           7.0    5.00          0   1    0      0
+```
+
+
+---
+## The minimum wage analysis
+
+
+```r
+summary(MinWage[,c(2:4)])
+```
+
+```
+##  EmploymentPost  EmploymentPre      WagePre     
+##  Min.   : 0.00   Min.   : 3.00   Min.   :4.250  
+##  1st Qu.:11.25   1st Qu.:11.38   1st Qu.:4.250  
+##  Median :17.00   Median :16.38   Median :4.500  
+##  Mean   :17.33   Mean   :17.65   Mean   :4.611  
+##  3rd Qu.:22.50   3rd Qu.:21.00   3rd Qu.:4.890  
+##  Max.   :55.50   Max.   :80.00   Max.   :5.750
+```
+
+```r
+summary(MinWage[,-c(2:4)])
+```
+
+```
+##  NJ.PA   BurgerKing KFC     Roys    Wendys 
+##  0: 73   0:218      0:295   0:280   0:323  
+##  1:299   1:154      1: 77   1: 92   1: 49
+```
+
+
+---
+## The minimum wage analysis
+
+Let's examine covariate balance. First, summarize covariates by NJ and PA.
+
+```r
+summary(MinWage[MinWage$NJ.PA == 0, 3:8]) #first PA
+```
+
+```
+##  EmploymentPre     WagePre      BurgerKing KFC    Roys   Wendys
+##  Min.   : 4.5   Min.   :4.250   0:40       0:63   0:56   0:60  
+##  1st Qu.:12.5   1st Qu.:4.250   1:33       1:10   1:17   1:13  
+##  Median :17.0   Median :4.500                                  
+##  Mean   :20.1   Mean   :4.629                                  
+##  3rd Qu.:25.0   3rd Qu.:5.000                                  
+##  Max.   :67.5   Max.   :5.500
+```
+
+```r
+summary(MinWage[MinWage$NJ.PA == 1, 3:8]) #now NJ
+```
+
+```
+##  EmploymentPre      WagePre      BurgerKing KFC     Roys    Wendys 
+##  Min.   : 3.00   Min.   :4.250   0:178      0:232   0:224   0:263  
+##  1st Qu.:11.00   1st Qu.:4.250   1:121      1: 67   1: 75   1: 36  
+##  Median :15.75   Median :4.500                                     
+##  Mean   :17.05   Mean   :4.606                                     
+##  3rd Qu.:20.38   3rd Qu.:4.870                                     
+##  Max.   :80.00   Max.   :5.750
+```
+
+
+---
+## The minimum wage analysis
+
+Using the `bal.tab` function in the `cobalt` package, we have
+
+```r
+bal.tab(list(treat=MinWage$NJ.PA,covs=MinWage[,3:8],estimand="ATE"))
+```
+
+```
+## Balance Measures
+##                  Type Diff.Un
+## EmploymentPre Contin. -0.2937
+## WagePre       Contin. -0.0645
+## BurgerKing     Binary -0.0474
+## KFC            Binary  0.0871
+## Roys           Binary  0.0180
+## Wendys         Binary -0.0577
+## 
+## Sample sizes
+##     Control Treated
+## All      73     299
+```
+
+--
+
+The default statistic for continuous variables is the standardized mean difference (without the absolute value). For binary variables, the default is the raw difference in proportion.
+
+--
+
+The distribution of prior employment is not well balanced across groups; other variables are pretty close, but we might be able to do better.
+
+---
+## The minimum wage analysis
+
+Can also use `love.plot` instead.
+
+
+```r
+love.plot(list(treat=MinWage$NJ.PA,covs=MinWage[,3:8],estimand="ATE"),stars = "std")
+```
+
+&lt;img src="6-4-covariate-balance_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+
+Same conclusion. How can we improve the balance?
+
+
+---
+## Acknowledgements
+
+These slides contain materials adapted from courses taught by Dr. Fan Li.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

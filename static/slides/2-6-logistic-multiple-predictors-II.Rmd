@@ -1,0 +1,77 @@
+---
+title: "IDS 702: Module 2.6"
+subtitle: "Logistic regression with multiple predictors II"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+
+
+## The contaminated wells analysis cont'd
+
+Data description:
+
+Variable    | Description
+:------------- | :------------
+Switch | 1 = if respondent switched to a safe well <br /> 0 = if still using own unsafe well
+Arsenic | amount of arsenic in well at respondent's home (100s of micro-grams per liter)
+Dist | distance in meters to the nearest known safe well
+Assoc | 1 = if any members of household are active in community organizations <br /> 0 = otherwise
+Educ | years of schooling of the head of household
+
+--
+
+Treat `switch` as the response variable and others as potential predictors.
+
+--
+
+The data is in the file `arsenic.csv` on Sakai.
+
+
+
+---
+class: center, middle
+
+# Move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Arsenic-II.R).
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

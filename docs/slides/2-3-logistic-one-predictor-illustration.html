@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 2.3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 2.3
+## Logistic regression with one predictor (illustration)
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Predicting nba wins
+
+- Let's fit a logistic regression with one predictor to NBA data for four seasons from the 2014/2015 season to the 2017/2018 season.
+
+--
+
+- Suppose we want to see how the amount of points a team let's the opponents score, affects their odds of winning.
+
+--
+
+- For this simple example, we will focus on data from one team: SAS (San Antonio Spurs).
+
+--
+
+- The data is in the file `nba_games_stats_reduced.csv` on Sakai.
+
+--
+
+- Ideally, we should use more information (and that data is actually available) to predict wins but let's continue for illustrative purposes.
+
+--
+
+- You will get to practice with the full data soon.
+
+
+---
+## Predicting nba wins
+
+
+```r
+nba &lt;- read.csv("data/nba_games_stats_reduced.csv",header=T)
+nba &lt;- nba[nba$Team=="SAS",]
+colnames(nba)[3] &lt;- "Opp"
+nba$win &lt;- rep(0,nrow(nba)); nba$win[nba$WINorLOSS=="W"] &lt;- 1
+nba$win &lt;- as.factor(nba$win)
+head(nba); dim(nba)
+```
+
+```
+##     Team WINorLOSS Opp win
+## 165  SAS         W 100   1
+## 166  SAS         L  94   0
+## 167  SAS         W  92   1
+## 168  SAS         L  98   0
+## 169  SAS         L 100   0
+## 170  SAS         W  85   1
+```
+
+```
+## [1] 328   4
+```
+
+```r
+summary(nba)
+```
+
+```
+##      Team            WINorLOSS              Opp         win    
+##  Length:328         Length:328         Min.   : 68.00   0: 98  
+##  Class :character   Class :character   1st Qu.: 90.00   1:230  
+##  Mode  :character   Mode  :character   Median : 97.00          
+##                                        Mean   : 96.97          
+##                                        3rd Qu.:104.00          
+##                                        Max.   :129.00
+```
+
+
+---
+## Predicting nba wins
+
+Only one predictor so not much to do in terms of EDA. We can look at
+
+```r
+ggplot(nba,aes(x=win, y=Opp, fill=win)) +
+  geom_boxplot() + coord_flip() +
+  scale_fill_brewer(palette="Blues") +
+  labs(title="Opposition Points against SAS vs Winning",y="Opposition Points",x="Win") + 
+   theme_classic() + theme(legend.position="none")
+```
+
+&lt;img src="2-3-logistic-one-predictor-illustration_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+
+---
+## Predicting nba wins
+
+.block[
+.small[
+$$
+\textrm{win}_i | \textrm{Opp}_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 \textrm{Opp}_i
+$$
+]
+]
+
+
+```r
+nbareg &lt;- glm(win~Opp,family=binomial(link=logit),data=nba); summary(nbareg)
+```
+
+```
+## 
+## Call:
+## glm(formula = win ~ Opp, family = binomial(link = logit), data = nba)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2760  -0.7073   0.4454   0.7902   1.9593  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 13.31989    1.66935   7.979 1.47e-15
+## Opp         -0.12567    0.01655  -7.594 3.11e-14
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 400.05  on 327  degrees of freedom
+## Residual deviance: 313.42  on 326  degrees of freedom
+## AIC: 317.42
+## 
+## Number of Fisher Scoring iterations: 5
+```
+
+  
+
+---
+## Predicting nba wins
+
+Same output re-presented:
+
+
+```r
+stargazer(nbareg,type = "html", header = FALSE,single.row = TRUE)
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;win&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Opp&lt;/td&gt;&lt;td&gt;-0.126&lt;sup&gt;***&lt;/sup&gt; (0.017)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;13.320&lt;sup&gt;***&lt;/sup&gt; (1.669)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;328&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-156.709&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;317.417&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+  .block[For every additional point an opponent scores against SAS in a game, the odds of winning decreases by approximately 12%, since exp(-0.126) = 0.88.]
+
+
+
+---
+## Predicting nba wins
+
+
+```r
+#Let's mean-center the opposition points for interpretation.
+nba$Opp_cent &lt;- nba$Opp - mean(nba$Opp)
+nbareg &lt;- glm(win~Opp_cent,family=binomial(link=logit),data=nba)
+stargazer(nbareg,type = "html", header = FALSE,single.row = TRUE)
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;win&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Opp_cent&lt;/td&gt;&lt;td&gt;-0.126&lt;sup&gt;***&lt;/sup&gt; (0.017)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;1.134&lt;sup&gt;***&lt;/sup&gt; (0.151)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;328&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-156.709&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;317.417&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+
+  .block[The odds of SAS winning an nba game during this period, when the opposition scores approximately 97 points, is approximately 3.11, that is, exp(1.134).]
+
+
+---
+## Predicting nba wins
+
+Confidence intervals for the coefficients. Remember that this is on the log-odds scale.
+
+```r
+confint.default(nbareg) #Asymptotic
+```
+
+```
+##                  2.5 %      97.5 %
+## (Intercept)  0.8370288  1.43070311
+## Opp_cent    -0.1581094 -0.09323567
+```
+
+```r
+confint(nbareg) #Based on the profile-likelihood
+```
+
+```
+## Waiting for profiling to be done...
+```
+
+```
+##                  2.5 %      97.5 %
+## (Intercept)  0.8462671  1.44156134
+## Opp_cent    -0.1599671 -0.09488784
+```
+
+--
+&lt;div class="question"&gt;
+Can you interpret the intervals?
+&lt;/div&gt;
+
+---
+## Predicting nba wins
+
+Let's transform to the odds scale.
+
+```r
+exp(confint.default(nbareg)) #Asymptotic
+```
+
+```
+##                 2.5 %    97.5 %
+## (Intercept) 2.3094947 4.1816383
+## Opp_cent    0.8537564 0.9109788
+```
+
+```r
+exp(confint(nbareg)) #Based on the profile-likelihood
+```
+
+```
+## Waiting for profiling to be done...
+```
+
+```
+##                 2.5 %    97.5 %
+## (Intercept) 2.3309296 4.2272909
+## Opp_cent    0.8521718 0.9094749
+```
+
+--
+&lt;div class="question"&gt;
+Can you interpret the intervals?
+&lt;/div&gt;
+
+
+
+---
+## Predicting nba wins
+
+We can get the predicted probabilities for the observed cases.
+
+
+```r
+nba$predprobs &lt;- predict(nbareg,type="response")
+#use predict(logreg, type="link") for the logit scale
+nba[1:20,]
+```
+
+```
+##     Team WINorLOSS Opp win   Opp_cent predprobs
+## 165  SAS         W 100   1   3.033537 0.6797523
+## 166  SAS         L  94   0  -2.966463 0.8185670
+## 167  SAS         W  92   1  -4.966463 0.8529607
+## 168  SAS         L  98   0   1.033537 0.7318401
+## 169  SAS         L 100   0   3.033537 0.6797523
+## 170  SAS         W  85   1 -11.966463 0.9332502
+## 171  SAS         W 100   1   3.033537 0.6797523
+## 172  SAS         W  80   1 -16.966463 0.9632468
+## 173  SAS         L  94   0  -2.966463 0.8185670
+## 174  SAS         W  75   1 -21.966463 0.9800514
+## 175  SAS         W  90   1  -6.966463 0.8817762
+## 176  SAS         W  92   1  -4.966463 0.8529607
+## 177  SAS         W  87   1  -9.966463 0.9157825
+## 178  SAS         W 100   1   3.033537 0.6797523
+## 179  SAS         W 104   1   7.033537 0.5621626
+## 180  SAS         W  89   1  -7.966463 0.8942617
+## 181  SAS         W 103   1   6.033537 0.5928153
+## 182  SAS         L  95   0  -1.966463 0.7991510
+## 183  SAS         W 101   1   4.033537 0.6518001
+## 184  SAS         W 101   1   4.033537 0.6518001
+```
+
+
+---
+## Predicting nba wins
+
+Useful to examine a plot of predicted probabilities by `\(x\)`, that is, opposition points.
+
+
+```r
+ggplot(nba,aes(x=Opp, y=predprobs)) +
+  geom_point(alpha = .5,colour="blue2") +
+  geom_smooth(col="red3") + theme_classic() +
+  labs(title="Predicted Prob. of Winning vs Opposition Points",x="Opposition Points",y="Pred. Probability of Winning")
+```
+
+&lt;img src="2-3-logistic-one-predictor-illustration_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

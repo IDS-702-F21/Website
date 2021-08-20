@@ -1,0 +1,131 @@
+---
+title: "IDS 702: Module 3.6"
+subtitle: "Proportional odds model (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+library(e1071)
+library(caret)
+library(pROC)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+## Political ideology data
+
+- This data is from a General Social Survey.
+
+--
+
+- Again, political ideology has a five-point ordinal scale, ranging from very liberal to very conservative.
+
+.mini[
+<table>
+  <tr>
+    <th> </th>
+    <th> </th>
+    <th colspan="5">Political Ideology</th>
+  </tr>
+  <tr>
+    <th colspan="2"></th>
+    <td style="text-align:center">Very Liberal</td>
+    <td style="text-align:center">Slightly Liberal</td>
+    <td style="text-align:center">Moderate</td>
+    <td style="text-align:center">Slightly Conservative</td>
+    <td style="text-align:center">Very Conservative</td>
+  </tr>
+  <tr>
+    <th rowspan="2">Female</th>
+    <td height="50px">Democratic</td>
+    <td style="text-align:center">44</td>
+    <td style="text-align:center">47</td>
+    <td style="text-align:center">118</td>
+    <td style="text-align:center">23</td>
+    <td style="text-align:center">32</td>
+  </tr>
+  <tr>
+    <td height="50px">Republican</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">28</td>
+    <td style="text-align:center">86</td>
+    <td style="text-align:center">39</td>
+    <td style="text-align:center">48</td>
+  </tr>
+  <tr>
+    <th rowspan="2">Male</th>
+    <td height="50px">Democratic</td>
+    <td style="text-align:center">36</td>
+    <td style="text-align:center">34</td>
+    <td style="text-align:center">53</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">23</td>
+  </tr>
+  <tr>
+    <td height="50px">Republican</td>
+    <td style="text-align:center">12</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">62</td>
+    <td style="text-align:center">45</td>
+    <td style="text-align:center">51</td>
+  </tr>
+</table>
+]
+  
+
+
+
+---
+class: center, middle
+
+# In-class analysis: move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Political.R)
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+

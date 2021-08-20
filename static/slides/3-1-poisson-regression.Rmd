@@ -1,0 +1,399 @@
+---
+title: "IDS 702: Module 3.1"
+subtitle: "Poisson regression"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+
+
+## Generalized linear models
+
+- As we've seen over the last few modules, we may often need to work with outcome variables that are not continuous.
+
+--
+
+- Clearly, the standard linear regression will not suffice in those situations.
+
+--
+
+- Specifically, we saw how to use logistic and probit regression to handle binary response variables.
+
+--
+
+- In other scenarios however, our outcome variable will not be binary either. 
+
+--
+
+- How should we handle that?
+
+
+---
+## Generalized linear models
+
+- For example, we may want to predict
+
+--
+
+  + Whether someone prefers product A, B, or C (nominal)
+  
+--
+
+  + Political ideology on an ordered 3 scale outcome, such as "very liberal", "moderate", "very conservative" (ordinal)
+  
+--
+
+  + The number of times an event happens (counts)
+
+--
+
+- The classes of models we will use to handle these types of responses are referred to as .hlight[generalized linear models (GLMs)].
+
+--
+
+- Note that GLMs includes the linear, logistic and probit regressions we already covered.
+
+
+
+---
+## Components of GLMs
+
+Generally, GLMs have three major components:
+
+--
+
+1. The .hlight[random component] describes the randomness of the outcome variable $Y$ through a pdf or pmf $f$, with parameter $\theta_i$. That is,
+.block[
+.small[
+$$y_i | \boldsymbol{x}_i \sim f(y_i|\theta_i) \ \ \ \textrm{OR} \ \ \ y_i | \boldsymbol{x}_i \sim f(y_i;\theta_i) \ \ \ \textrm{OR} \ \ \ y_i | \boldsymbol{x}_i \sim f(\theta_i)$$
+]
+]
+
+--
+
+2. The .hlight[systematic component] defines a linear component of the predictors. That is, for each observation $i$,
+.block[
+.small[
+$$\eta_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}$$
+]
+]
+
+--
+
+3. The .hlight[link function] $g$ connects the random and systematic components through $\mu_i = \mathbb{E}[Y_i | \boldsymbol{x}_i]$, that is
+.block[
+.small[
+$$\eta_i = g(\mu_i)$$
+]
+]
+
+  where $g$ is a monotonic and differentiable function (for those with some math background).
+
+--
+  
+  In standard linear regression, $g$ is the .hlight[identity link] $n_i=g(\mu_i)=\mu_i$, whereas in logistic regression, $g$ is the logit function.
+
+
+
+---
+## Poisson regression
+
+- Suppose you have count data (non-negative integers) as your response variable. 
+
+--
+
+- For example, we may want to explain the number of c-sections carried out in hospitals using potential predictors such as
+  + hospital type, that is, private vs public
+  + location
+  + size of the hospital
+
+--
+
+- The models we have covered so far are not adequate for count data.
+
+--
+
+- While this is generally the case, there are instances where linear regression, with some transformations (especially taking logs) on the response variable, might still work reasonably well for count data.
+
+--
+
+- Thus, one can attempt to fit a linear regression model first, check to see if the assumptions of the model are violated, and then move on to a more appropriate model if needed.
+
+
+---
+## Poisson regression
+
+- A good distribution for modeling count data with no limit on the total number of counts is the .hlight[Poisson distribution].
+
+--
+
+- <div class="question">
+Why would the Binomial distribution be inappropriate when there is no limit on the total number of counts?
+</div>
+
+--
+
+- The Poisson distribution is parameterized by $\lambda$ and the pmf is given by
+.block[
+.small[
+$$\Pr[Y = y] = \dfrac{\lambda^y e^{-\lambda}}{y!}; \ \ \ \ y=0,1,2,\ldots; \ \ \ \ \lambda > 0.$$
+]
+]
+
+--
+
+- An interesting feature of the Poisson distribution is.
+.block[
+.small[
+$$\mathbb{E}[Y = y] = \mathbb{V}[Y = y] = \lambda.$$
+]
+]
+
+
+--
+
+- When our data fails this assumption, we may have what is known as .hlight[over-dispersion] and may want to consider the [Negative Binomial distribution](https://en.wikipedia.org/wiki/Negative_binomial_distribution) instead, or try a Bayesian specification (STA 602!).
+
+--
+
+- With no predictors, the best guess for $\lambda$ is the sample mean, that is, $\hat{\lambda} = \sum_{i=1}^n \dfrac{y_i}{n}$.
+  
+
+
+---
+## Poisson regression
+
+- With predictors, we want to index $\lambda$ with $i$, where each $\lambda_i$ is a function of $\boldsymbol{x}_i$. We can therefore write the .hlight[random component] of this glm as
+.block[
+.small[
+$$y_i | \boldsymbol{x}_i \sim \textrm{Poisson}(\lambda_i); \ \ \ i=1,\ldots,n. $$
+]
+]
+
+--
+
+- We must ensure that $\lambda_i > 0$ at any value of $\boldsymbol{x}_i$, therefore, we need a .hlight[link function] that enforces this. A natural choice is the natural logarithm, so that we have
+.block[
+.small[
+$$\textrm{log}\left(\lambda_i\right) = \beta_{0} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip}.$$
+]
+]
+
+--
+
+- Combining these pieces give us our full mathematical representation for the .hlight[Poisson regression].
+
+--
+
+- In .hlight[R], use the `glm` command but set the option `family = “poisson”`.
+
+--
+
+- Clearly, $\lambda_i$ has a natural interpretation as the "expected count", and
+.block[
+.small[
+$$\lambda_i = e^{\beta_{0} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip}}$$
+]
+]
+
+  means that we can interpret the $e^{\beta_{j}}$'s as .hlight[multiplicative effects on the expected counts].
+
+
+---
+## Poisson regression
+
+- For predictions, we can look at the expected counts, that is,
+.block[
+.small[
+$$\hat{\lambda}_i = e^{\hat{\beta_{0}} + \hat{\beta_{1}} x_{i1} + \hat{\beta_{2}} x_{i2} + \ldots + \hat{\beta_{p}} x_{ip}}$$
+]
+]
+
+--
+
+- Interpretation of $e^{\beta_j}$:
+  + For continuous $x_j$: the expected count of $Y$ increases by a multiplicative factor of $e^{\beta_j}$ when increasing $x_j$ by one unit.
+  
+--
+
+  + For binary $x_j$: the expected count of $Y$ increases by a multiplicative factor of $e^{\beta_j}$ for the group with $x_j = 1$ in comparison to the group with $x_j = 0$.
+ 
+
+
+---
+## Poisson regression
+ 
+- For example, suppose
+  + Suppose the response variable is the number of mating for elephants, and let $x_1$ represent the age of the elephants
+
+--
+
+  + Also suppose $\hat{\beta}_j = 0.069$, so that $e^{\hat{\beta}_j} = e^{0.069} = 1.0714$.
+  
+--
+
+  + Then, an increase in age of one year increases the expected number of mating for elephants by 7 percent.
+  
+  
+---
+## Poisson regression
+
+- The raw residuals $e_i = y_i - \hat{\lambda}_i$ are difficult to interpret since variance is equal to the mean in Poisson distributions.
+
+--
+
+- Use the Pearson's residuals instead:
+.block[
+.small[
+$$r_i = \dfrac{y_i - \hat{\lambda}_i}{\sqrt{\hat{\lambda}_i}}$$
+]
+]
+
+--
+
+- Plot the $r_i$'s versus the predicted $\hat{\lambda}_i$'s, as well as the  $x_j$ values for each predictor $j$, to look for trends suggesting model misspecification.
+
+--
+
+- We can also use those to identify potential outliers.
+
+--
+
+- We can still check for multicollinearity, do model validation using RMSE, and do model selection via forward, backward and stepwise selection for Poisson regression
+
+--
+
+- We can also perform a change in deviance test to compare nested models.
+
+--
+
+-  We will look at an example soon.
+
+
+
+---
+## Poisson regression in terms of rate
+
+- Recall that for aggregated data, the logistic regression model is
+.block[
+.small[
+$$y_i | x_i \sim \textrm{Bin}(n_i,\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip},$$
+]
+]
+
+  where $n_i$ represents the .hlight[population size] for each "count" $y_i$.
+
+--
+
+- Here, we are really interested in learning about, explaining or estimating the probability/proportion/rate, $\pi_i \in (0,1)$.
+
+--
+
+- The maximum likelihood estimate of each $\hat{\pi}_i = \frac{y_i}{n_i}$.
+
+--
+
+- When dealing with very rare events, the rates $\pi_i$ will be very small, and sometimes really close to $0$. Using the logistic regression model in these applications may not be ideal.
+
+--
+
+- Generally, estimation under the logistic regression model often fails for rates or probabilities close to $0$ or $1$.
+
+--
+
+- When dealing with these rare events, it turns out that we often will be able to take advantage of the Poisson approximation to the binomial.
+
+
+
+---
+## Poisson regression in terms of rate
+
+- To take advantage of this relationship, one way to rewrite the Poisson regression model is
+.block[
+.small[
+$$
+\begin{split}
+y_i | \boldsymbol{x}_i & \sim \textrm{Poisson}\left(\lambda_i = n_i\pi_i\right); \ \ \ i=1,\ldots,n.
+\end{split}
+$$
+]
+]
+
+--
+
+- However, since we are really interested in the original rate $\pi_i$, we want to model that instead of the "expected counts" $\lambda_i$.
+
+--
+
+- That is, we can write
+.block[
+.small[
+$$
+\begin{split}
+\textrm{log}\left(\pi_i = \frac{\lambda_i}{n_i}\right) & = \beta_{0} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip}.
+\end{split}
+$$
+]
+]
+
+--
+
+- Since each $n_i$ is then known, we can write
+.block[
+.small[
+$$
+\begin{split}
+\Rightarrow \textrm{log}\left(\lambda_i\right) & = \beta_{0} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip} + \textrm{log}\left(n_i\right).
+\end{split}
+$$
+]
+]
+
+--
+
+- Thus, .hlight[rate data] can be modeled by including the $\text{log}(n)$ term with coefficient of $1$ (called an .hlight[offset]). This offset is modeled with `offset()` option in R.
+  ```{r eval=F}
+Model <- glm(successes ~ predictor, data=Data_agg, offset=log(n), family=poisson)
+```
+  
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

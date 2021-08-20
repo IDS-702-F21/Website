@@ -1,0 +1,184 @@
+---
+title: "IDS 702: Module 1.12"
+subtitle: "Bringing the MLR pieces together II (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+```
+
+
+
+## Back to the diamonds data
+
+Let's try model selection for our diamonds example. We will do this on the log scale - recall our analysis in the previous module.
+
+First, forward selection using AIC
+
+```{r,error=FALSE}
+diamonds <- read.csv("data/diamonds.csv", header= T,
+                     colClasses = c("numeric","factor","factor","factor","numeric"))
+diamonds$CaratsCent <- diamonds$Carats - mean(diamonds$Carats)
+diamonds$CaratsCent2 <- diamonds$CaratsCent^2
+NullModel <- lm(log(Price)~1,data=diamonds)
+FullModel <- lm(log(Price)~CaratsCent+CaratsCent2+
+                  Color*Clarity+Color*Certification+
+                  Clarity*Certification,
+                data=diamonds)
+Model_forward <- step(NullModel, scope = formula(FullModel),direction="forward",trace=0)
+# Remove the trace=0 option if you want to function to print the entire process
+# Let's see the variables the model selected
+Model_forward$call
+#run summary(Model_forward) to see the results of the final model
+```
+
+
+---
+## Back to the diamonds data
+
+Let's do the same using BIC
+
+```{r}
+# use k = log(n) to use BIC instead.
+n <- nrow(diamonds)
+Model_forward <- step(NullModel, scope = formula(FullModel),direction="forward",trace=0,
+                      k = log(n))
+# Let's see the variables the model selected
+Model_forward$call
+#run summary(Model_forward) to see the results of the final model
+```
+
+
+---
+## Back to the diamonds data
+
+Backward selection using AIC
+
+```{r}
+Model_backward <- step(FullModel,direction="backward",trace=0)
+# Let's see the variables the model selected
+Model_backward$call
+#run summary(Model_backward) to see the results of the final model
+```
+
+Same result as forward selection using AIC
+
+
+---
+## Back to the diamonds data
+
+Backward selection using BIC
+
+```{r}
+Model_backward <- step(FullModel,direction="backward",trace=0,k = log(n))
+# Let's see the variables the model selected
+Model_backward$call
+#run summary(Model_backward) to see the results of the final model
+```
+
+Same result as forward selection using BIC
+
+
+---
+## Back to the diamonds data
+
+Stepwise selection using AIC
+
+```{r}
+Model_stepwise <- step(NullModel, scope = formula(FullModel),direction="both",trace=0)
+# Let's see the variables the model selected
+Model_stepwise$call
+#run summary(Model_backward) to see the results of the final model
+```
+
+Same result as previous results using AIC
+
+
+---
+## Back to the diamonds data
+
+Stepwise selection using BIC
+
+```{r}
+Model_stepwise <- step(NullModel, scope = formula(FullModel),direction="both",trace=0,
+                       k = log(n))
+# Let's see the variables the model selected
+Model_stepwise$call
+#run summary(Model_backward) to see the results of the final model
+```
+
+Same result as previous results using BIC
+
+
+---
+## Back to the diamonds data
+
+Let's use the .hlight[regsubsets] function.
+
+```{r}
+library(leaps)
+Model_forward <- regsubsets(log(Price)~CaratsCent+CaratsCent2+Color*Clarity+
+                              Color*Certification+Clarity*Certification,data=diamonds,
+                            method="forward")
+Select_results <- summary(Model_forward)
+coef(Model_forward, which.max(Select_results$adjr2)) # Adj R-sq 
+coef(Model_forward, which.min(Select_results$bic)) #BIC
+```
+
+---
+## Back to the diamonds data
+
+```{r}
+Model_backward <- regsubsets(log(Price)~CaratsCent+CaratsCent2+Color*Clarity+
+                              Color*Certification+Clarity*Certification,data=diamonds,
+                            method="backward")
+Select_results <- summary(Model_backward)
+coef(Model_backward, which.max(Select_results$adjr2)) # Adj R-sq 
+coef(Model_backward, which.min(Select_results$bic)) #BIC
+```
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

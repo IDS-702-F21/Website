@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 8.5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 8.5
+## Ensemble tree methods
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+## Bagging
+
+- Instead of using one big tree, .hlight[bagging] constructs `\(B\)` classification and regression trees using `\(B\)` bootstrapped datasets.
+
+--
+
+- Each tree is grown deep and has high variance, but low bias. 
+
+--
+
+- Averaging all `\(B\)` trees reduces the variance. 
+
+--
+
+- Improve accuracy by combining hundreds or even thousands of trees.
+
+--
+
+- To predict,
+  + a continuous outcome, drop new `\(X\)` down each tree until getting to terminal leaf. Predicted value of `\(Y\)` is the average of all `\(B\)` predictions across all the trees.
+--
+
+  + a categorical outcome, select the most commonly occurring majority level among the `\(B\)` predictions.
+
+
+---
+## Random forests
+
+- The trees in bagging would be correlated since they are all based on the same data (sort of!).
+
+--
+
+- .hlight[Random forests] attemps to de-correlate the trees.
+
+--
+
+- Random forests also constructs `\(B\)` classification and regression trees using `\(B\)` bootstrapped datasets but only uses a sample of the predictors for each tree.
+
+--
+
+- Doing so prevents the same variables from dominating the splitting process across all trees.
+
+--
+
+- Both bagging and random forests will not overfit for large `\(B\)`.
+
+
+---
+## Random forests
+
+- .hlight[Random forest algorithm]:
+
+--
+  
+  For `\(b = 1, \ldots, B\)`,
+  1. Take a bootstrap sample of the original data. 
+      + Alternatively, can take a sub-sample of the original data of size `\(m &lt; n\)`, where `\(n\)` is the sample size of the collected data.
+  
+--
+
+  2. Take a sample of `\(q &lt; p\)` predictors, where `\(p\)` is the total number of predictors in the dataset.
+  
+--
+
+  3. Using only the data in the bootstrapped sample or sub-sample, grow a tree using only the `\(q\)` sampled predictors. Save the tree.
+  
+--
+
+- For predictions, do the same thing as in bagging.
+
+--
+
+- Variable importance measures based on how often a variable is used in splits of the trees.
+
+
+---
+## Random forests vs. parametric regression: benefits
+
+- No parametric assumptions.
+
+--
+
+- Automatic model selection.
+
+--
+
+- Multi-collinearity not problematic.
+
+--
+
+- Can handle big data files, since trees are small.
+
+--
+
+- In R, use the `randomForest` package.
+
+
+---
+## Random forests vs. parametric regression: limitations
+
+- Regression prediction limitations like those for CART.
+
+--
+
+- Hard to assess chance error.
+
+--
+
+- Little control over the few parameters to tweak if model does not fit the data well.
+
+
+
+---
+## Boosting
+
+- .hlight[Boosting] works like bagging, except that the trees are grown sequentially.
+
+--
+
+- Specifically, each tree is grown using information from previously grown trees.
+
+--
+
+- After the first tree, the remaining trees are built using residuals as outcomes.
+
+--
+
+- The idea is so that boosting can slowly improve the model in areas where it does not perform well.
+
+--
+
+- Boosting does not involve bootstrap since each tree is fit on a modified version of the original data set.
+
+--
+
+- It can overfit if the number of trees is too large.
+
+--
+
+- There are so many boosting methods! This is just one of them.
+
+
+
+---
+## Boosting
+
+- Goal: to construct a function `\(\hat{f}(y|x)\)` to estimate true `\(f(y|x)\)`.
+
+--
+
+- .hlight[Boosting algorithm]:
+
+--
+
+  1. Fit a decision tree `\(\hat{f}\)` with `\(d\)` splits to the data using `\(Y\)` as the outcome. Compute the residuals.
+  
+--
+
+  2. For `\(b = 2, \ldots, B\)`,
+      + Fit a decision tree `\(\hat{f}^b\)` with `\(d\)` splits to the data using the residuals as the outcome.
+      + Add this new decision tree into the fitted function: `\(\hat{f} = \hat{f} + \lambda \hat{f}^b\)`.
+      + Compute updated residuals.
+
+--
+  3. Output the boosted model: `\(\hat{f} = \sum_{b=1}^B \lambda \hat{f}^b\)`.
+  
+--
+
+- The shrinkage parameter `\(\lambda\)` (often small, e.g. 0.01) controls the rate at which boosting learns.
+
+
+
+---
+## General advice about tree methods vs parametric regressions
+
+- When the goal is prediction and sample sizes are large, tree methods can be effective engines for prediction.
+
+--
+
+- When the goal is interpretation of predictors, or when sample sizes are modest, use parametric models with careful model diagnostics.
+
+--
+
+- Either way, always remember the data:
+  + What population, if any, are they representative of?
+  + Are the definitions of variables what you wanted?
+  + Are there missing values or data errors to correct?
+
+
+---
+## Arsenic example again
+
+- Recall the study measuring the concentrations of arsenic in wells in Bangladesh.
+
+--
+
+- We already fit a logistic regression to the data.
+
+--
+
+- We will use the same data to compare these models.
+
+--
+
+- Research question: predicting why people switch from unsafe wells to safe wells.
+
+--
+
+- The data is in the file `arsenic.csv` on Sakai.
+
+
+
+---
+## Arsenic example again
+
+
+Variable    | Description
+:------------- | :------------
+Switch | 1 = if respondent switched to a safe well &lt;br /&gt; 0 = if still using own unsafe well
+Arsenic | amount of arsenic in well at respondent's home (100s of micro-grams per liter)
+Dist | distance in meters to the nearest known safe well
+Assoc | 1 = if any members of household are active in community organizations &lt;br /&gt; 0 = otherwise
+Educ | years of schooling of the head of household
+
+- Treat switch as the response variable and others as predictors.
+
+- Move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Arsenic_II.R).
+
+
+---
+
+class: center, middle
+
+# What's next?
+
+### Well.........nothing!
+
+### You made it to the end of this course.
+
+### Hope you enjoyed the course and that you have learned a lot.
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

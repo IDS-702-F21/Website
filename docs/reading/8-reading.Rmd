@@ -1,0 +1,25 @@
+---
+title: "Module 8: other topics"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Optional:
+
+### Book sections
+
+
+- [An Introduction to Statistical Learning with Applications in R](https://www.statlearning.com) by James, G., Witten, D., Hastie, T., and Tibshirani, R.:
+    + Section 5.2: The bootstrap
+    + Section 7.1: Polynomial regression
+    + Section 7.2: Step functions
+    + Section 7.3: Basis functions
+    + Section 7.6: Local regression
+    + Section 8: Tree-based methods

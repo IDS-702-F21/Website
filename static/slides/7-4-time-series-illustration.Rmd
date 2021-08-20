@@ -1,0 +1,89 @@
+---
+title: "IDS 702: Module 7.4"
+subtitle: "Time series analysis (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(ggplot2)
+#library(arm)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## FTSE 100
+
+```{r}
+ftse100 <- read.csv("data/ftse2018.csv", header = T)
+ftse100 <- ftse100[nrow(ftse100):1,]
+dim(ftse100)
+head(ftse100)
+```
+
+
+---
+## Sunspots and melanoma
+
+```{r fig.height=3}
+cancersun <- read.csv("data/melanoma.csv", header = T)
+names(cancersun) = c("year", "melanoma", "sunspot")
+str(cancersun)
+head(cancersun)
+```
+
+
+---
+class: center, middle
+
+# In-class analysis: move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/TS_examples.R)
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

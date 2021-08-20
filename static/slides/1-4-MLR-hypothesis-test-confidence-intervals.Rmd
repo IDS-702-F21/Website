@@ -1,0 +1,250 @@
+---
+title: "IDS 702: Module 1.4"
+subtitle: "Hypothesis tests, confidence intervals, and predictions"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(rvest)
+wages <- read.csv("data/wagediscrim.txt", header= T)
+wages$sex <- factor(wages$sex,levels=c("Male","Female"))
+wages$fsex <- factor(wages$fsex)
+
+wages$agec <- c(scale(wages$age,scale=F))
+wages$seniorc <- c(scale(wages$senior,scale=F))
+wages$experc <- c(scale(wages$exper,scale=F))
+wages$educc <- c(scale(wages$educ,scale=F))
+```
+
+
+## Recap: model for baseline salary
+
+```{r}
+regwage <- lm(bsal~ sex + senior + age + educ + exper, data= wages)
+summary(regwage)
+```
+
+
+---
+## Recap: model for baseline salary with centered predictors
+
+```{r}
+regwagec <- lm(bsal~ sex + seniorc + agec + educc + experc, data= wages)
+summary(regwagec)
+```
+
+
+
+
+---
+## Hypothesis tests for coefficients
+
+- The reported t-values and p-values in `R` are used to test whether a particular coefficient equals 0, GIVEN that all other variables are in the model.
+
+--
+
+
+- Specifically, for coefficient $\beta_j$,
+.block[
+.small[
+$$\mathcal{H}_0: \beta_j = 0; \ \ \ \text{vs.} \ \ \ \mathcal{H}_1: \beta_j  \neq 0$$
+]
+]
+
+
+--
+
+- Examples:
+  - The test for whether the coefficient of education equals zero has p-value $\approx .0004$. Hence, .hlight[reject the null hypothesis]; it appears that education is a useful predictor of baseline salary when all the other predictors are in the model.
+
+--
+
+  - The test for whether the coefficient of experience equals zero has p-value $\approx .6364$. Hence, .hlight[we cannot reject the null hypothesis]; it appears that experience is not a particularly useful predictor of baseline salary when all other predictors are in the model.
+
+
+---
+## Hypothesis tests for coefficients
+
+- Fortunately, R (and pretty much all statistical software) computes both the t-values and p-values for us automatically.
+
+--
+
+  <div class="question">
+How do we calculate the t-values and p-values manually?
+</div>
+
+--
+
+- The t-values (test statistics) have the usual form:
+.block[
+.small[
+$$T = \frac{\textrm{Point Estimate} - \textrm{Null Value}}{SE} = \frac{\hat{\beta}_j - 0}{\sqrt{\left[s^2_e \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1}\right]_{jj}}}$$
+]
+]
+
+--
+
+- For p-value, use area under a t-distribution with $n-(p+1)$ degrees of freedom, where $p$ is the
+number of predictors (minus the intercept) in the model.
+
+--
+
+- In this problem, the degrees of freedom equal $93 - 6 = 87$.
+
+--
+  .block[
+You should know how to compute the p-values directly using the .hlight[pt] function in R (from the summer review materials).
+]
+
+
+
+---
+## CIs for regression coefficients
+
+- A 95% CI for the coefficients is obtained in the usual way. Recall the general form for two-sided CIs from the online review material:
+.block[
+.small[
+$$CI = pe \pm SE \times C_{\alpha}$$
+]
+]
+
+  where $pe$ is the point estimate, and $C_{\alpha}$ is a multiplier (critical value) that depends on the confidence level.
+
+--
+
+- For MLR, we have
+  .block[
+.small[
+$$CI = \hat{\beta}_j \pm SE \times C_{\alpha} = \hat{\beta}_j \pm C_{\alpha} \times \sqrt{\left[s^2_e \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1}\right]_{jj}} \ ,$$
+]
+]
+
+  and the multiplier is obtained from the t-distribution with $n-(p+1)$ degrees of freedom.
+
+--
+
+- Example: A 95% "two-sided" CI for the population regression coefficient of age equals: $(0.63 - 1.988 \times0.72, 0.63 + 1.988 \times0.72) = (-0.80,2.06)$.
+
+--
+  .block[
+  Find the multiplier (1.988) in R by using the command .hlight[qt(0.975,df=87)].
+  ]
+
+
+---
+## CIs for regression coefficients
+
+- We can compute "two-sided" confidence intervals very easily in R.
+  ```{r}
+confint(regwage,level = 0.95)
+```
+
+--
+
+- For employees with the same age, seniority, education, and experience, we expect the average starting salary for female employees to be between 511 and 1024 dollars less than the average starting salary for male employees.
+
+--
+
+- More succinctly, for employees with the same age, seniority, education, and experience, we expect female employees’ average starting salary to be around $767 less than male employees' average salary, with 95% CI in dollars = (-1024, -512).
+
+
+---
+## Notes about tests and CIs
+
+- When sample size is large enough, you will probably reject the null hypothesis $H_0: \beta_j = 0$.
+  - This is because as $n$ increases, the SE will decrease, most likely blowing up the test statistic $T$.
+  - Thus, you should consider practical significance, not just statistical significance.
+  
+--
+
+- When sample size is small, there simply may not be enough evidence to reject null hypothesis $H_0: \beta_j = 0$.
+  - When you fail to reject the null hypothesis, don't be too hasty to say that predictor has no linear association with the outcome. 
+  - There may be an association, just not strong enough to detect with this sample (or perhaps a nonlinear one).
+  - It may also be that the association is not significant because you are already controlling for other characteristics.
+  
+
+---
+## Predictions
+
+- Making predictions using the fitted model is straightforward.
+
+--
+
+- For example, suppose we want to prediction baseline salary for a 25 year old woman with 12 years of education, 10 months of seniority, and two years of experience. We can simply plugin these values into the estimated model (without centering):
+.block[
+.small[
+$$\hat{y}_i = 6277.9 - 767.9(1) - 22.6(10) + 0.63(300) + 92.3(12) + 0.50(24) = 6592.6$$
+]
+]
+
+--
+
+- Easier to do in R using the .hlight[predict] command. We can also get confidence and prediction intervals using the same command.
+  ```{r, warning=F}
+newdata <- data.frame(sex="Female",senior=10,age=25*12,
+                      educ=12,exper=2*12)
+pred1 <- predict(regwage,newdata,interval="confidence"); pred1
+pred2 <- predict(regwage,newdata,interval="prediction"); pred2
+```
+
+
+
+
+---
+## Predictions
+
+- Or using the model with centered predictors,
+  ```{r, warning=F}
+newdatac <- data.frame(sex="Female",
+                       seniorc=(10 - mean(wages$senior)),
+                       agec=(25*12 - mean(wages$age)),
+                       educc=(12 - mean(wages$educ)),
+                       experc=(2*12 - mean(wages$exper)))
+predc1 <- predict(regwagec,newdatac,interval="confidence"); predc1
+predc2 <- predict(regwagec,newdatac,interval="prediction"); predc2
+
+```
+
+--
+
+- <div class="question">
+Notice that this is the same as what we had on the previous slide. Why is this so?
+</div>
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

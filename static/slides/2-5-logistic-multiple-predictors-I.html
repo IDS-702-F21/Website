@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 2.5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 2.5
+## Logistic regression with multiple predictors I
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Logistic regression with multiple predictors: motivating example
+
+- In many developing countries, people get their drinking water from wells.
+
+--
+
+- Sometimes these wells are contaminated with the chemical arsenic, which when consumed in high concentrations causes skin and bladder cancer, as well as cardiovascular disease.
+
+--
+
+- Fortunately, in many cases people living near contaminated wells have the opportunity to get water from nearby uncontaminated wells.
+
+
+
+---
+## The contaminated wells analysis
+
+- In one study, several researchers measured the concentrations of arsenic in wells in a particular region of Bangladesh.
+
+--
+
+- They labeled wells as safe or unsafe based on the measurements.
+
+--
+
+- The researchers encouraged people drinking from unsafe wells to switch to safe wells.
+
+--
+
+- Several years later, the researchers returned to the area with the goal of seeing who had switched from unsafe to safe wells.
+
+--
+
+- They recorded information on a sample of 3020 individuals who had wells at their homes that were unsafe.
+
+--
+
+- Let's address the question: what predicts why people switch wells?
+
+--
+
+- The data is in the file `arsenic.csv` on Sakai.
+
+
+
+---
+## The contaminated wells analysis
+
+Data description
+
+Variable    | Description
+:------------- | :------------
+Switch | 1 = if respondent switched to a safe well &lt;br /&gt; 0 = if still using own unsafe well
+Arsenic | amount of arsenic in well at respondent's home (100s of micro-grams per liter)
+Dist | distance in meters to the nearest known safe well
+Assoc | 1 = if any members of household are active in community organizations &lt;br /&gt; 0 = otherwise
+Educ | years of schooling of the head of household
+
+Treat `switch` as the response variable and others as potential predictors.
+
+
+
+---
+## Logistic regression with multiple predictors
+
+- We can then formally extend the .hlight[logistic regression model] we had before to allow for multiple predictors.
+
+--
+
+- We still have
+.block[
+.small[
+`$$\Pr[y_i = 1 | x_i]  = \pi_i \ \ \textrm{and} \ \ \Pr[y_i = 0 | x_i] = 1-\pi_i,$$`
+]
+]
+
+--
+
+  or
+  .block[
+.small[
+`$$y_i | x_i \sim \textrm{Bernoulli}(\pi_i)$$`
+]
+]
+
+--
+
+  as before, but with
+  .block[
+.small[
+`$$\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}$$`
+]
+]
+
+  now in both cases.
+
+--
+
+- Let's fit the model to our motivating example.
+
+
+---
+## The contaminated wells analysis: EDA
+
+
+```r
+arsenic &lt;- read.csv("data/arsenic.csv",header=T,
+                    colClasses=c("numeric","numeric","numeric","factor","numeric"))
+head(arsenic)
+```
+
+```
+##   switch arsenic   dist assoc educ
+## 1      1    2.36 16.826     0    0
+## 2      1    0.71 47.322     0    0
+## 3      0    2.07 20.967     0   10
+## 4      1    1.15 21.486     0   12
+## 5      1    1.10 40.874     1   14
+## 6      1    3.90 69.518     1    9
+```
+
+```r
+summary(arsenic[,-1])
+```
+
+```
+##     arsenic           dist         assoc         educ       
+##  Min.   :0.510   Min.   :  0.387   0:1743   Min.   : 0.000  
+##  1st Qu.:0.820   1st Qu.: 21.117   1:1277   1st Qu.: 0.000  
+##  Median :1.300   Median : 36.761            Median : 5.000  
+##  Mean   :1.657   Mean   : 48.332            Mean   : 4.828  
+##  3rd Qu.:2.200   3rd Qu.: 64.041            3rd Qu.: 8.000  
+##  Max.   :9.650   Max.   :339.531            Max.   :17.000
+```
+
+```r
+table(arsenic$switch)
+```
+
+```
+## 
+##    0    1 
+## 1283 1737
+```
+
+
+
+---
+class: center, middle
+
+# Move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Arsenic-I.R).
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

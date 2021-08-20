@@ -1,0 +1,361 @@
+---
+title: "IDS 702: Module 1.2"
+subtitle: "Introduction to multiple linear regression"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(rvest)
+```
+
+
+
+## Multiple linear regression
+
+- Multiple linear regression (MLR) assumes the following distribution for a response variable $y_i$ given $p$ potential covariates/predictors/features $\boldsymbol{x}_i = (x_{i1}, x_{i2}, \ldots, x_{ip})$.
+.block[
+.small[
+$$y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} \mathcal{N}(0, \sigma^2), \ \ \ i = 1,\ldots, n.$$
+]
+]
+
+--
+
+- We can also write the model as:
+.block[
+.small[
+$$y_i \overset{iid}{\sim} \mathcal{N}(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}, \sigma^2).$$
+$$p(y_i | \boldsymbol{x}_i) = \mathcal{N}(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}, \sigma^2).$$
+]
+]
+
+--
+
+- MLR assumes that the conditional average or expected value of a response variable is a linear function of potential predictors.
+
+--
+
+- Note that the linearity is in terms of the "unknown" parameters (intercept and slopes).
+
+--
+
+- Just like in SLR, MLR also assumes values of the response variable follow a normal curve within any combination of predictors.
+
+
+---
+## MLR
+
+- Just as we had under SLR, here each $\beta_j$ represents the true "unknown" value of the parameter, while $\hat{\beta}_j$ represents the estimate of $\beta_j$.
+
+--
+
+- Similarly, $y_i$ represents the true value of the response variable, while $\hat{y}_i$ represents the predicted value. That is, 
+.block[
+.small[
+$$\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_{i1} + \hat{\beta} x_{i2} + \ldots + \hat{\beta} x_{ip}.$$
+]
+]
+
+--
+
+- Also, the residuals $e_i$ are our estimates of the true "unobserved" errors $\epsilon_i$. Thus, 
+.block[
+.small[
+$$e_i = y_i - \left[\hat{\beta}_0 + \hat{\beta}_1 x_{i1} + \hat{\beta} x_{i2} + \ldots + \hat{\beta} x_{ip}\right] = y_i - \hat{y}_i.$$
+]
+]
+
+--
+
+- Since the $e_i$'s estimate the $\epsilon_i$'s, we expect them to also be .hlight[independent, centered at zero, and have constant variance].
+
+--
+
+- We will get into this more under model assessment. 
+
+
+---
+## MLR: estimation
+
+- Estimated coefficients are found by taking partial derivatives of the sum of squares of the errors
+.small[
+$$\sum^n_{i=1} \left(y_i - \left[\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} \right] \right)^2,$$
+]
+
+  with respect to each parameter, that is, $\beta_0, \beta_1, \ldots, \beta_p$.
+  
+--
+
+- This is the ordinary least squares (OLS) method.
+
+--
+
+- Resulting formulas are a bit messy to write down in this form.
+
+--
+
+- However, there is a very nice matrix algebra representation as we will see soon.
+
+
+
+---
+## MLR: estimation
+
+- An alternative derivation uses maximum likelihood estimation (MLE).
+
+--
+
+- First, not that if each $Y_i$, with $i=1,\ldots,n$, follows the .hlight[normal distribution] $Y_i \sim \mathcal{N}(\mu, \sigma^2)$, then the likelihood is
+.block[
+.small[
+$$
+\begin{split}
+L(\mu,\sigma^2 | y_1,\ldots, y_n) & = \prod_{i=1}^n \left( 2\pi\sigma^2 \right)^{-\frac{1}{2}}\ e^{-\frac{1}{2\sigma^2} \left(y_i-\mu\right)^2}\\
+& = \left( 2\pi\sigma^2 \right)^{-\frac{n}{2}}\ e^{-\frac{1}{2\sigma^2} \sum\limits_{i=1}^n \left(y_i-\mu\right)^2}.
+\end{split}
+$$
+]
+]
+
+--
+
+- So that for MLR, the likelihood is
+.block[
+.small[
+$$
+\begin{split}
+L(\beta_0, \beta_1, \ldots, \beta_p,\sigma^2 | y_1,\ldots, y_n) & = \left( 2\pi\sigma^2 \right)^{-\frac{n}{2}}\ e^{-\frac{1}{2\sigma^2} \sum\limits_{i=1}^n \left(y_i-\left[\beta_0 + \beta_1 x_{i1} + \ldots + \beta_p x_{ip}\right]\right)^2}.
+\end{split}
+$$
+]
+]
+
+--
+
+- To get the MLEs, take the log of the likelihood, differentiate with respect to each parameter in $(\beta_0, \beta_1, \ldots, \beta_p,\sigma^2)$, and set to zero.
+
+--
+
+- Again, resulting formulas for $(\beta_0, \beta_1, \ldots, \beta_p)$ are a bit messy to write down in this form.
+
+
+
+---
+## MLR: estimation
+
+- The MLE for $\sigma^2$ (work it out to convince yourself) is
+.block[
+.small[
+$$
+\begin{split}
+\hat{\sigma}^2_{\text{MLE}} &= \frac{1}{n} \sum^n_{i=1} \left(y_i - \left[\hat{\beta}_0 + \hat{\beta_1} x_{i1} + \ldots + \hat{\beta_p} x_{ip}\right] \right)^2\\
+&= \frac{1}{n} \sum^n_{i=1} \left(y_i - \hat{y}_i \right)^2 = \frac{1}{n} \sum^n_{i=1} e_i^2.
+\end{split}
+$$
+]
+]
+
+--
+
+- However, the MLE is biased. That is, $\mathbb{E}[\hat{\sigma}^2_{\text{MLE}}] \neq \sigma^2$.
+
+--
+
+- Therefore, we often used the following "unbiased" estimator for $\sigma^2$.
+.block[
+.small[
+$$\hat{\sigma}^2 = s_e^2 = \frac{1}{n-(p+1)} \sum^n_{i=1} \left(y_i - \hat{y}_i \right)^2 = \frac{1}{n-(p+1)} \sum^n_{i=1} e_i^2.$$
+]
+]
+
+--
+
+- Most software packages will estimate $s_e^2$ automatically.
+
+
+
+---
+## MLR: matrix representation
+
+- Let
+.midsmall[
+$$
+\boldsymbol{y} =
+\begin{bmatrix}
+y_1 \\
+y_2 \\
+\vdots\\
+y_n \\
+\end{bmatrix}
+\hspace{0.5em}
+\boldsymbol{X} =
+\begin{bmatrix}
+1 & x_{11} & x_{12} & \ldots & x_{1p} \\
+1 & x_{21} & x_{22} & \ldots & x_{2p} \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+1 & x_{n1} & x_{n2} & \ldots & x_{np} \\
+\end{bmatrix}
+\hspace{0.5em}
+\boldsymbol{\beta} =
+\begin{bmatrix}
+\beta_0\\
+\beta_1\\
+\beta_2 \\
+\vdots \\
+\beta_p \\
+\end{bmatrix}
+\hspace{0.5em}
+\boldsymbol{\epsilon} =
+\begin{bmatrix}
+\epsilon_1\\
+\epsilon_2 \\
+\vdots \\
+\epsilon_n \\
+\end{bmatrix}
+\hspace{0.5em}
+\boldsymbol{I} =
+\begin{bmatrix}
+1 & 0 & \ldots & 0 \\
+0 & 1 & \ldots & 0 \\
+\vdots & \vdots & \vdots & \vdots \\
+0 & 0 & \ldots & 1 \\
+\end{bmatrix}
+$$ 
+]
+
+--
+
+- Then, we can write the MLR model as
+.block[
+.small[
+$$\boldsymbol{y} = \boldsymbol{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}; \ \ \boldsymbol{\epsilon} \sim \mathcal{N}(0, \sigma^2 \boldsymbol{I}).$$
+]
+]
+
+--
+
+- The OLS and MLE estimates of all $(p+1)$ coefficients (intercept plus $p$ slopes) is then given by
+.block[
+.small[
+$$\hat{\boldsymbol{\beta}} = \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \boldsymbol{y}.$$
+]
+]
+
+--
+<div class="question">
+Ideally, n should be bigger than p. Why?
+</div>
+
+--
+
+  There are many ways around the $p > n$ problem. If there is time, we may look at some options.
+
+
+---
+## MLR: matrix representation
+
+- The predictions can then be written as
+.block[
+.small[
+$$\hat{\boldsymbol{y}} =  \boldsymbol{X}\hat{\boldsymbol{\beta}} = \boldsymbol{X} \left[\left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \boldsymbol{y} \right] = \left[\boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \right] \boldsymbol{y}.$$
+]
+]
+
+--
+
+- The residuals can be written as
+.block[
+.small[
+$$\boldsymbol{e} = \boldsymbol{y} - \hat{\boldsymbol{y}} = \boldsymbol{y} - \left[\boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \right] \boldsymbol{y} =  \left[\boldsymbol{1}_n - \boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T \right] \boldsymbol{y}$$
+]
+]
+where $\boldsymbol{1}_n$ is a matrix of ones
+
+--
+
+- The $n \times n$ matrix
+.block[
+.small[
+$$\boldsymbol{H} = \boldsymbol{X} \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} \boldsymbol{X}^T$$
+]
+]
+is often called the .hlight[projection matrix] or the .hlight[hat matrix].
+
+--
+
+- We will see some important features of the elements of $\boldsymbol{H}$ soon.
+
+
+---
+## MLR: matrix representation
+
+- In matrix form,
+.block[
+.small[
+$$s_e^2  = \sum^n_{i=1} \dfrac{\left(y_i - \hat{y}_i \right)^2}{n-(p+1)} = \dfrac{(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}})^T(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}})}{n-(p+1)} = \dfrac{\boldsymbol{e}^T\boldsymbol{e}}{n-(p+1)}.$$
+]
+]
+
+--
+
+- The variance of the OLS estimates of all $(p+1)$ coefficients (intercept plus $p$ slopes) is
+.block[
+.small[
+$$\mathbb{V}\left[ \hat{\boldsymbol{\beta}} \right] = \sigma^2 \left(\boldsymbol{X}^T \boldsymbol{X}\right)^{-1} $$
+]
+]
+
+--
+
+- Notice that this is a covariance matrix; the square root of the diagonal elements give us the standard errors for each $\beta_j$, which we can use for hypothesis testing and interval estimation.
+--
+<div class="question">
+What are the off-diagonal elements?
+</div>
+
+--
+
+- When estimating $\mathbb{V}[\hat{\boldsymbol{\beta}}]$, plug in $s_e^2$ as an estimate of $\sigma^2$.
+
+--
+
+- Now that we have a basic introduction, we are ready see how to fit MLR models.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

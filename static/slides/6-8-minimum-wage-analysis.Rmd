@@ -1,0 +1,105 @@
+---
+title: "IDS 702: Module 6.8"
+subtitle: "The minimum wage analysis"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+#library(ggplot2)
+#library(arm)
+library(DiagrammeR)
+library(MatchIt)
+library(cobalt)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## The minimum wage analysis
+
+- Let's see how causal inference with propensity scores works using the minimum wage data.
+
+--
+
+- The data is in the file `MinimumWageData.csv` on Sakai.
+
+  .small[
+Variables    | Description
+:------------- | :------------
+NJ.PA | indicator for which state the restaurant is in (1 if NJ, 0 if PA)
+EmploymentPre | measures employment for each restaurant before the minimum wage raise in NJ
+EmploymentPost | measures employment for each restaurant after the minimum wage raise in NJ
+WagePre | measures the hourly wage for each restaurant before the minimum wage raise
+BurgerKing | indicator for Burger King
+KFC | indicator for KFC
+Roys | indicator for Roys
+Wendys | indicator for Wendys
+]
+
+
+---
+## The minimum wage analysis
+
+```{r}
+MinWage <- read.csv("data/MinimumWageData.csv",header=T,
+                    colClasses=c("factor","numeric","numeric","numeric",
+                                 "factor","factor","factor","factor"))
+str(MinWage)
+head(MinWage)
+```
+
+
+---
+class: center, middle
+
+# In-class analysis: move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/MinimumWage.R)
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

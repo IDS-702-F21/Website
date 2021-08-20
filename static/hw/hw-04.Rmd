@@ -1,0 +1,71 @@
+---
+title: "Data Analysis Assignment 4"
+date: "Due: 11:59pm, Tuesday, Nov 2"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    fig_caption: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+
+<br/><br/>
+<font color="blue">**THIS IS AN OPTIONAL HOMEWORK. IF YOU CHOOSE TO SUBMIT IT, THE SCORE WILL REPLACE THE LOWEST SCORE OUT OF THE FOUR OTHER METHODS AND DATA ANALYSIS ASSIGNMENTS, AS LONG AS IT EXCEEDS AT LEAST ONE OF THE SCORES FROM THOSE PREVIOUS ASSIGNMENTS.**</font>
+
+
+
+## Instructions
+
+This assignment involves missing data. Note that this is an individual assignment.
+<!-- The data can be found on Sakai: go to Resources $\rightarrow$ Datasets $\rightarrow$ Data Analysis Assignments $\rightarrow$ Assignment 2.   -->
+Please type your solutions using R Markdown, LaTeX or any other word processor but YOU MUST knit or convert the final output file to ".pdf". Submissions should be made on gradescope: go to Assignments $\rightarrow$ Data Analysis Assignment 4.
+
+<font color="red">**DO NOT INCLUDE R CODE OR OUTPUT IN YOUR SOLUTIONS/REPORTS** *All R code can be included in an appendix, and R outputs should be converted to nicely formatted tables. Feel free to use R packages such as `kable`, `xtable`, `stargazer`, etc.*</font>
+
+<font color="red">*Also, you can round up ALL numbers/estimates to 2 decimal places (4 decimal places at the most to avoid exact zeros when possible).*</font>
+
+**Reminder: You are allowed and even encouraged to talk to each other about general concepts, or to the instructor/TAs. However, the write-ups, solutions, and code MUST be entirely your own work.**
+
+
+
+## Questions
+
+1. <font color="blue">MISSING DATA MECHANICS</font>.  
+    *The data for this question can be found in the file "treeage.txt" on Sakai.*  
+This is a dataset on 20 trees comprising age and diameter of trees. Let’s create some missing values and run the multiple imputation approach.
+      + Create a dataset with 30% of the age values missing completely at random, leaving all values of diameter observed. Report the R commands you used to make the dataset. Also report the dataset values after you made the ages missing. (This is so we can tell which cases you made missing.)
+      + Use a multiple imputation approach to fill in missing ages with the R software `mice` using a default application, i.e., no transformations in the imputation models. Create m = 50 imputed datasets. Use multiple imputation diagnostics to check the quality of the imputations of age, looking at both the marginal distribution of age and the scatter plot of age versus diameter. Run the diagnostics on at least two of the completed datasets. Turn in the graphical displays you made (showing results for at least two completed datasets) and your conclusions about the quality of the imputation model.
+      + If you are satisfied with your model, skip this part and go to the next part. If you are not satisfied with the quality of imputations, try a transformation as follows:
+        - Make any transformed variables, and add them to the end of the dataset.
+        - Make a new dataset that includes only the variables you want to include in the imputation model, e.g., transformed age and transformed diameter.
+        - Run the `mice` program on the new dataset.
+        - You can back transform the imputed values to raw scale.
+        - Note: the process is more complicated for data with multiple variables. See the section on “passive imputation” in the article  [here](https://www.jstatsoft.org/index.php/jss/article/view/v045i03/v45i03.pdf).
+      
+        You don’t need to turn in anything for this part, but you should report the final impu- tation model that you decided to use.
+      + Estimate a regression of age on diameter. Apply the multiple imputation combining rules to obtain point and variance estimates for the regression parameters that account for missing data. What can you conclude about the relationship between age and diameter?
+
+
+2. <font color="blue">MULTIPLE IMPUTATION IN NHANES DATA</font>.
+We now will use multiple imputation on a larger dataset that has missing values. The dataset has variables `sdmvstra`, `sdmvpsu`, `wtmec2yr`, and `ridageyr`. You can ignore these variables.
+    *The data and code book for this question can be found in the files "nhanes.csv" and "nhanesCodebook.pdf" on Sakai.*  
+      + Use a multiple imputation approach to fill in missing values with the R software mice using a default application (no transformations in the modeling). 
+        - Create m = 10 imputed datasets. 
+        - Use multiple imputation diagnostics to check the quality of the imputations, looking at both marginal distributions and scatter plots. Run the diagnostics on at least two of the completed datasets. Turn in plots for `bmxbmi` (BMI measurement) by `age` and `bmxbmi` by `riagendr` (gender). 
+        - What are your conclusions about the quality of the impuation model?
+      + Run a model that predicts BMI from some subset of age, gender, race, education, and income. Apply the multiple imputation combining rules to obtain point and variance estimates for the regression parameters that account for missing data. Interpret the results of your final model.
+      + Notes: 
+        - Use one of the completed datasets to decide the model specification, treating it like a standard regression modeling problem. 
+        - Then use the combining rules to come up with estimates that use all 10 completed datasets. 
+        - You should explore interactions but you don't need to do any rigorous model selection. A quick forward, backward or step-wise selection would be fine here (be sure to specify the metric used).
+        - You should still do model assessment but you need not check for multicollinearity or do model validation via RMSE, and so on.
+
+
+## Grading
+
+25 points: 10 points for question 1, 15 points for question 2.
+  

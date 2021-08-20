@@ -1,0 +1,148 @@
+---
+title: "IDS 702: Module 1.8"
+subtitle: "Transformations"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+
+## Transformations
+
+- As we have already seen, sometimes, we have to deal with data that fail linearity and normality. 
+
+--
+
+- Transforming variables can help with linearity and normality (for the response variable, since we do not need normality of the predictors). 
+
+--
+
+- The most common transformation is the .hlight[natural logarithm]. For the response variable, that is, $\textrm{log}_e(y)$ or $\textrm{ln}(y)$.
+
+--
+
+- This is often because it is the easiest to interpret.
+
+--
+
+- Suppose 
+.block[
+.small[
+$$\textrm{ln}(y_i) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i.$$
+]
+]
+
+--
+
+- Then it is easy to see that
+.block[
+.small[
+$$y_i = e^{(\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i)} = e^\beta_0 \times e^{\beta_1 x_{i1}} \times e^{\beta_2 x_{i2}} \times \ldots \times e^{\beta_p x_{ip}} \times e^{\epsilon_i}.$$
+]
+]
+
+--
+
+- That is, .hlight[the predictors actually have a multiplicative effect] on $y$.
+
+
+---
+## Natural log transformation
+
+- The estimated $\beta_j$'s can be interpreted in terms of approximate proportional differences.
+
+--
+
+- For example, suppose $\beta_1 = 0.10$, then $e^{\beta_1} = 1.1052$. 
+
+--
+
+- Thus, a difference of 1 unit in $x_1$ corresponds to an expected positive difference of approximately $11\%$ in $y$.
+
+--
+
+- Similarly, $\beta_1 = -0.10$ implies $e^{\beta_1} = 0.9048$, which means a difference of 1 unit in $x_1$ corresponds to an expected negative difference of approximately $10\%$ in $y$.
+
+--
+
+- .block[When making predictions using the regression of the transformed variable, remember to transform back to the original scale to make your predictions more meaningful.]
+
+
+
+---
+## Other transformations
+
+- While the natural logarithm transformation is the most common, there are several options.
+
+--
+
+- For example, logarithm transformations with other bases, taking squares, taking square roots, etc.
+
+--
+
+- 
+<div class="question">
+Which one should you use?
+</div>
+
+--
+
+- Well, it depends on what you are trying to fix. 
+
+--
+
+- For linearity, for example, it is possible to need a logarithm transformation on the response variable but a square root transformation on the one of the predictors, to fix violations of linearity and normality.
+
+--
+
+- Overall, if you do not know the options to consider, you could try .hlight[Box-Cox power transformations] (to fix non-normality).
+
+--
+
+- We will not spend time on those in this course but I am more than happy to provide resources to anyone who is interested.
+
+--
+
+- First, see the .hlight[boxcox] function in R's .hlight[MASS] library.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

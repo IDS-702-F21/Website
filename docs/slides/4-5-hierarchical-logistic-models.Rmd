@@ -1,0 +1,340 @@
+---
+title: "IDS 702: Module 4.5"
+subtitle: "Multilevel/hierarchical logistic models"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+#library(lattice)
+#library(dplyr)
+#library(ggplot2)
+library(lme4)
+library(arm)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## Multilevel linear models
+
+- The same idea and approach used to build multilevel models for normal data can be used to build multilevel logistic (and probit) models for binary outcomes.
+
+--
+
+- Recall that for a .hlight[varying-intercepts linear model] with one individual-level predictor, we have
+.block[
+.small[
+$$
+\begin{split}
+y_{ij} & = \beta_{0} + \gamma_{0j} + \beta_1 x_{1ij} + \epsilon_{ij}; \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J; \\
+\epsilon_{ij} & \sim N(0, \sigma^2); \\
+\gamma_{0j} & \sim N(0, \tau_0^2)
+\end{split}
+$$
+]
+]
+
+  where $x_{1ij}$ can be replaced with $x_{1j}$ for a group-level predictor.
+
+--
+
+- This model is a compromise between complete pooling across groups of a grouping variable, such as counties in the radon example for last class (that is, same intercept for each county), and no pooling (estimating a separate intercept for each county without borrowing information).
+
+--
+
+- The degree of pooling is determined by the amount of information within and between groups.
+
+
+---
+## Multilevel logistic models
+
+- We can use the same idea to build a .hlight[varying-intercepts logistic model].
+
+- That is,
+.block[
+.small[
+$$
+\begin{split}
+y_{ij} | x_{ij} & \sim \textrm{Bernoulli}(\pi_{ij}); \ \ \ i = 1, \ldots, n_j; \ \ \ j = 1, \ldots, J; \\
+\textrm{log}\left(\dfrac{\pi_{ij}}{1-\pi_{ij}}\right) & = \beta_{0} + \gamma_{0j} + \beta_1 x_{1ij}; \\
+\gamma_{0j} & \sim N(0, \sigma_0^2)
+\end{split}
+$$
+]
+]
+
+  where once again, $x_{1ij}$ is an .hlight[individual-level predictor] which can be replaced with $x_{1j}$ for a .hlight[group-level predictor].
+
+
+--
+
+- The Gelman and Hill book uses the following notation instead
+.block[
+.small[
+$$
+\begin{split}
+y_i | x_i & \sim \textrm{Bernoulli}(\pi_i); \ \ \ i = 1, \ldots, n; \ \ \ j = 1, \ldots, J; \\
+\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) & = \beta_{0} + \gamma_{0j[i]} + \beta_1 x_{i1}; \\
+\gamma_{0j} & \sim N(0, \sigma_0^2).
+\end{split}
+$$
+]
+]
+
+
+--
+
+- .hlight[I will use this notation in this module and the next].
+
+
+---
+## Varying-intercepts logistic model
+
+Inverse logit functions for varying-intercepts logistic models.
+
+```{r fig.height=4,echo=F,warning=F}
+curve(invlogit((0.3*x)),xlim=c(0,5),ylim=c(0,1),col="blue4",ylab="probabilities")
+curve(invlogit((1+0.3*x)),xlim=c(0,5),ylim=c(0,1),col="red4",add=T)
+curve(invlogit((1.5+0.3*x)),xlim=c(0,5),ylim=c(0,1),col="green4",add=T)
+curve(invlogit((3+0.3*x)),xlim=c(0,5),ylim=c(0,1),col="orange4",add=T)
+```
+
+
+---
+## Multilevel logistic models
+
+- It is easy to extend this model to allow for .hlight[varying-slopes] or both .hlight[varying-intercepts and varying-slopes] just like we had for multilevel linear models.
+
+--
+
+- The interpretations of the fixed effect(s) in multilevel logistic models follow directly from what we had for the standard logistic models, that is, log-odds, odds and odds ratios.
+
+--
+
+- The only difference now is the hierarchy in our data which allows us to borrow information across groups.
+
+--
+
+- One way to think about this is that we expect odds and odd-ratios to be more similar for observations within the same group, but we allow for some similarity across groups via partial pooling.
+
+
+---
+## Varying-slopes logistic model
+
+Inverse logit functions for varying-slopes logistic models.
+
+```{r fig.height=4,echo=F,warning=F}
+curve(invlogit((0.3*x)),xlim=c(0,5),ylim=c(0,1),col="blue4",ylab="probabilities")
+curve(invlogit((0.5*x)),xlim=c(0,5),ylim=c(0,1),col="red4",add=T)
+curve(invlogit((0.7*x)),xlim=c(0,5),ylim=c(0,1),col="green4",add=T)
+curve(invlogit((x)),xlim=c(0,5),ylim=c(0,1),col="orange4",add=T)
+```
+
+
+---
+## Varying-intercepts, varying-slopes logistic model
+
+Inverse logit functions for varying-intercepts, varying-slopes logistic models.
+
+```{r fig.height=4,echo=F,warning=F}
+curve(invlogit((0.3*x)),xlim=c(0,5),ylim=c(0,1),col="blue4",ylab="probabilities")
+curve(invlogit((1+0.5*x)),xlim=c(0,5),ylim=c(0,1),col="red4",add=T)
+curve(invlogit((1.5-0.7*x)),xlim=c(0,5),ylim=c(0,1),col="green4",add=T)
+curve(invlogit((3-x)),xlim=c(0,5),ylim=c(0,1),col="orange4",add=T)
+```
+
+
+---
+## 1988 elections analysis
+
+- To illustrate how to fit and interpret the results of multilevel logistic models, we will use a sample data on election polls.
+
+--
+
+- National opinion polls are conducted by a variety of organizations (e.g., media, polling organizations, campaigns) leading up to elections.
+
+--
+
+- While many of the best opinion polls are conducted at a national level, it can also be often interesting to estimate voting opinions and preferences at the state or even local level.
+
+--
+
+- Well-designed polls are generally based on national random samples with corrections for nonresponse based on a variety of demographic factors (e.g., sex, ethnicity, race, age, education).
+
+--
+
+- The data is from CBS News surveys conducted during the week before the 1988 election.
+
+--
+
+- Respondents were asked about their preferences for either the Republican candidate (Bush Sr.) or the Democratic candidate (Dukakis). 
+
+
+
+---
+## 1988 elections analysis
+
+The dataset includes 2193 observations from one of eight surveys (the most recent CBS News survey right before the election) in the original full data.
+
+.small[
+Variable    | Description
+:------------- | :------------
+org | cbsnyt = CBS/NYT
+.hlight[bush] | .hlight[1 = preference for Bush Sr., 0 = otherwise]
+state | 1-51: 50 states including DC (number 9)
+edu | education: 1=No HS, 2=HS, 3=Some College, 4=College Grad
+age | 1=18-29, 2=30-44, 3=45-64, 4=65+
+female | 1=female, 0=male
+black | 1=black, 0=otherwise
+region | 1=NE, 2=S, 3=N, 4=W, 5=DC
+v_prev | average Republican vote share in the three previous elections (adjusted for home-state and home-region effects in the previous elections)
+]
+
+--
+
+Given that the data has a natural multilevel structure (through `state` and `region`), it makes sense to explore multilevel models for this data.
+
+--
+
+We will do just that in the next module.
+
+
+---
+## 1988 elections analysis
+
+- Both voting turnout and preferences often depend on a complex combination of demographic factors.
+
+--
+
+- In our example dataset, we have demographic factors such as biological sex, race, age, education, which we may all want to look at by state, resulting in $2 \times 2 \times 4 \times 4 \times 51 = 3264$ potential categories of respondents.
+
+--
+
+- We may even want to control for `region`, adding to the number of categories.
+
+--
+
+- Clearly, without a very large survey (most political survey poll around 1000 people), we will need to make assumptions in order to even obtain estimates in each category.
+
+--
+
+- We usually cannot include all interactions; we should therefore select those to explore (through EDA and background knowledge).
+
+--
+
+- The data is in the file `polls_subset.txt` on Sakai.
+
+
+---
+## 1988 elections analysis
+
+```{r}
+###### Load the data
+polls_subset <- read.table("data/polls_subset.txt",header=TRUE)
+str(polls_subset)
+head(polls_subset)
+```
+
+
+---
+## 1988 elections analysis
+
+```{r}
+summary(polls_subset)
+```
+
+
+
+---
+## 1988 elections analysis
+
+```{r}
+polls_subset$v_prev <- polls_subset$v_prev*100 #rescale 
+polls_subset$region_label <- factor(polls_subset$region,levels=1:5,
+                                    labels=c("NE","S","N","W","DC"))
+#we consider DC as a separate region due to its distinctive voting patterns
+polls_subset$edu_label <- factor(polls_subset$edu,levels=1:4,
+                                 labels=c("No HS","HS","Some College","College Grad"))
+polls_subset$age_label <- factor(polls_subset$age,levels=1:4,
+                                 labels=c("18-29","30-44","45-64","65+"))
+#the data includes states but without the names, which we will need, 
+#so let's grab that from R datasets
+data(state) 
+#"state" is an R data file (type ?state from the R command window for info)
+state.abb #does not include DC, so we will create ours
+#In the polls data, DC is the 9th "state" in alphabetical order
+state_abbr <- c (state.abb[1:8], "DC", state.abb[9:50])
+polls_subset$state_label <- factor(polls_subset$state,levels=1:51,labels=state_abbr)
+rm(list = ls(pattern = "state")) #remove unnecessary values in the environment
+```
+
+
+
+
+---
+## 1988 elections analysis
+
+```{r}
+###### View properties of the data  
+head(polls_subset)
+dim(polls_subset)
+```
+
+
+
+---
+## 1988 elections analysis
+
+```{r}
+###### View properties of the data  
+str(polls_subset)
+```
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

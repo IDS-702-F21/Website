@@ -1,0 +1,301 @@
+---
+title: "IDS 702: Module 3.5"
+subtitle: "Proportional odds model"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+library(e1071)
+library(caret)
+library(pROC)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+## Ordinal responses
+
+- Suppose the categories of our response variable has a natural ordering.
+
+- Let's use data from Example 6.2.2 from Alan Agresti's [An Introduction to Categorical Data Analysis, Second Edition](https://find.library.duke.edu/catalog/DUKE005142588) to demonstrate this.
+
+- This data is from a General Social Survey. Clearly, political ideology has a five-point ordinal scale, ranging from very liberal to very conservative.
+
+.mini[
+<table>
+  <tr>
+    <th> </th>
+    <th> </th>
+    <th colspan="5">Political Ideology</th>
+  </tr>
+  <tr>
+    <th colspan="2"></th>
+    <td style="text-align:center">Very Liberal</td>
+    <td style="text-align:center">Slightly Liberal</td>
+    <td style="text-align:center">Moderate</td>
+    <td style="text-align:center">Slightly Conservative</td>
+    <td style="text-align:center">Very Conservative</td>
+  </tr>
+  <tr>
+    <th rowspan="2">Female</th>
+    <td height="50px">Democratic</td>
+    <td style="text-align:center">44</td>
+    <td style="text-align:center">47</td>
+    <td style="text-align:center">118</td>
+    <td style="text-align:center">23</td>
+    <td style="text-align:center">32</td>
+  </tr>
+  <tr>
+    <td height="50px">Republican</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">28</td>
+    <td style="text-align:center">86</td>
+    <td style="text-align:center">39</td>
+    <td style="text-align:center">48</td>
+  </tr>
+  <tr>
+    <th rowspan="2">Male</th>
+    <td height="50px">Democratic</td>
+    <td style="text-align:center">36</td>
+    <td style="text-align:center">34</td>
+    <td style="text-align:center">53</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">23</td>
+  </tr>
+  <tr>
+    <td height="50px">Republican</td>
+    <td style="text-align:center">12</td>
+    <td style="text-align:center">18</td>
+    <td style="text-align:center">62</td>
+    <td style="text-align:center">45</td>
+    <td style="text-align:center">51</td>
+  </tr>
+</table>
+]
+  
+  
+
+---
+## Cumulative logits
+
+- When we have ordinal response with categories $1, 2, \ldots, J$, we still want to estimate
+.block[
+.small[
+$$\Pr[y_i = 1 | \boldsymbol{x}_i] = \pi_{i1}, \ \Pr[y_i = 2 | \boldsymbol{x}_i] = \pi_{i2}, \ \ldots, \ \Pr[y_i = J | \boldsymbol{x}_i] = \pi_{iJ}.$$
+]
+]
+
+--
+
+- However, we need to use models that can reflect the ordering
+.block[
+.small[
+$$\Pr[y_i\leq 1 | \boldsymbol{x}_i] \leq \Pr[y_i\leq 2 | \boldsymbol{x}_i] \leq \ldots \leq \Pr[y_i\leq J | \boldsymbol{x}_i] = 1.$$
+]
+]
+
+  *Notice that the ordering of probabilities is not for the actual marginal probabilities, but rather the cumulative probabilities.*
+
+--
+
+- The multinomial logistic regression does not enforce this.
+
+--
+
+- Instead, we can focus on building models for the cumulative logits, that is, models for 
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j | \boldsymbol{x}_i]}{\Pr[y_i > j | \boldsymbol{x}_i]}\right) = \textrm{log}\left(\dfrac{\pi_{i1} + \pi_{i2} + \ldots + \pi_{ij}}{\pi_{i(j+1)} + \pi_{i(j+2)} + \ldots + \pi_{iJ}}\right), \ \ \ j = 1, \ldots, J-1.$$
+]
+]
+
+
+
+
+---
+## Proportional odds model
+
+- This leads us to the .hlight[proportional odds model], written as:
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| \boldsymbol{x}_i]}{\Pr[y_i > j| \boldsymbol{x}_i]}\right) = \beta_{0j} + \beta_{1} x_{i1} + \beta_{2} x_{i2} + \ldots + \beta_{p} x_{ip}, \ \ \ j = 1, \ldots, J-1.$$
+]
+]
+
+  *There is no need for a model for $\Pr[y_i \leq J]$ since it is necessarily equal to 1.*
+
+--
+
+- Notice that this model looks like a binary logistic regression in which we combine the first $j$ categories to form a single category (say 1) and the remaining categories to form a second category (say 0).
+
+--
+
+- Since $\beta_0$ is the only parameter indexed by $j$, the $J-1$ logistic regression curves essentially have the same shapes but different "intercepts".
+
+--
+
+- That is, the effect of the predictors is identical for all $J - 1$ cumulative log odds. This is therefore, a .hlight[more parsimonious model] (both in terms of estimation and interpretation) than the multinomial logistic regression, when it fits the data well.
+
+
+
+---
+## Proportional odds model
+
+- The probabilities we care about are quite easy to extract, since each
+.block[
+.small[
+$$\Pr[y_i = j| \boldsymbol{x}_i] = \Pr[y_i \leq j| \boldsymbol{x}_i] - \Pr[y_i \leq j - 1| \boldsymbol{x}_i], \ \ \ j = 2, \ldots, J,$$
+]
+]
+
+  with $\Pr[y_i \leq 1| \boldsymbol{x}_i] = \Pr[y_i = 1| \boldsymbol{x}_i]$.
+
+--
+
+- Let's focus first on a single continuous predictor, that is,
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i > j| x_i]}\right) = \beta_{0j} + \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, J-1.$$
+]
+]
+
+--
+
+  Here, $\beta_1 > 0$, actually means that a 1 unit increase in $x$ makes  the larger values of $Y$ less likely. 
+  
+--
+
+- This can seem counter-intuitive, thus, many books and software packages (including the `polr` function in R) often write 
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i > j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, J-1$$
+]
+]
+
+  instead. We will stick with this representation.
+  
+
+---
+## Proportional odds model
+
+- Suppose we have $J=5$, $\beta_1 = 1.1$, and $(\beta_{01},\beta_{02},\beta_{03},\beta_{04}) = (0.5,1,2,2.5)$ in the first representation
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i > j| x_i]}\right) = \beta_{0j} + \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$
+]
+]
+
+  the cumulative probabilities would look like:
+
+```{r fig.height=3.5,echo=F}
+curve(invlogit((0.5 + 1.1*x)),xlim=c(-5,5),col="blue3",ylim=c(0,1),ylab=" ",
+      main="Depiction of cumulative probabilities in proportional odds model")
+curve(invlogit((1 + 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="red3",add=T)
+curve(invlogit((2 + 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="yellow3",add=T)
+curve(invlogit((2.5 + 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="green3",add=T)
+legend("bottomright",col=c("blue3","red3","yellow3","green3"),lty=1,
+       c(expression(paste("P[Y \u2264 1]")),expression(paste("P[Y \u2264 2]")),
+         expression(paste("P[Y \u2264 3]")),expression(paste("P[Y \u2264 4]"))))
+```
+
+
+---
+## Proportional odds model
+
+- But with $J=5$, and the same values $\beta_1 = 1.1$, and $(\beta_{01},\beta_{02},\beta_{03},\beta_{04}) = (0.5,1,2,2.5)$ in the second representation
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[y_i \leq j| x_i]}{\Pr[y_i > j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$
+]
+]
+
+  the cumulative probabilities would look like:
+
+```{r fig.height=3.5,echo=F}
+curve(invlogit((0.5 - 1.1*x)),xlim=c(-5,5),col="blue3",ylim=c(0,1),ylab=" ",
+      main="Depiction of cumulative probabilities in proportional odds model")
+curve(invlogit((1 - 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="red3",add=T)
+curve(invlogit((2 - 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="yellow3",add=T)
+curve(invlogit((2.5 - 1.1*x)),xlim=c(-5,5),ylim=c(0,1),col="green3",add=T)
+legend("bottomright",col=c("blue3","red3","yellow3","green3"),lty=1,
+       c(expression(paste("P[Y \u2264 1]")),expression(paste("P[Y \u2264 2]")),
+         expression(paste("P[Y \u2264 3]")),expression(paste("P[Y \u2264 4]"))))
+```
+
+
+
+---
+## Proportional odds model
+
+- Take our example on political ideology for instance. Suppose we fit the model 
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\Pr[\textrm{ideology}_i \leq j| x_i]}{\Pr[\textrm{ideology}_i > j| x_i]}\right) = \beta_{0j} - \beta_{1} x_{i1}, \ \ \ j = 1, \ldots, 4,$$
+]
+]
+
+  where $x$ is an indicator variable for political party, with $x = 1$ for Democrats and $x = 0$ for Republicans.
+
+--
+
+- Then,
+  + For any $j$, $\beta_{1}$ is the log-odds of a Democrat, when compared to a Republican, of .hlight[being more conservative] than $j$ .hlight[compared to being more liberal] than $j$.
+
+--
+
+  + For any $j$, $e^{\beta_{1}}$ is the odds of a Democrat, when compared to a Republican, of .hlight[being more conservative] than $j$ .hlight[compared to being more liberal] than $j$.
+
+--
+
+- If $\beta_{1} > 0$, a Democrat's response ..hlight[is more likely than a Republican's response] to be in the conservative direction than in the liberal direction.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

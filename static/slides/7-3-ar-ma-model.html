@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 7.3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 7.3
+## AR and MA models
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## AR models
+
+- The most common time series model is called the .hlight[autoregressive (AR)] model.
+  
+--
+
+- When only one lag matters, the zero-mean AR(1) model is
+.block[
+.small[
+`$$y_t = \phi y_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- With a non-zero mean, we have
+.block[
+.small[
+`$$y_t = \mu + \phi y_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- When the mean is non-zero, we can choose to de-mean (mean-center) the series and model that instead.
+  
+--
+
+- In both cases, for the AR(1) we basically have a linear regression where the value of the outcome at time `\(t\)` depends on value of outcome at time `\(t-1\)`.
+  
+--
+
+- `\(\phi\)` is the autocorrelation.
+
+
+---
+## AR models
+
+- For the zero-mean AR(1) model,  
+
+--
+
+  + `\(|\phi|&lt;1\)` represents stationary time series.
+    
+--
+
+  + `\(\phi=1\)` is a random walk.
+    
+--
+
+  + `\(|\phi|&gt;1\)` implies non-stationary, "explosive" models.
+    
+--
+
+  
+- A stationary AR(1) series varies around its mean, randomly wandering off away from the mean in response to the "input" values of the random `\(\epsilon_t\)` series, but always returning to near the mean, and never "exploding" away for more than a short time.
+  
+--
+
+- AR(1) series with `\(0&lt;\phi&lt;1\)` represent short-term, positive correlations that would damp out exponentially if `\(\epsilon_t\)` were zero.
+  
+--
+
+- Negative values of `\(\phi\)` represent short-term, negative correlations.
+
+
+---
+## AR models
+
+- Let's explore what AR(1) models look like via simulations.
+  
+--
+
+- Move to the R script [here](https://ids-702-f20.github.io/Course-Website/slides/TS_simulations.R).
+
+--
+
+- Note that
+  
+--
+
+  + autocorrelations decay steadily with lags.
+    
+--
+
+  + partial autocorrelations go to zero after lag p.
+
+
+---
+## AR models
+
+- For a zero mean AR(p) model, we have
+.block[
+.small[
+`$$y_t = \sum_{k=1}^{p} \phi_k y_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- So that for a non-zero mean AR(p) model, we have
+.block[
+.small[
+`$$y_t = \mu + \sum_{k=1}^{p} \phi_k y_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- AR(p) models are capable of adequately representing a wide range of observed behaviors in time series for large enough `\(p\)`.
+
+
+---
+## AR models: how many lags?
+
+- Several ways to decide how many lags to include.
+  
+--
+
+- Use graphical techniques
+  + Look at partial autocorrelation plots.
+    
+--
+
+  + Set `\(p\)` at lag where correlations become small enough not to be important.
+  
+--
+
+- Use a model selection criterion like BIC.
+  
+--
+
+- See section 8.6 of the assigned readings.
+  
+--
+
+- Sometimes in time series data, the partial autocorrelations are small even at lag 1.
+  
+--
+
+- In this case, it can be reasonable to skip autoregressive models and just use usual linear regression modeling approaches.
+
+
+---
+## What if the series is not stationary?
+
+- Sometimes transformations can make stationarity a reasonable assumption.
+  
+--
+
+- Differencing (subtract lagged values from outcome at time `\(t\)`) also often help; changes over time are more likely to be stationary than the raw values.
+  
+--
+
+- Including predictors can also help as we will see later with the melanoma example.
+  
+--
+
+- There are other models for non stationary time series.
+
+
+---
+## AR(p): including predictors
+
+- We also might want to account for serial correlation in regression modeling.
+  
+--
+
+- Linear regression assumes independent errors across individuals.
+  
+--
+
+- As we have already seen with the melanoma example, this may not be reasonable with time series data.
+  
+--
+
+- With a single predictor `\(x_t\)`, we have
+.block[
+.small[
+`$$y_t = \mu + \sum_{k=1}^{p} \phi_k y_{t-k} + x_t + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- That is, the value of outcome at time `\(t\)` depends on value of outcome at time `\(t-1, t-2, \ldots, t-k\)`, but also on the predictor `\(x\)` at time `\(t\)`.
+  
+--
+
+- Easy to extend the model to multiple predictors.
+
+
+---
+## Model assumptions: stationarity
+
+- Coefficients and regression variance do not change with time.
+  
+--
+
+  + Apart from changes in explanatory variables, the behavior of the time series is the same at different segments of time.
+    
+--
+
+  + Generally, no predictable patterns in the long term
+    
+--
+
+- Diagnostics: check if patterns in residuals are similar across time.
+  
+--
+
+- Tests:
+  + Ljung-Box
+  + Augmented Dickey–Fuller (ADF)
+  + Kwiatkowski-Phillips-Schmidt-Shin (KPSS)
+  
+--
+
+- Remedies:
+  + Sometimes transformations (e.g., using logs) can make stationarity more reasonable.
+  + Use time series models that allow for drifts.
+  
+  
+---
+## Model assumptions: others
+
+- Other assumptions
+  1. Linearity
+  
+  2. Independence of errors
+  
+  3. Equal variance
+
+  4. Normality
+  
+--
+
+- Diagnose using the same methods we used for linear regression.
+  
+--
+
+- Remedies include transformations and model changes as we had before.
+
+
+---
+## MA models
+
+- The zero-mean MA(1) model is
+.block[
+.small[
+`$$y_t = \phi \epsilon_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- With a non-zero mean, we have
+.block[
+.small[
+`$$y_t = \mu + \phi \epsilon_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- The value of the outcome at time `\(t\)` depends on the value of the deviation from the mean (the error term) at time `\(t-1\)`.
+  
+--
+
+- For a zero mean MA(p) model, we have
+.block[
+.small[
+`$$y_t = \sum_{k=1}^{p} \phi_k \epsilon_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+  
+--
+
+- So that for a non-zero mean MA(p) model, we have
+.block[
+.small[
+`$$y_t = \mu + \sum_{k=1}^{p} \phi_k \epsilon_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$`
+]
+]
+
+
+---
+## MA models
+
+- Let's explore what MA(1) models looks like via simulations. Move back to the same R script.
+
+--
+
+- Note that
+  
+--
+
+  + Autocorrelations die off almost immediately after lag 1.
+    
+--
+
+  + In MA(p) model, autocorrelations (mostly!) die off after lag `\(p\)`. May not be exact since autocorrelation measures correlation between the actual outcome at different time points.
+    
+--
+
+  + Partial autocorrelations are not particularly useful.
+  
+&lt;!-- - Contrast to AR(p) models --&gt;
+&lt;!--   + Autocorrelations tend to decrease over time smoothly. --&gt;
+&lt;!--   + Partial autocorrelations die off after lag `\(p\)`. --&gt;
+    
+--
+
+- It is possible to write any stationary AR(p) model as an `\(\textrm{MA}(\infty)\)` model. The reverse result holds for some constraints on the MA parameters. See the reading material.
+  
+  
+---
+## Deciding models?
+
+- Use autocorrelations and partial autocorrelations to help decide model.
+  
+--
+
+- Steady decay on autocorrelations often implies AR.
+  
+--
+
+- Non zero autocorrelations before lag `\(p\)` and zero after lag `\(p\)` often implies MA.
+  
+--
+
+- Sometimes use both AR and MA error structure, called an .hlight[ARMA] model.
+  
+--
+
+- Whenever we take differences in `\(y\)` values to ensure stationarity before fitting ARMA models, we have .hlight[ARIMA] models.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

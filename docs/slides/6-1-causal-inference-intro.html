@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 6.1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/d3/d3.min.js"></script>
+    <script src="libs/dagre/dagre-d3.min.js"></script>
+    <link href="libs/mermaid/dist/mermaid.css" rel="stylesheet" />
+    <script src="libs/mermaid/dist/mermaid.slim.min.js"></script>
+    <link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+    <script src="libs/chromatography/chromatography.js"></script>
+    <script src="libs/DiagrammeR-binding/DiagrammeR.js"></script>
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 6.1
+## The potential outcomes framework and causal estimands
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Causality
+
+--- 
+&lt;i class="fa fa-quote-left fa-2x fa-pull-left fa-border" aria-hidden="true"&gt;&lt;/i&gt;
+&lt;i class="fa fa-quote-right fa-2x fa-pull-right fa-border" aria-hidden="true"&gt;&lt;/i&gt;
+We do not have knowledge of a thing until we have grasped its why, that is to say, &lt;font color="red"&gt;its cause&lt;/font&gt;.
+
+-- Aristotle, Physics
+
+--
+
+&lt;/br&gt;
+- Over the next few modules, we will discuss causal inference, specifically, on measuring the .hlight[effects of causes]. 
+
+--
+
+- For now, we will simply lay the foundations for causal inference. 
+
+--
+
+- We will get more into the actual methods later.
+
+
+---
+## Association vs. causation
+
+- In the models we have covered so far, our focus has been on inferring .hlight[associations] using samples drawn from our population of interest.
+
+--
+
+- For example, we have been asking questions such as, do people who receive job training tend to earn more wages than people who do not?
+
+--
+
+- Causal inference goes further as we try to infer aspects of the actual data generating process, that is, .hlight[causation].
+
+--
+
+- For example, does receiving job training actually cause one to earn more wage than they would have without the training?
+
+--
+
+- The additional information needed to move from association to causation is often provided by .hlight[causal assumptions] (often untestable).
+
+--
+
+- Note: in most cases, .hlight[association does not imply causation]!
+
+
+---
+## Confounding
+
+- Why is it that association does not often imply causation? .hlight[confounding variables or confounders]!
+
+--
+
+- Causal relationship
+<div id="htmlwidget-cfff5415593048e9fc33" style="width:2100px;height:180px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cfff5415593048e9fc33">{"x":{"diagram":"\n\t        graph LR\n\t        W(Treatment)-->Y(Outcome)\n\t        "},"evals":[],"jsHooks":[]}</script>
+
+--
+
+- Confounding
+<div id="htmlwidget-6a2ea320d8096f150c3c" style="width:2100px;height:180px;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6a2ea320d8096f150c3c">{"x":{"diagram":"\n\t        graph TB\n\t        C(Confounder)-->W(Treatment)\n\t        C-->Y(Outcome)\n\t        "},"evals":[],"jsHooks":[]}</script>
+
+
+---
+## Examples of confounding
+
+- Ice cream consumption and number of people who drowned.  
+  .hlight[Confounder: temperature]; people tend to consume more ice cream and also swim more when it is hot.
+
+--
+
+- Medical treatment and patient outcome.  
+  .hlight[Confounders: age, sex, other complications]
+  
+--
+
+- Education and income.  
+  .hlight[Confounder: socio-economic status of family]
+  
+--
+
+- An extreme example of confounding is Simpson’s paradox: where  a confounder reverses the sign of the correlation between treatment and outcome
+
+
+---
+## Simpson's paradox
+
+
+- Example: kidney stone treatment (Charig et al., BMJ, 1986).
+  + Compare the success rates of two treatments for kidney stones
+  
+--
+
+  + Treatment A: open surgery. Treatment B: small puncture
+
+--
+
+&lt;br /&gt;       | Treatment A | Treatment B   |
+:----------- | :--------- | :---------   |
+Small stones | &lt;b&gt;93%&lt;/b&gt; (81/87) | 87% (234/270) |
+Large stones | &lt;b&gt;73%&lt;/b&gt; (192/263) | 69% (55/80) |
+Both         | 78% (273/350) | &lt;b&gt;83%&lt;/b&gt; (289/350) |
+
+--
+
+  + Overall treatmnent B has a higher success rate but treatment A actually has higher success rates given the type of stones.
+  
+--
+
+  + What is the confounder here? Severity of the case/type of stones.
+  
+  
+---
+## Simpson's paradox or Yule-Simpson effect
+
+- Simpson’s paradox: a trend appears in different groups of data but disappears or reverses when these groups are combined.
+
+&lt;img src="img/SimpsonsParadox.png" width="400px" height="300px" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Mathematically, it is about conditioning.
+
+--
+
+- Another well-known example is the Berkeley admission gender bias (Bickel et al., Science, 1976).
+
+
+---
+## General notation
+
+- .hlight[W]: Treatment (e.g. job training); we will focus on binary treatments.
+
+- .hlight[Y]: Outcome (e.g. annual wages).
+
+- .hlight[X]: Observed predictors or confounders (e.g. age, education, etc).
+
+- .hlight[U]: Unobserved predictors or confounders.
+
+&lt;/br&gt;
+
+--
+
+- Examples of causal questions:
+  + Causal effect of exposure to a disease.
+  
+  + Comparative effectiveness research such as in clinical trials: whether one drug or medical procedure is better than the other.
+  
+  + Program evaluation in economics and policy.
+
+
+---
+class: center, middle
+
+# Potential outcomes framework
+
+
+---
+## Potential outcomes framework
+
+- The .hlight[potential outcomes framework] or .hlight[counterfactual framework] or .hlight[Rubin Causal Model (RCM)] is arguably the most widely used framework across many disciplines, e.g., medicine, health care, policy, social sciences.
+
+--
+
+- Under this framework, causal inference is viewed as a problem of missing data with explicit mathematical modeling of the assignment mechanism as a process for revealing the observed data.
+
+--
+
+- Rooted in the statistical work on randomized experiments by Fisher (1918, 1925) and Neyman (1923), as extended by Rubin (1974, 1976, 1977, 1978, 1990).
+
+
+
+---
+## Potential outcomes framework
+
+- For a binary treatment, each individual gets exactly one of the two options, and we observe the corresponding response for that. 
+
+--
+
+- Conceptually, under the potential outcomes framework, we think about what each individual's response should have been had they gotten the other treatment option instead of the one they actually got.
+
+--
+
+- The individual causal effect then is the difference between the two "potential" outcomes, only one of which is observed.
+
+--
+
+- Clearly, we never observe the two potential outcomes for any individual, making it natural to think of this as a missing data problem.
+
+
+
+---
+## Potential outcomes framework
+
+- No causation without manipulation - "cause" must be (hypothetically speaking) something we can manipulate. e.g., intervention, action, treatment.
+
+--
+
+- That is, gender, time and age are not well defined “causes" under the RCM.
+
+--
+
+- Three integral components of the potential outcomes framework:
+  + .hlight[potential outcomes] corresponding to the various levels of a treatment.
+  
+  + .hlight[assignment mechanisms], that is, the treatment indicator for all observations.
+  
+  + a .hlight[model] for the science (the potential outcomes and covariates).
+
+
+
+---
+## Potential outcomes framework: basic concepts
+
+- .hlight[Unit]: The person, place, or thing upon which a treatment will operate, at a particular time (note: a single person, place, or thing at two different times comprises two different units).
+
+--
+
+- .hlight[Treatment]: An intervention, the effects of which (on some particular measurement of the units) the investigator wishes to assess relative to no intervention (i.e., the control).
+
+--
+
+- .hlight[Potential Outcomes]: The values of a unit’s measurement of interest after (a) application of the treatment and (b) non-application of the treatment (i.e., under control).
+
+--
+
+- .hlight[Causal Effect]: For each unit, the comparison of the potential outcome under treatment and the potential outcome under control.
+
+
+---
+## Causal effects
+
+- For a single unit, let `\(Y(0)\)` denote the outcome given the control treatment and `\(Y(1)\)`, the outcome given the active treatment.
+
+--
+
+- For example, suppose `\(Y\)` denotes a score (level of severity) for headache, then for a single unit, we could have
+
+--
+
+&lt;table&gt;
+  &lt;caption&gt;Raw scores&lt;/caption&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Unit&lt;/th&gt;
+    &lt;th&gt;Initial headache&lt;/th&gt;
+    &lt;th height="30px" colspan="2"&gt;Potential outcomes&lt;/th&gt;
+    &lt;th&gt;Causal effect&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; X &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(asp) &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(not) &lt;/td&gt;
+    &lt;td style="text-align:center" width="250px"&gt; Y(asp) - Y(not) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="80px"&gt; you&lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 80 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 25 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 75 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; -50 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+--
+
+&lt;table&gt;
+  &lt;caption&gt;Gain scores&lt;/caption&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Unit&lt;/th&gt;
+    &lt;th&gt;Initial headache&lt;/th&gt;
+    &lt;th height="30px" colspan="2"&gt;Potential outcomes&lt;/th&gt;
+    &lt;th&gt;Causal effect&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; X &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(asp) - X &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(not) - X &lt;/td&gt;
+    &lt;td style="text-align:center" width="250px"&gt; [Y(asp) - X] - [Y(not) - X] &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="80px"&gt; you&lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 80 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; -55 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; -5 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; -50 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+
+---
+## The fundamental problem of causal inference
+
+As mentioned before,
+
+- The fundamental problem of causal inference: we can observe at most one of the potential outcomes for each unit.
+
+--
+
+- Causal inference under the potential outcome framework is essentially a missing data problem.
+
+--
+
+- To identify causal effects from observed data, under any mathematical framework, one must make assumptions (structural or/and stochastic)
+
+--
+
+- Since we can at most observe a single potential outcome, we must rely on multiple units (and a lot of assumptions) to make causal inferences.
+
+
+
+---
+## Basic setup
+
+- .hlight[Target population]: a well-defined population of individuals whose outcomes are going to be compared
+
+--
+
+- .hlight[Data]: a random sample of `\(N\)` units from a target population.
+
+--
+
+- A treatment with two levels: `\(w = 0,1\)`.
+
+--
+
+- For each unit `\(i\)`, we observe 
+  + the binary treatment status `\(W_i \in \{0,1\}\)`, 
+  
+  + a vector of `\(p\)` predictors/covariates `\(X_i = (X_{i1}, \ldots, X_{ip})\)`, and 
+  
+  + an outcome `\(Y_i^{\text{obs}}\)`.
+
+
+---
+## Basic setup
+
+- For each unit `\(i\)`, there are two potential outcomes `\((Y_i(0),Y_i(1))\)`.
+
+--
+
+- That is, the outcomes under the two values of the treatment, at most one of which is observed.
+
+--
+
+- Potential outcomes and assignments jointly determine the values of the observed outcomes
+.block[
+$$
+Y_i^{\text{obs}} \equiv Y_i(W_i) = W_i \cdot Y_i(1) + (1-W_i) \cdot Y_i(0)
+$$
+]
+
+--
+
+  and the missing outcomes:
+.block[
+$$
+Y_i^{\text{mis}} \equiv Y_i(1-W_i) = (1-W_i) \cdot Y_i(1) + W_i \cdot Y_i(0)
+$$
+]
+
+---
+## Causal estimands
+
+- The .hlight[average treatment effect (ATE)]:
+.block[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0)].
+$$
+]
+
+--
+
+- The .hlight[average treatment effect for the treated (ATT)]:
+.block[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0) | W_i = 1].
+$$
+]
+
+--
+
+- The .hlight[average treatment effect for the control (ATC)]:
+.block[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0) | W_i = 0].
+$$
+]
+
+--
+
+- For binary outcomes, .hlight[causal odds ratio (OR) or risk ratio (RR):]:
+.block[
+$$
+\tau = \dfrac{\mathbb{Pr}[Y_i(1) = 1]/\mathbb{Pr}[Y_i(1) = 0]}{\mathbb{Pr}[Y_i(0) = 1]/\mathbb{Pr}[Y_i(0) = 0]}.
+$$
+]
+
+- Obviously these estimands are not identifiable without further assumptions.
+
+--
+
+- We will start to explore those soon.
+
+
+---
+## Example
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;th height="30px" colspan="2"&gt;Potential Outcomes&lt;/th&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;th height="30px" colspan="3"&gt;Observed Data&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; Y(0) &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(1) &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; W &lt;/td&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; Y(0) &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y(1) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 13 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 14 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 1 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 14 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 4 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 1 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 4 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 5 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 2 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 5 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 3 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 1 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 0 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 6 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 8 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 10 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 1 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 10 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt;  &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 8 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 9 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 1 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; ? &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; True averages &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 7 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 5 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; Observed averages &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 5.4 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; 11 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+
+
+---
+## Acknowledgements
+
+These slides contain materials adapted from courses taught by Dr. Fan Li.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

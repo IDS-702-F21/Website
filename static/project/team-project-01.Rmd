@@ -1,0 +1,145 @@
+---
+title: "Team Project 1"
+subtitle: "Effects of Job Training on Wages"
+output: 
+  html_document:
+    css: hw.css
+    theme: yeti
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+## Due dates
+
+- In-class presentations: 10:15 - 11:30am, Thursday, September 30.
+- Final reports: 11:59pm, Sunday, October 3.
+- Evaluation of team members: 11:59pm, Monday, October 4.
+
+
+
+## General instructions
+### Team work
+You MUST work within your assigned teams.
+
+- <font color="red">Each team member must work on understanding the data, exploring the data, building the models and providing answers to the questions of interest. This should be the focus of the team meetings.</font>
+- The other responsibilities must be divided according to the following designations:
+  + <font color="green">Checker:</font> Double-checks the work for reproducibility and errors. Also responsible for submitting the report and presentation files.
+  + <font color="green">Coordinator:</font> Keeps everyone on task and makes sure everyone is involved. Also responsible for coordinating team meetings and defining the objectives for each meeting.
+  + <font color="green">Presenter:</font> Primarily responsible for putting the team presentations together, including the presentation slides and recorded videos.
+  + <font color="green">Programmer:</font> Primarily responsible for all things coding. The programmer is responsible for putting everyone's code together and making sure the final product is "readable".
+  + <font color="green">Writer:</font> Prepares the final report.
+- <font color="red">Four-person teams should combine the roles of checker and coordinator into a single role. Three-person teams should combine the roles of checker and writer into a single role, and the roles of coordinator and presenter into a single role.</font>
+
+
+### Presentations
+<font color="red">Each team will create/record a (6-7 minute) video presentation of their findings. Feel free to get creative; fun animations are welcome!</font>
+
+  + In the videos, Teams 1, 3, 5, 7, and 9 should only present findings and results for Part I of this project, while Teams 2, 4, 6, and 8 should only present findings and results for Part II of this project.
+  + The presentation for each team should only cover a brief introduction as well as your most interesting and important findings. At least one EDA plot must be included.
+  + If you choose to use presentation slides, you should create them with the time limit in mind. You should consider making between 5 and 7 slides (excluding the title slide), so that you have approximately one minute to get through each one. You are free to create your presentation slides using PowerPoint, LaTeX or any other application you choose. 
+  + You are free to record the presentation videos using any application you choose.
+  + The order of the in-class presentations will be randomized for each part of the project; each team is expected to come to class fully prepared to present first.
+  +  <font color="red">Each team's presentation files (videos and slides) must be submitted on Sakai by 9:00am on Thursday, September 30. The checker should upload the files to their Dropbox folder on Sakai.</font> 
+
+
+### Reports
+Each team MUST turn in only one report with team members' names at the top of the report, and the different designations (checker, coordinator, presenter, programmer, and writer).
+
+  + Please limit your combined PDF document for both parts of the project to 10 pages in total. <font color="red">You will be penalized should your combined report exceed 10 pages!</font>
+  + Please type your reports using R Markdown, LaTeX or any other word processor but be sure to knit or convert the final output file to `.pdf`. 
+  + <font color="red">**DO NOT INCLUDE R CODE OR OUTPUT IN YOUR SOLUTIONS/REPORTS** *All R code can be included in an appendix, and R outputs should be converted to nicely formatted tables. Feel free to use R packages such as `kable`, `xtable`, `stargazer`, etc.*</font>
+  + All R-code must be included in the appendix. Feel free to also include any supplemental material that is important for your analysis, such as diagnostic checks or exploratory plots that you feel justify the conclusions in your report.
+  + All reports must be submitted on Gradescope: go to Assignments $\rightarrow$ Team Project 1 Reports. Gradescope will let you select your team mates when submitting, so make sure to do so. The checker is responsible for submitting the report.
+  
+
+
+### Evaluations
+<font color="red">All team members must complete a very short written evaluation, quickly describing the effort put forth by other team members.</font>
+
+  + The evaluation should include a list of all other team members (not including you) and considering all the work on the assignment that was not done by you, a breakdown of the fraction of work done by each other team member. For example, if you are on a 4 person team and the other team members all contributed equally, you would assign the fraction 1/3 to each of them (regardless of whether you all did 1/4 of the work overall, or whether you personally did half the work and the others each did 1/6).
+  + In the case you feel one or more team members deserves a different grade on the assignment than the others, you should provide a description of why that member or members deserves a different grade. (In this case you can talk about your own relative contribution.)
+  + Submit on Gradescope: go to Assignments $\rightarrow$ Team Project 1 Evaluations.
+
+
+
+### Analyses
+
+<font color="red">Your analyses MUST address the two sets of questions directly.</font> The report should be written so that there is a section which clearly answers the first set of questions for Part I and another section which clearly answers the second set of questions about Part II. If you prefer, you can write two 5-paged reports, one to address each set of questions. Be sure to also include the following in your report: 
+
+- the final models you ultimately decided to use,
+- clear model building, that is, justification for the models (e.g., why you chose certain transformations and why you decided the final models are reasonable),
+- model assessment for the final models,
+- the relevant regression output (includes: a table with coefficients and SEs, and confidence intervals),
+- your interpretation of the results in the context of the questions of interest, including clear and direct answers to the questions posed, and
+- any potential limitations of the analyses.
+
+
+
+## The project
+### Introduction
+
+In the 1970s, researchers in the United States ran several randomized experiments intended to evaluate public policy programs. One of the most famous experiments is the National Supported Work (NSW) Demonstration, in which researchers wanted to assess whether or not job training for disadvantaged workers had an effect on their wages. Eligible workers were randomly assigned either to receive job training or not to receive job training. Candidates eligible for the NSW were randomized into the program between March 1975 and July 1977.
+
+We analyze a subset of the data from the NSW Demonstration containing only male participants. These and other data were originally analyzed in a highly influential paper by the economist Robert Lalonde. Two relevant references for the study are:
+
+- [Lalonde, R. J. (1986), Evaluating the econometric evaluations of training programs with experimental data, *The American Economic Review*, 76, 604 - 620](https://www.jstor.org/tc/accept?origin=%2Fstable%2Fpdf%2F1806062.pdf). <font color="blue">(**Main reference.**)</font>
+- [Dehejia, R., and Wahba, S. (1999), Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs, *Journal of the American Statistical Association*, 94, 1053-1062](http://www.uh.edu/~adkugler/Dehejia&Wahba_JASA.pdf). <font color="blue">(**Secondary reference which analyzes a subset of the Lalonde data.**)</font>
+
+Although the original data is based on a randomized experiment (which means we would have been able to make causal statements directly), the data provided for this project only compares a subset of the data. In the data provided, the treatment group (those who received the training) includes male participants within Lalonde's NSW data for which 1974 earnings can be obtained, and the control group (those who did not receive the training) includes all the unemployed males in 1976 whose income in 1975 was below the poverty level. This control group is based on a matched Current Population Survey - Social Security Administration file.
+
+
+### Data
+
+The data for this project can be found in the file <font color="brown">"lalondedata.txt"</font> on Sakai. You might consider taking a look at the references for a more in-depth background on the data.
+
+
+### Questions
+
+Use regression models with multiple predictors (to control for the effects of potential confounding factors in the available data) to answer the following questions of interest.
+
+- <font color="green">Part I:</font> Is there evidence that workers who receive job training tend to earn higher wages than workers who do not receive job training?
+  + Quantify the effect of the treatment, that is, receiving job training, on real annual earnings.
+  + What is a likely range for the effect of training?
+  + Is there any evidence that the effects differ by demographic groups? 
+  + Are there other interesting associations with wages that are worth mentioning?
+
+- <font color="green">Part II:</font> Is there evidence that workers who receive job training tend to be more likely to have positive (non-zero) wages than workers who do not receive job training?
+  + Quantify the effect of the treatment, that is, receiving job training, on the odds of having non-zero wages.
+  + What is a likely range for the effect of training?
+  + Is there any evidence that the effects differ by demographic groups?
+  + Are there other interesting associations with positive wages that are worth mentioning?
+
+
+### Code book
+      
+Variable       |        Description
+:------------- | :-------------------
+treat          |    1 if participant received job training, 0 if participant did not receive job training.
+age            |    age in years.
+educ           |    years of education. 
+black          |    1 if race is black, 0 otherwise. 
+hisp           |    1 if Hispanic ethnicity, 0 otherwise. 
+married        |    1 if married, 0 otherwise. 
+nodegree       |    1 if participant dropped out of high school, 0 otherwise. 
+re74           |    real annual earnings in 1974.
+re75           |    real annual earnings in 1975.
+re78           |    real annual earnings in 1978.
+    
+
+
+## Grading
+
+30 points: 15 points for each part.
+
+
+
+
+
+
+
+
+
+
+
+

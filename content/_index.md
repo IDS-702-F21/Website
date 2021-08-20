@@ -44,7 +44,7 @@ To gain access to the pre-recorded lecture videos, you will have to create a Pla
 <span></span>     | <span></span>     | <span></span>    | <span></span>    |  <span></span>      
 ------------------|-------------------|------------------|------------------|------------------ 
 Instructor        | [Dr. Olanrewaju Michael Akande](https://olanrewajuakande.com) | <a href="mailto:olanrewaju.akande@duke.edu" title="email"><i class="fa fa-envelope"></i></a> &nbsp; <a href="https://github.com/akandelanre" title="GitHub"><i class="fa fa-github"></i></a> | Wednesdays and Fridays (9am - 10am) | Zoom Meeting ID: **See Sakai**
-TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu) | <a href="mailto:jiaman.wu@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Tuesdays and Thursdays (2pm - 3pm) | Zoom Meeting ID: **See Sakai**
+TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu) | <a href="mailto:jiaman.wu@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Tuesdays and Thursdays (4pm - 5pm) | Zoom Meeting ID: **See Sakai**
                   | [Xinyi (Iris) Pan](https://datascience.duke.edu/xinyi-iris-pan) | <a href="mailto:xinyi.pan@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Mondays (8am - 9am) and Wednesdays (5pm - 6pm) | Zoom Meeting ID: **See Sakai**
                   
 
@@ -55,7 +55,7 @@ TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-
  <span></span>     | <span></span> | <span></span> 
 -----------|---------------------------------|----------------------------------
 [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) | Gelman A., and Hill, J. | Recommended but not compulsory
-[An Introduction to Statistical Learning with Applications in R](http://faculty.marshall.usc.edu/gareth-james/ISL/) | James, G., Witten, D., Hastie, T., and Tibshirani, R. | Recommended but not compulsory (Free pdf available online via the link)
+[An Introduction to Statistical Learning with Applications in R](https://www.statlearning.com) | James, G., Witten, D., Hastie, T., and Tibshirani, R. | Recommended but not compulsory (Free pdf available online via the link)
 [Categorical Data Analysis (3rd ed)](https://find.library.duke.edu/catalog/DUKE005142588) | Agresti, A. | Optional (pdf versions of individual chapters, via Duke library using the link)
 
 *Lecture notes and slides, links to the videos and other reading resources will be posted on the course website. We will only loosely follow the textbooks.*

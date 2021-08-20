@@ -1,0 +1,379 @@
+---
+title: "IDS 702: Module 6.2"
+subtitle: "Assignment mechanisms and the role of randomization"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+#library(ggplot2)
+#library(arm)
+library(DiagrammeR)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+## The stable unit treatment value assumption (SUTVA)
+
+To quote the Causal Inference book by Imbens and Rubin,
+
+- In many situations, it may be reasonable assume that treatments applied to one unit do not affect the outcome of another unit.
+
+--
+
+- For example, if we are in different locations and have no contact with each other, it would appear reasonable to assume that whether you take an aspirin has no effect on the status of my headache.
+
+--
+
+- .hlight[SUTVA] incorporates both this idea that units do not interfere with one another and the concept that for each unit, there is only a single version of each treatment (ruling out, in this case, that a particular individual could take aspirin tablets of varying efficacy).
+
+--
+
+- Formally, we have....
+
+
+---
+## SUTVA
+
+- .hlight[SUTVA] 
+
+   .block[The potential outcomes for any unit do not vary with the treatments assigned to other units. Also, for each unit, there are no different forms or versions of each treatment level, which lead to different potential outcomes.]
+
+--
+
+- Mathematically, SUTVA $\Rightarrow$
+  + If $W_i = 1$, then $Y_i = Y_i(1)$
+  + If $W_i = 0$, then $Y_i = Y_i(0)$
+  
+  Seems trivial but may not hold
+
+--
+  
+- SUTVA includes two assumptions: (1) no interference, (2) no different versions of a treatment
+
+<!-- -- -->
+
+<!-- - Also know as .hlight[consistency] -->
+
+
+---
+## SUTVA: no interference
+
+- .hlight[Interference]: the potential outcome $Y_i(w)$ where $w = 0,1$ for an individual $i$ depends on what treatment other people receive.
+
+--
+
+- SUTVA assumes we can't have this problem.
+
+--
+
+- Examples: infectious diseases, social networks, agricultural experiments.
+
+--
+
+- That is, there are lots of possible $Y_i(w)$ *depending on what happens to other people*.
+
+--
+
+- When in the presence of interference, other assumptions are required for causal inference (e.g., Rosebaum 2007; Hudgens and Hollaran 2008)
+
+
+---
+## SUTVA: no hidden/multiple variations of treatment
+
+- .hlight[Multiple variations of treatment]: Sometimes the treatment $W$ does not have a clear meaning, as it has many versions.
+
+--
+
+- SUTVA also assumes we can't have this problem.
+
+--
+
+- For example, suppose two people need to take one aspirin tablet each.
+
+--
+
+- However, suppose that one of the tablets is old and no longer contains an effect dose, whereas the other is new and at full strength.
+
+--
+
+- In that case, each person may now have three treatments available, and we can think of there being three potential outcomes for each person.
+
+--
+
+- There are lots of possible $Y_i(w)$ values depending on what version of $W$ gets selected.
+
+
+
+---
+## Assignment mechanism
+
+- Next, we review the different .hlight[assignment mechanisms].
+
+--
+
+- The assignment mechanism describes how each individual came to receive each treatment level they actually received.
+
+--
+
+- This is a key piece of information we usually do not have.
+
+--
+
+- Thus, most key identifying assumptions in causal inference are on the assignment mechanisms.
+
+--
+
+- .hlight[Assignment mechanism]: the probabilistic rule that decides which unit gets assigned to which treatment.
+
+--
+
+- In .hlight[randomized experiments], assignment mechanism is usually .hlight[known] and .hlight[controlled] by investigators.
+
+--
+
+- In .hlight[observational studies], assignment mechanism is usually .hlight[unknown] and .hlight[uncontrolled].
+
+
+---
+## Properties of assignment mechanisms
+
+- We will not cover all the  mathematical details on assignment mechanisms in this course.
+
+--
+
+- Use bold font to denote the vector of a variable of all sample units, e.g. $\boldsymbol{W} = (W_1, \ldots, W_N)$, $\boldsymbol{Y}(1) = (Y_1(1), \ldots, Y_N(1))$, and so on.
+
+--
+
+- .hlight[Probabilistic assignment]: an assignment mechanism is probabilistic if for all $i$, and all $\boldsymbol{X}$, $\boldsymbol{Y}(0)$ and $\boldsymbol{Y}(1)$, the probability of assignment is strictly between 0 and 1. That is,
+.block[
+.small[
+$$
+0 < \mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)] < 1.
+$$
+]
+]
+
+--
+
+- .hlight[Local independence]: assignment probabilities do not depend on pre-treatment variables or potential outcomes for other units, that is, suppose $\boldsymbol{X}^\star = \boldsymbol{X}_{-i}$, $\boldsymbol{Y}^\star(0) = \boldsymbol{Y}_{-i}(0)$, and $\boldsymbol{Y}^\star(1) = \boldsymbol{Y}_{-i}(1)$,
+.block[
+.small[
+$$
+\mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1), \boldsymbol{X}^\star,\boldsymbol{Y}^\star(0),\boldsymbol{Y}^\star(1)] = \mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)].
+$$
+]
+]
+
+
+---
+## Properties of assignment mechanisms
+
+- .hlight[Ignorable assignment]: an assignment mechanism is ignorable if the assignment mechanism does not depend on the missing outcomes:
+.block[
+.small[
+$$
+\mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)] = \mathbb{Pr}[W_i = 1 | X_i, Y_i^{\text{obs}}].
+$$
+]
+]
+
+--
+
+- .hlight[Unconfounded assignment]: an assignment mechanism is unconfounded if the assignment mechanism does not depend on the potential outcomes:
+.block[
+.small[
+$$
+\mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)] = \mathbb{Pr}[W_i = 1 | X_i].
+$$
+]
+]
+
+--
+
+- Note that:
+  + An unconfounded assignment is ignorable
+  
+  + An ignorable assignment may be confounded
+
+
+---
+## Classification of assignment mechanisms
+
+- .hlight[Randomized experiments]: a randomized experiment is an assignment mechanism such that
+  + the assignment mechanism is ignorable
+  
+  + the assignment mechanism is probabilistic
+  
+  + the assignment mechanism is a known function of its arguments
+  
+--
+
+- .hlight[Observational studies]: an assignment mechanism corresponds to an observational study if it is an unknown function of its arguments.
+
+
+---
+## Classification of assignment mechanisms
+
+- .hlight[Regular assignment mechanisms]: an assignment mechanism is regular if
+  + the assignment mechanism is ignorable
+  + the assignment is probabilistic
+  + the assignment mechanism is locally independent
+
+--
+
+- .hlight[Irregular assignment mechanisms]. When an assignment mechanism is irregular, we often have
+  + instrumental variables (latent regular design)
+  + regression discontinuity (the probabilistic assignment assumption is violated)
+  + before/after control/treatment group designs or difference in differences methods
+
+
+---
+## The role of randomization
+
+- In randomized experiments, the assignment mechanism is known and controlled by investigators
+
+--
+
+- Randomization gives us the following:
+  + balanced observed covariates: $W \perp \!\!\! \perp X$.
+  
+--
+  
+  + balanced unobserved covariates: $W \perp \!\!\! \perp U$.
+  
+--
+  
+  + Guarantees ignorability or unconfoundedness (Rubin 1978) $W \perp \!\!\! \perp (Y(1),Y(0))$.
+  
+--
+
+  where the $\perp \!\!\! \perp$ symbol represents independence.
+
+--
+  
+- In other words, randomization ensures that the treated and control groups are actually similar in both observed and predictors, so that whatever difference we see in their response values can be attributed to the treatment.
+
+
+---
+## The role of randomization
+
+- Under randomization, causal effects are (nonparametrically) identified, because we can show
+.block[
+.small[
+$$
+\mathbb{Pr}(Y_i(w)) = \mathbb{Pr}[Y_i^\textrm{obs}|W_i=w], \ \ \ \ w= 0,1.
+$$
+]
+]
+
+--
+
+- Thus, under randomization, .hlight[association does imply causation] (of course within the potential outcome framework and with assumptions), for example. 
+.block[
+.small[
+$$
+\textrm{ATE} = \mathbb{E}[Y_i^\textrm{obs}|W_i=1] - \mathbb{E}[Y_i^\textrm{obs}|W_i=0].
+$$
+]
+]
+
+--
+
+  since 
+.block[
+.small[
+$$
+\begin{split}
+\textrm{ATE} & = \mathbb{E}[Y_i(1) - Y_i(0)] = \mathbb{E}[Y_i(1)] - \mathbb{E}[Y_i(0)] \\
+& = \mathbb{E}[Y_i^\textrm{obs}|W_i=1] - \mathbb{E}[Y_i^\textrm{obs}|W_i=0],
+\end{split}
+$$
+]
+]
+
+  using the identification result above.
+  
+--
+
+- In randomized experiments, ATE is equivalent to ATT (and ATC) because treatment and control groups are comparable in expectation.
+
+---
+## Observational studies
+
+- In observational studies, we do not control or know the assignment mechanism.
+
+--
+
+- Presence of measured and unmeasured confounders: unbalanced between groups.
+
+--
+
+- Some structural (often untestable) assumptions must be made, e.g. on the treatment assignment, for identifying causal effects.
+
+--
+
+- Model assumptions are also made.
+
+--
+
+- In observational studies, ATE is usually different from ATT and ATC.
+
+--
+
+- Over the next few modules, we will review many causal inference methods when dealing with observational studies.
+
+
+---
+## Acknowledgements
+
+These slides contain materials adapted from courses taught by Dr. Fan Li.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

@@ -1,0 +1,224 @@
+---
+title: "IDS 702: Module 2.1"
+subtitle: "Odds, odds ratios, and relative risks"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+```
+
+
+
+## Introduction
+
+- So far, our response variables have been continuous.
+
+--
+
+- Sometimes, we would also like to build models for binary outcome variables. For example,
+
+  + $Y = 1$: healthy, $Y = 0$: not healthy
+  + $Y = 1$: employed, $Y = 0$: not employed
+  + $Y = 1$: win, $Y = 0$: lose
+
+--
+
+- Often, we want to predict or explain the binary outcome variable from several predictors.
+
+--
+
+- Linear regression is NOT appropriate, because normality for the response variable (and errors) makes no sense in this case.
+
+--
+
+- This brings us to .hlight[logistic regression], the most popular model for binary outcomes.
+
+--
+
+- First let's review relative risk, odds and odds ratios.
+
+
+
+---
+## Absolute risk and relative risk
+
+- $Y$: binary response variable, $X$: binary predictor
+
+<br />       | $Y=1$       | $Y=0$       |
+:----------- | :---------: | :---------: |
+$X=1$        | a           | b           |
+$X=0$        | c           | d           |
+
+- .hlight[Absolute risk] of $Y=1$ for level $X=1$: $\dfrac{a}{(a+b)}$
+
+- .hlight[Absolute risk] of $Y=1$ for level $X=0$: $\dfrac{c}{(c+d)}$
+
+- .hlight[Relative risk (RR)]: $\dfrac{a/(a+b)}{c/(c+d)}$
+
+--
+
+- Relative risk is a ratio of two probabilities.
+
+--
+<div class="question">
+Give an example of an application where you think relative risk might be useful.
+</div>
+
+
+
+---
+## Odds and odds ratio
+
+- $Y$: binary response variable, $X$: binary predictor
+
+<br />       | $Y=1$       | $Y=0$       |
+:----------- | :---------: | :---------: |
+$X=1$        | a           | b           |
+$X=0$        | c           | d           |
+
+- .hlight[Odds] of $Y=1$ for level $X=1$: $\dfrac{a}{b}$
+
+- .hlight[Odds] of $Y=1$ for level $X=0$: $\dfrac{c}{d}$
+
+- .hlight[Odds ratio (OR)]: $\dfrac{a/b}{c/d}$
+
+--
+
+- Odds ratio is a ratio of two odds.
+
+--
+<div class="question">
+Give an example of an application where you think odds or odds ratio might be useful.
+</div>
+
+
+
+---
+## Probabilities and odds: motivating example
+
+- Physicians' Health Study (1989): randomized experiment with 22071 male physicians at least 40 years old.
+
+--
+
+- Half the subjects were assigned to take aspirin every other day.
+
+--
+
+- The other half were assigned to take a placebo pill.
+
+--
+
+- Broad goal: determine whether aspirin decreases cardiovascular mortality.
+
+--
+
+- Here are the number of people in each cell of the contingency table:
+
+<br />         | Heart attack  | No heart attack |
+:------------- | :-----------: | :-------------: |
+Aspirin        | 104           | 10933           |
+Placebo        | 189           | 10845           |
+
+
+
+---
+## Absolute risk and relative risk for physicians health study
+
+- Physicians Health Study
+
+<br />         | Heart attack  | No heart attack |
+:------------- | :-----------: | :-------------: |
+Aspirin        | 104           | 10933           |
+Placebo        | 189           | 10845           |
+
+- .block[Relative risk of a heart attack when taking aspirin versus when taking a placebo equals]
+$$\textrm{RR} = \dfrac{104/(104+10933)}{189/(189+10845)} = 0.55$$
+
+--
+
+- .block[Odds of having a heart attack when taking aspirin over odds of a heart attach when talking a placebo (odds ratio)]
+$$\textrm{OR} = \dfrac{104/10933}{189/10845} = 0.546$$
+
+
+
+---
+## Interpreting odds ratios and relative risks
+
+  <br />       | $Y=1$       | $Y=0$       |
+:----------- | :---------: | :---------: |
+$X=1$        | a           | b           |
+$X=0$        | c           | d           |
+
+- When the variables $X$ and $Y$ are independent 
+$$OR = 1; \ \ \ \ \ \ \ \ \ RR = 1$$
+  
+--
+
+- When subjects with level $X=1$ are more likely to have $Y=1$ than subjects with level $X=0$, then 
+$$OR > 1; \ \ \ \ \ \ \ \ \ RR > 1$$
+  
+--
+
+- When subjects with level $X=1$ are less likely to have $Y=1$ than subjects with level $X=0$, then 
+$$OR < 1; \ \ \ \ \ \ \ \ \ RR < 1$$
+
+
+---
+## Relative risk vs. absolute risk: smoking and lung cancer
+
+- Small or large values of relative risk may or may not be significant depending on the base rate.
+
+--
+
+- Thus, it can be more helpful or meaningful to present both the absolute risk and RR.
+
+--
+
+- For example,
+  + Percentage of smokers who get lung cancer: 8% (conservative estimate)
+  + Relative risk of lung cancer for smokers: 800%
+  + That is, getting lung cancer is not commonplace, even for smokers but, smokers’chances of getting lung cancer are much, much higher than non-smokers’ chances.
+  + The absolute risk helps place the RR in context.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

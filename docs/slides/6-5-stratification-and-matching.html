@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 6.5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 6.5
+## Stratification and matching
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Balancing covariates: small number of covariates
+
+- When the number of covariates is small, the adjustment needed to get some balance can be achieved by .hlight[matching] or .hlight[stratification].
+
+--
+
+- .hlight[Exact matching]: for each treated subject, get one control with the exact same value of the covariates (easier for categorical covariates).
+
+--
+
+- Exact matching ensures distributions of covariates in treatment and control groups are exactly the same, thus eliminating bias due to difference in `\(X\)`.
+
+--
+
+- After matching, compute treatment effect by using the matched data.
+
+--
+
+- However, exact matching is usually unfeasible, even with low dimensional covariates.
+
+
+---
+## Matching
+
+- Matching estimators impute the missing potential outcomes, using only the outcomes of .hlight[nearest neighbors] of the opposite treatment group.
+
+--
+
+- They have often (but not exclusively) been applied in settings where
+  + the interest is in the ATT; and
+  
+--
+
+  + there is a large reservoir of potential controls. This allows matching each treated unit to one or more distinct controls (nearest neighbors).
+  
+--
+
+- More general settings: both treated and control units are (potentially) matched and matching is done with replacement.
+
+
+---
+## Matching (fixed number of matches)
+
+- Let `\(\cal{M}_i\)` be the set of the indices of `\(M\)` closest matches of unit `\(i\)` using a .hlight[distance metric] that depends on `\(X\)`.
+
+--
+
+- Let  
+.block[
+.small[
+$$
+`\begin{split}
+\hat{Y}_i(0) &amp; = \sum_{i \in \cal{M}_i} \dfrac{Y_j}{M} \ \ \ \textrm{if} \ \ \ W_i = 1 \ \ \ \textrm{and} \ \ \ \hat{Y}_i(0) = Y_i^{\text{obs}} \ \ \ \textrm{if} \ \ \ W_i = 0; \\
+\hat{Y}_i(1) &amp; = Y_i^{\text{obs}} \ \ \ \textrm{if} \ \ \ W_i = 1 \ \ \ \textrm{and} \ \ \ \hat{Y}_i(1) = \sum_{i \in \cal{M}_i} \dfrac{Y_j}{M} \ \ \ \textrm{if} \ \ \ W_i = 0.
+\end{split}`
+$$
+]
+]
+
+--
+
+- Then, the treatment effect within a pair is estimated as the difference in outcomes, and we can average these within-pair differences.
+
+--
+
+- That is,
+.block[
+.small[
+$$
+`\begin{split}
+\hat{\tau}^{\textrm{ATE}} &amp; = \sum_i \dfrac{\hat{Y}_i(1) - \hat{Y}_i(0) }{N}; \\
+\hat{\tau}^{\textrm{ATT}} &amp; = \sum_i \dfrac{\left(Y_i - \hat{Y}_i(0)\right)W_i }{N_i}. \\
+\end{split}`
+$$
+]
+]
+
+
+---
+## Matching (fixed number of matches)
+
+- Pros: Matching estimators that ensure good balance in covariates between groups are generally robust.
+
+--
+
+- Cons: With fixed number of matches and matching with replacement, matching estimators can be biased.
+
+--
+
+- Matching estimators are generally not efficient.
+
+--
+
+- In fact, estimators combining matching and regression adjustment are usually more efficient.
+
+--
+
+- There can be residual imbalance in matching.
+
+--
+
+- Perform bias correction via regression on the matched sample.
+
+
+---
+## Matching: Tuning
+
+- Matching involves lots of tuning
+  + distance metric
+  + fixed or varying number of matches
+  + for fixed `\(M\)`, number of matches
+  + with or without replacement
+  
+--
+
+- Tuning for matching is an art, with some theory and general guidelines available...
+
+
+---
+## Matching: Tuning
+
+- Distance metric: Mahalanobis distance, propensity score, tree-based.
+
+--
+
+- Fixed `\(M\)` or varying `\(M\)`? For varying `\(M\)`:
+  + Matching with caliper: define a caliper (say 0.1) and all units within that caliper are matches
+  + M increases with sample size.
+  
+--
+
+- For fixed `\(M\)`, the choice of `\(M\)` (number of matches per unit) has a bias-variance trade-off: 
+  + smaller `\(M \Rightarrow\)` smaller bias but larger variance
+  + larger `\(M \Rightarrow\)`, larger bias but smaller variance.
+  
+--
+
+- Also depends on the proportion of treatment versus control: when there is a much larger control group, we can use one-to-many matching.
+
+
+---
+## Matching: Tuning
+
+- Matching with replacement:
+  + Pros:
+      1. computationally easier
+    
+      2. both controls and treated can be matched, but with high variances
+    
+      3. not order-dependent
+
+  + Cons: some units (especially ones with extreme propensity scores) can be matched many times and thus heavily influence overall estimates.
+ 
+--
+ 
+- What about matching ties? What should we do about them?
+
+--
+
+- Matching is a vast topic and there are so many matching methods.
+
+--
+
+- Implementation in R: `Matchit`, `Matching`, and many more.
+
+
+
+---
+## Stratification
+
+- Another option is stratification.
+
+--
+
+- Suppose we have a single covariate `\(X\)` with `\(k\)` levels (e.g. race).
+
+--
+
+- We will continue to assume unconfoundedness and overlap holds.
+
+--
+
+- Suppose we want to estimate ATE.
+
+--
+
+- Let
+  + `\(n_k\)` be the number of observations with `\(X_i = k\)`; and
+  + `\(\bar{Y}_{k,w}\)` be the sample average of all `\(Y_i\)` values among observations in cell `\(X_i = k\)` and `\(W_i = w\)`.
+
+--
+
+- Once again, recall that ATE is `\(\tau = \mathbb{E}[Y_i(1) - Y_i(0)]\)`.
+
+
+---
+## Stratification
+
+- Then we have
+.block[
+.small[
+$$
+\mathbb{E}[Y_i(1)] = \sum_k \mathbb{E}[Y_i | X_i = k, W_i = 1] \cdot \mathbb{Pr}[X_i = k],
+$$
+]
+]
+
+--
+
+  and
+.block[
+.small[
+$$
+\mathbb{E}[Y_i(0)] = \sum_k \mathbb{E}[Y_i | X_i = k, W_i = 0] \cdot \mathbb{Pr}[X_i = k].
+$$
+]
+]
+
+--
+
+- We can estimate `\(\mathbb{E}[Y_i(1)]\)` using a consistent estimator `\(\sum_k \bar{Y}_{k,1} \dfrac{n_k}{N}\)`. We can use a similar estimand for `\(\mathbb{E}[Y_i(0)]\)`.
+
+--
+
+- Therefore, the ATE `\(\tau\)` can be estimated by 
+.block[
+.small[
+`$$\hat{\tau} = \sum_k \left(\bar{Y}_{k,1} - \bar{Y}_{k,0} \right) \dfrac{n_k}{N}.$$`
+]
+]
+
+
+---
+## Stratification
+
+- What if `\(X\)` is continuous?
+
+--
+
+- .hlight[Stratification (subclassification)]: split `\(X\)` into `\(k\)` classes.
+
+--
+
+- Then, for class `\(k\)`, define `\(n_k\)` and `\(\bar{Y}_{k,w}\)` as before.
+
+--
+
+- An estimator of `\(\tau\)` is then once again
+.block[
+.small[
+`$$\hat{\tau}^k = \sum_k \left(\bar{Y}_{k,1} - \bar{Y}_{k,0} \right) \dfrac{n_k}{N}.$$`
+]
+]
+
+--
+
+- `\(\hat{\tau}^k\)` is generally biased for `\(\tau\)`, however, stratification of over 5 blocks can remove 90% of the bias!
+
+--
+
+- **Overall, the key idea with stratification is this**: even though we may not have balance across the entire sample, we likely can get balance by focusing on subgroups, one at a time.
+
+
+
+---
+## Balancing covariates: large number of covariates
+
+- What if we have a large number of covariates? 
+
+--
+
+- With just 20 binary covariates, there are `\(2^{20}\)` or about a million covariate patterns!
+
+--
+
+- Direct matching (exact of nearest neighbors) or stratification is nearly impossible.
+
+--
+
+- Need dimensional reduction to a single score which we can then use to match or stratify.
+
+--
+
+- The most popular option is the .hlight[propensity score]: `\(e(x) = \mathbb{Pr}[W_i = 1 | X_i = x]\)`.
+
+--
+
+- We will focus on .hlight[propensity score methods] over the next few modules and use them to analyze the minimum wage data.
+
+
+
+
+---
+## Acknowledgements
+
+These slides contain materials adapted from courses taught by Dr. Fan Li.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

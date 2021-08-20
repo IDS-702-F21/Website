@@ -1,0 +1,31 @@
+---
+title: "Module 3: other generalized linear models"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<!-- ## Required: -->
+
+<!-- - [An Introduction to Statistical Learning with Applications in R](http://faculty.marshall.usc.edu/gareth-james/ISL/) by James, G., Witten, D., Hastie, T., and Tibshirani, R.: -->
+<!--     + Section 4.3: Logistic regression -->
+
+
+## Optional:
+
+- [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) by Gelman A., and Hill, J.:
+    + Section 6.2: Poisson regression, exposure, and overdispersion
+    + Section 6.4: Probit regression: normally distributed latent data
+    + Section 6.5: Ordered and unordered categorical regression
+
+- [An Introduction to Categorical Data Analysis, Second Edition](https://www.amazon.com/Introduction-Categorical-Analysis-Probability-Statistics/dp/1119405262) by Alan Agresti:
+    + Section 3.2.4: Probit Regression Model
+    + Section 3.3: Generalized Linear Models for Count Data
+    + Section 6: Multicategory Logit Models  
+    *Download pdf versions of individual chapters, including this one, via Duke library [here](https://find.library.duke.edu/catalog/DUKE005142588). Let me know if you run into problems downloading the chapter.*

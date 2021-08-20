@@ -1,0 +1,492 @@
+---
+title: "IDS 702: Module 2.4"
+subtitle: "Model assessment and validation - binned residuals and roc curves"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+library(e1071)
+library(caret)
+library(pROC)
+library(stargazer)
+```
+
+
+
+## Model assessment and validation
+
+There are various types of residuals when working with generalized linear models (GLMs). For logistic regression in particular, we have
+
+- .hlight[Response residuals]
+  .block[
+.small[
+$$e_i = y_i - \hat{\pi}_i.$$
+]
+]
+
+--
+
+- .hlight[Pearson residuals]
+  .block[
+.small[
+$$e_i^P = \dfrac{y_i - \hat{\pi}_i}{\sqrt{\hat{\pi}_i(1-\hat{\pi}_i)}},$$
+]
+]
+
+  which are obtained by "normalizing" the response residuals by the estimated Bernoulli standard deviation.
+
+--
+
+- .hlight[Deviance residuals]
+  .block[
+.small[
+$$e_i^D = \textrm{sign}(y_i - \hat{\pi}_i) \times 2\left(y_i \textrm{log}\dfrac{1}{\hat{\pi}_i} + (1-y_i) \textrm{log}\dfrac{1}{1-\hat{\pi}_i} \right),$$
+]
+]
+ 
+ which are the default in R when using the .hlight[residuals()] function. We will talk a bit more about deviance later, but deviance residuals represent the contributions of individual samples to the deviance.
+
+ 
+ 
+
+---
+## Model assessment and validation
+
+- Deviance residuals are usually the most appropriate for residual plots, when working with GLMs.
+
+--
+
+- However, unlike what we had for linear regression, just looking at the residuals does not work well here.
+  + They are always positive when $Y=1$ and always negative when $Y=0$.
+  
+--
+
+  + Also, constant variance is not an assumption of logistic regression.
+  
+     <div class="question">
+    Why is that the case?
+    </div>  
+    Think about the properties of the Bernoulli distribution when we write $y_i | x_i \sim \textrm{Bernoulli}(\pi_i)$
+     
+--
+
+  + We also do not have normality of residuals to work with either.
+
+
+
+---
+## Model assessment and validation
+
+- What we can do is check to see if the function of predictors is well specified using .hlight[binned residuals].
+
+--
+
+- We can assess the overall fit of our model using .hlight[deviance] and .hlight[change in deviance].
+
+--
+
+- We can also see how well our model predicts (model validation) using
+ + Confusion matrix
+
+ + ROC curves
+ 
+
+
+---
+## Binned residuals
+
+- Compute raw (response) residuals for fitted logistic regression.
+
+- Order observations by values of predicted probabilities (or predictor values) from the fitted regression.
+
+- Using ordered data, form $g$ bins of (approximately) equal size. Default: $g = \sqrt{n}$.
+
+- Compute average residual in each bin.
+
+- Plot average residual versus average predicted probability (or average predictor value) for each bin.
+
+- Use the .hlight[arm] package in R.
+
+
+---
+## NBA analysis
+
+Recall the NBA data
+
+```{r fig.height=3}
+nba <- read.csv("data/nba_games_stats_reduced.csv",header=T,
+                stringsAsFactors=T)
+nba <- nba[nba$Team=="SAS",]
+colnames(nba)[3] <- "Opp"
+nba$win <- rep(0,nrow(nba))
+nba$win[nba$WINorLOSS=="W"] <- 1
+nba$win <- as.factor(nba$win)
+nba$Opp_cent <- nba$Opp - mean(nba$Opp)
+nbareg <- glm(win~Opp_cent,family=binomial(link=logit),data=nba)
+```
+
+
+
+---
+## NBA analysis
+
+```{r fig.height=3}
+plot(nbareg,which=1)
+```
+
+The residuals are the deviance residuals, while the predicted values are on the linear (logit) scale, that is, $\beta_0 + \beta_1 x_i$.
+
+Look to see which cases have large absolute values for cases that don't fit well, but not too useful otherwise.
+
+
+
+---
+## NBA analysis
+
+Plot binned raw residuals versus predicted probabilities (.hlight[arm] package).
+
+
+```{r fig.height=3.5,message=F}
+binnedplot(fitted(nbareg),residuals(nbareg,"resp"),xlab="Pred. probabilities",col.int="red4",
+           ylab="Avg. residuals",main="Binned residual plot",col.pts="navy")
+```
+
+Look for "randomness" with almost all points within the red lines.
+
+
+---
+## NBA analysis
+
+- Useful as a "one-stop shopping" plot; especially with many predictors and you want an initial look at model adequacy. 
+
+--
+
+- What we have is mostly good, although model seems to struggle for fitted values over 0.95 or so.
+
+--
+
+- The red lines represent $\pm 2$ SE bands, which we would expect to contain about 95% of the observations. 
+
+--
+
+- Too few points here to draw any conclusions!
+
+--
+
+- You usually want many more data points before these plots start being useful.
+
+
+---
+## NBA analysis
+
+Plot binned raw residuals versus individual predictors.
+
+```{r fig.height=4,message=F}
+binnedplot(nba$Opp,residuals(nbareg,"resp"),xlab="Opponent's points (centered)",
+           col.int="red4",ylab="Avg. residuals",main="Binned residual plot",col.pts="navy")
+```
+
+
+
+---
+## NBA analysis
+
+- Mostly good, although model seems to struggle for low values of opponent's points.
+
+--
+
+- Also, too many points (16.7%) outside the bands.
+
+--
+
+- However, still too few points here for any conclusive takeaways.
+
+--
+
+- We also know some important predictors are missing by construction...
+
+
+
+
+---
+## Deviance
+
+- To assess overall model fit, we can also look at .hlight[deviance].
+
+--
+
+- Deviance measures how well the model fits the data, when compared to the .hlight[saturated model], that is, an abstract model that fits the sample perfectly.
+
+--
+
+- Precisely, deviance is defined as the difference of likelihoods between the fitted model and the saturated model:
+.block[
+.small[
+$$D = - 2 \left[ \text{ Log Likelihood}(\text{Fitted Model}) - \text{ Log Likelihood}(\text{Saturated Model}) \right].$$
+]
+]
+
+--
+
+- However, this "abstract saturated model" will have likelihood equal to one, so that deviance is simply
+.block[
+.small[
+$$D = - 2\text{ Log Likelihood}(\text{Fitted Model}) = - 2 \sum_{i=1}^n \left[y_i \textrm{log}(\hat{\pi}_{1i}) + (1-y_i) \textrm{log}(1-\hat{\pi}_{1i})\right].$$
+]
+]
+
+--
+
+- Note that .hlight[deviance is always larger or equal than zero], and will only be zero if the fit is "perfect".
+
+--
+
+- Overall, deviance is a measure of error, so that, .hlight[lower values of deviance means better fit to the data].
+
+
+
+---
+## Deviance
+
+- Like the metrics used under MLR, it is also often useful to use deviance for a model in relation to another model. We will revisit this soon.
+
+--
+
+- For now, a model we can use for this comparison is the .hlight[null model], that is, the model with only the intercept.
+
+--
+
+- Intuitively, this gives us a sense of how much the model improves from the "worst model", by the addition of  the predictors.
+
+--
+
+- The deviance of the null model, denoted $D_0$, is thus referred to as the .hlight[null deviance].
+
+--
+
+- To get a general sense of how much better the fitted model is to the null model, compare $D$ to $D_0$, usually through the difference $D_0 - D$.
+
+--
+
+- The "larger" this .hlight[change in deviance] $D_0 - D$ is, the more confident we are that the predictors we have included improve model fit.
+
+--
+
+- In large samples, $D_0 - D$ has approximately a chi-squared distribution with degrees of freedom equal to the difference in the number of predictors between the two models.
+
+
+
+---
+## NBA analysis
+
+For the NBA data for example, we see what looks like a meaningful difference in the two deviance scores.
+
+```{r fig.height=3}
+summary(nbareg)
+```
+
+
+
+---
+## NBA analysis
+
+- We can formalize this by doing a chi-squared test on the null model vs our fitted model. That is,
+  ```{r fig.height=3}
+nbareg_null <- glm(win~1,family=binomial(link=logit),data=nba)
+anova(nbareg_null,nbareg,test= "Chisq")
+```
+
+--
+
+- The low p-value then confirms our previous statement.
+
+--
+
+- We will revisit this again when we look at logistic regression with multiple predictors.
+
+--
+
+- We will be able to use deviance for model comparison and selection by looking at the change in deviance $D_{M_1} - D_{M_2}$, for two models $M_1$ and $M_2$, where $M_1$ is nested within $M_2$.
+
+
+
+---
+## Confusion matrix
+
+- We can use the estimated probabilities from our fitted model to predict outcomes, and then compare those to the observed values.
+
+--
+
+- For example, we could decide to predict $Y=1$ when the predicted probability exceeds $0.5$ and predict $Y=0$ otherwise.
+
+--
+
+- We then can determine how many cases we classify correctly and incorrectly.
+
+--
+
+- Resulting $2 \times 2$ table is called the .hlight[confusion matrix].
+
+--
+
+- When mis-classification rates are high, model may not be an especially good fit to the data.
+
+
+
+---
+## Confusion matrix
+
+<table>
+  <tr>
+    <th> </th>
+    <th> </th>
+    <th colspan="2">Observed</th>
+  </tr>
+  <tr>
+    <th colspan="2"></th>
+    <td style="text-align:center">Y=1</td>
+    <td style="text-align:center">Y=0</td>
+  </tr>
+  <tr>
+    <th rowspan="2">Predicted</th>
+    <td height="50px">Y=1</td>
+    <td style="text-align:center">TP (True Positives)</td>
+    <td style="text-align:center">FP (False Positives)</td>
+  </tr>
+  <tr>
+    <td height="50px">Y=0</td>
+    <td style="text-align:center">FN (False Negatives)</td>
+    <td style="text-align:center">TN (True Negatives)</td>
+  </tr>
+</table>
+
+--
+
+- .hlight[True positive rate (TPR)] = $\dfrac{TP}{TP+FN}$ (also known as .hlight[sensitivity])
+
+--
+
+- .hlight[False negative rate (FNR)] = $\dfrac{FN}{TP+FN}$
+
+--
+
+- .hlight[True negative rate (TNR)] = $\dfrac{TN}{FP+TN}$ (also known as .hlight[specificity])
+
+--
+
+- .hlight[False positive rate (FPR)] = $\dfrac{FP}{FP+TN}$ (1 - .hlight[specificity])
+
+
+
+---
+## ROC Curves
+
+- .block[We want high values of sensitivity and low values of (1 - specificity)!]
+
+--
+
+- The .hlight[receiver operating characteristic (ROC)] curve plots 
+  + Sensitivity on Y axis
+  + 1 - specificity on X axis
+
+--
+
+- Evaluated at lots of different values (beyond 0.5) for the threshold. 
+
+--
+
+- Good fitting logistic regression curves toward the upper left corner, with .hlight[area under the curve (AUC)] near one.
+
+--
+
+- Make ROC curves in R using the pROC package.
+
+--
+
+- By the way, we also often define .hlight[accuracy] as $\dfrac{TP + TN}{TP+FN+FP+TN}$. This estimates how well the model predicts correctly overall.
+
+
+
+---
+## NBA analysis
+
+Let's look at the confusion matrix for the NBA data. Load the .hlight[arm], .hlight[e1071], .hlight[caret], and .hlight[pROC] packages.
+
+
+```{r fig.height=3,message=F}
+Conf_mat <- confusionMatrix(as.factor(ifelse(fitted(nbareg) >= 0.5, "W","L")),
+                            nba$WINorLOSS,positive = "W")
+Conf_mat$table
+Conf_mat$overall["Accuracy"];
+Conf_mat$byClass[c("Sensitivity","Specificity")]
+```
+
+.hlight[confusionMatrix] produces a lot of output. Print the .hlight[Conf_mat] object to see all of them.
+
+
+
+---
+## NBA analysis
+
+
+```{r fig.height=4.5,message=F}
+invisible(roc(nba$win,fitted(nbareg),plot=T,print.thres=c(0.3,0.5,0.7),legacy.axes=T,
+              print.auc =T,col="red3"))
+```
+
+
+---
+## NBA analysis
+
+
+```{r fig.height=4.5,message=F}
+invisible(roc(nba$win,fitted(nbareg),plot=T,print.thres="best",legacy.axes=T,
+              print.auc =T,col="red3"))
+```
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

@@ -1,0 +1,273 @@
+---
+title: "IDS 702: Module 1.3"
+subtitle: "Model fitting and interpretation of coefficients"
+author: "Dr. Olanrewaju Michael Akande"
+date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(rvest)
+wages <- read.csv("data/wagediscrim.txt", header= T)
+wages$sex <- factor(wages$sex,levels=c("Male","Female"))
+wages$fsex <- factor(wages$fsex)
+```
+
+
+
+## Back to our motivating example
+
+Let's fit the following default MLR model to our Harris Trust and Savings Bank example using R.
+.small[
+$$\textrm{bsal}_i = \beta_0 + \beta_1 \textrm{sex}_i + \beta_2 \textrm{senior}_i + \beta_3 \textrm{age}_i + \beta_4 \textrm{educ}_i + \beta_5 \textrm{exper}_i + \epsilon_i$$
+]
+
+--
+
+We can estimate $\hat{\boldsymbol{\beta}}$ in R directly as follows:
+```{r}
+X <- model.matrix(~ sex + senior + age + educ + exper, data= wages)
+y <- as.matrix(wages$bsal)
+beta_hat <- solve(t(X)%*%X)%*%t(X)%*%y; beta_hat
+sigmasquared_hat <- t(y-X%*%beta_hat)%*%(y-X%*%beta_hat)/(nrow(X)-ncol(X))
+SE_beta_hat <- sqrt(diag(c(sigmasquared_hat)*solve(t(X)%*%X))); SE_beta_hat
+```
+
+
+
+---
+## Back to our motivating example
+
+Let's fit the same MLR model using the .hlight[lm] command in R.
+```{r}
+regwage <- lm(bsal~ sex + senior + age + educ + exper, data= wages)
+summary(regwage)
+```
+
+
+---
+## Interpretation of coefficients
+
+- Each estimated slope is the amount $y$ is expected to increase when the value of the corresponding predictor is increased by one unit, _holding the values of the other predictors constant_.
+
+--
+
+- For example, the estimated coefficient of .hlight[educ] is approximately 92.
+
+  .block[
+  _Interpretation_: For each additional year of education for an employee, we expect baseline salary to increase by about $92, holding all other variables constant.
+  ]
+  
+--
+
+- That interpretation is a bit different when dealing with a binary variable (more generally, categorical/factor variables).
+
+--
+
+- For example, the estimated coefficient of .hlight[sex] (.hlight[sexFemale]) is approximately -768.
+
+  .block[
+  _Interpretation_: For employees who started at the same time, had the same education and experience, and were the same age, women earned $768 less on average than men.
+  ]
+  
+
+---
+## Which variable is the strongest predictor of the outcome?
+  
+- The coefficient that has the strongest linear association with the outcome variable is the one
+with the .hlight[largest absolute value of T] (referred to as $t$-value in the R output), the .hlight[test statistic], which equals the coefficient over the corresponding SE.
+
+--
+
+- Note: $T$ is NOT the size of the coefficient. 
+
+--
+
+- The size of the coefficient is sensitive to scales of predictors, but $T$ is not, since it is a standardized measure.
+
+--
+
+- Example: In our regression, seniority is a better predictor than education because it has a larger $T$.
+
+
+
+---
+## Model fit
+
+- How sure are we that this is actually a good model for this data?
+
+--
+
+- The easiest thing to do would be to look at the R-squared.
+
+--
+
+- R-squared has the same interpretation under both SLR and MLR, that is, the proportion of variation in the response variable, that is being explained by the regression fit.
+
+--
+
+- In this example, that proportion is approximately 52%. We will see if we can do better later.
+
+--
+
+- The adjusted R-squared is a modified version of R-squared that penalizes the original R-squared as extra variables are included in the model.
+
+--
+
+- In this example, we have approximately 48%, lower than the original 52%.
+
+--
+
+- We can do much better in assessing model fit, as we will see over the next few modules.
+
+
+
+
+---
+## Centering
+
+- How should we interpret the estimated intercept $\hat{\beta}_0 \approx 6278$?
+
+--
+
+- Generally speaking, we can say that the baseline salary for male employees, with zero age, zero seniority, zero education and zero experience is $6278. 
+
+--
+
+- <div class="question">
+This is clearly not meaningful or realistic. Why?
+</div>
+
+--
+
+- One way around this problem is centering. We can mean-center (can also scale if we want) continuous predictors to improve interpretation of the intercept.
+
+--
+
+- Centering does not really improve model fit, however it does help a lot with interpretability. 
+
+
+---
+## Centering
+
+- So, for each continuous predictor,we will subtract its mean from every value, and use these mean centered predictors in our regression instead.
+
+--
+
+- The intercept can now be interpreted as the average value of $Y$ at the average value of $X$, which is much more interpretable.
+
+--
+
+- Centering can be especially useful in models with interactions (which we are yet to explore).
+
+--
+
+- Centering can also help with multicollinearity (which we will also explore soon).
+
+--
+
+- Essentially, a transformed variable $x_j^2$ may be highly correlated with the untransformed counterpart $x_j$, which we want to avoid. Centering $x_j$ before taking the square helps with that.
+
+--
+
+- Going forward, we will often mean center continuous predictors.
+
+
+---
+## Centering
+
+```{r}
+wages$agec <- c(scale(wages$age,scale=F))
+wages$seniorc <- c(scale(wages$senior,scale=F))
+wages$experc <- c(scale(wages$exper,scale=F))
+wages$educc <- c(scale(wages$educ,scale=F))
+regwagec <- lm(bsal~ sex + seniorc + agec + educc + experc, data= wages)
+summary(regwagec)
+```
+
+
+---
+## Centering
+
+- Notice that the coefficients for the predictors have not changed but the intercept has changed.
+
+--
+
+- We interpret the intercept as the average baseline salary for male employees who are 474 months old, have 82 months of seniority, 12.5 years of education, and 101 months of experience.
+  ```{r}
+colMeans(wages[,c("age","senior","educ","exper")])
+```
+
+--
+
+- Much more meaningful!
+
+
+---
+## Some notes
+
+- We can't say for sure that our model has not violated any of the assumptions. We must do model assessment just as with SLR.
+
+--
+
+- We will address these issues and more over the next few modules.
+
+--
+
+- .block[
+Be very wary of extrapolation! Because there are several predictors, you can fall into the extrapolation trap in many ways.
+]
+
+--
+
+  <div class="question">
+What do we mean by extrapolation?
+</div>
+
+
+--
+
+- .block[
+Finally, note that multiple regression shows association. 
+
+It does NOT prove causality. 
+
+Only a carefully designed observational study or randomized experiment or good causal inference methods can help show causality.
+]
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

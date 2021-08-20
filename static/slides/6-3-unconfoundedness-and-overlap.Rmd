@@ -1,0 +1,325 @@
+---
+title: "IDS 702: Module 6.3"
+subtitle: "Unconfoundedness and overlap"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+#library(ggplot2)
+#library(arm)
+library(DiagrammeR)
+library(MatchIt)
+library(cobalt)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## Observational studies
+
+- We will not focus on randomized experiments since most of the data you will have to analyze in practice are actually based on observational studies.
+
+--
+
+- In observational studies, we do not control or know the assignment mechanism.
+
+--
+
+- In addition, the presence of measured and unmeasured confounders can create unbalance between the groups.
+
+--
+
+- Again, to do causal inference, we have to make some structural (often untestable) assumptions, e.g. on the treatment assignment, for identifying causal effects.
+
+--
+
+- Once we have those general assumptions, we also usually have to make model assumptions to do the actual estimation.
+
+
+---
+## Estimands
+
+Once again, we will focus on the following estimands:
+
+- The .hlight[average treatment effect (ATE)]:
+.block[
+.small[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0)].
+$$
+]
+]
+
+--
+
+- The .hlight[average treatment effect for the treated (ATT)]:
+.block[
+.small[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0) | W_i = 1].
+$$
+]
+]
+
+--
+
+- The .hlight[average treatment effect for the control (ATC)]:
+.block[
+.small[
+$$
+\tau = \mathbb{E}[Y_i(1) - Y_i(0) | W_i = 0].
+$$
+]
+]
+
+--
+
+- For binary outcomes, .hlight[causal odds ratio (OR) or risk ratio (RR):]:
+.block[
+.small[
+$$
+\tau = \dfrac{\mathbb{Pr}[Y_i(1) = 1]/\mathbb{Pr}[Y_i(1) = 0]}{\mathbb{Pr}[Y_i(0) = 1]/\mathbb{Pr}[Y_i(0) = 0]}.
+$$
+]
+]
+
+
+---
+## Estimands
+
+- The relationship between ATE, ATT and ATC is given by
+.block[
+.small[
+$$
+\textrm{ATE} = \mathbb{Pr}[W_i = 1] \cdot \textrm{ATT} + \mathbb{Pr}[W_i = 0] \cdot \textrm{ATC}
+$$
+]
+]
+
+--
+
+- In randomized experiments, ATT is equivalent to ATC because treatment and control groups are similar/comparable.
+
+--
+
+- ATE is then also equivalent to ATT (and ATC).
+
+--
+
+- In observational studies, ATE is usually different from ATT and ATC.
+
+--
+
+- The above relation does not hold for ratio estimands.
+
+
+---
+## Assumptions: unconfoundedness
+
+We will need two major assumptions (in addition to SUTVA). The first, we already talked about, that is,
+
+--
+
+Assumption 1: .hlight[Unconfoundedness]
+
+.block[
+.small[
+$$
+\{Y_i(0), Y_i(1)\} \perp W_i | X_i,
+$$
+]
+]
+
+  or using the equivalent form from last class,
+.block[
+.small[
+$$
+\mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)] = \mathbb{Pr}[W_i = 1 | X_i]
+$$
+]
+]
+
+--
+
+- Assumes that within subgroups defined by values of observed covariates, the treatment assignment is random.
+
+--
+
+- Rules out unobserved confounders.
+
+--
+
+- Randomized experiments satisfy unconfoundedness. 
+
+--
+
+- Untestable in most observational studies, but sensitivity can be checked.
+
+
+
+---
+## Implications of unconfoundedness
+
+- Under unconfoundedness, it turns out that
+.block[
+.small[
+$$
+\mathbb{Pr}[Y(w) | X] = \mathbb{Pr}[Y^{\text{obs}} | X, W =w] \ \ \ \ w = 0,1.
+$$
+]
+]
+
+--
+
+- That is, the observed distribution of $Y$ in treatment arm $W = w$ equals the distribution of the potential outcomes $Y(w)$.
+
+--
+
+   <div class="question">
+Why does this matter or how does this help us?
+</div>
+
+--
+
+- Well, the causal estimands are essentially expectations and probabilities.
+
+--
+
+- Recall again that ATE is
+.block[
+.small[
+$$
+\textrm{ATE} = \mathbb{E}[Y_i(1) - Y_i(0)].
+$$
+]
+]
+  
+--
+
+- ATE can then be estimated from the observed data using
+.block[
+.small[
+$$
+\textrm{ATE} = \mathbb{E}_X\left(\mathbb{E}[Y^{\text{obs}} | X, W =1] - \mathbb{E}[Y^{\text{obs}} | X, W =0]\right).
+$$
+]
+]
+
+--
+
+- Note that we need to average out over the distribution of $X$ since the original formula for ATE does not depend on any $X$.
+
+
+
+---
+## Assumptions: overlap
+
+Assumption 2: .hlight[Overlap (or positivity)]
+
+.block[
+.small[
+$$
+0 < \mathbb{Pr}[W_i = 1 | X_i] < 1, \ \ \ \textrm{for all}\ \ \ i.
+$$
+]
+]
+  
+--
+
+- Notice that this is the probabilistic assignment from last class, that is,
+.block[
+.small[
+$$
+0 < \mathbb{Pr}[W_i = 1 | X_i, Y_i(0), Y_i(1)] < 1.
+$$
+]
+]
+
+--
+
+- However, we can exclude $\{Y_i(0), Y_i(1)\}$ now because of the unconfoundedness assumption.
+
+--
+
+- .block[
+.small[
+$$
+e(x) = \mathbb{Pr}[W_i = 1 | X_i = x]
+$$
+]
+]
+
+  is usually called the .hlight[propensity score].
+
+
+---
+## Implications of overlap
+
+- Overlap implies that, in large samples, for all possible values of the covariates, there are both treated and control units.
+
+--
+
+- This is important within the potential outcomes (or counterfactual) framework both conceptually and operationally (variance inflation).
+
+--
+
+- Unlike unconfoundedness, overlap can be directly checked from the data often using the estimated propensity scores.
+
+--
+
+- Unconfoundedness and positivity jointly define the .hlight[strong ignorability] assumption.
+
+
+---
+## Acknowledgements
+
+These slides contain materials adapted from courses taught by Dr. Fan Li.
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

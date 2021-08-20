@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 1.1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 1.1
+## Motivating example
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Introduction
+
+- By now, you should already be familiar with t-tests and simple linear regression (SLR). 
+
+--
+
+- At the very least, you should know the basics.
+
+--
+
+- Specifically, you should know how to fit a SLR model and assess whether or not the model assumptions are violated. 
+
+--
+
+- We will use those ideas as building blocks for the models we will explore throughout this course.
+
+
+
+---
+## Motivating example
+
+- In the 1970’s, Harris Trust and Savings Bank was sued for discrimination on the basis of sex.  
+
+--
+
+- As evidence, the defense presented analysis of salaries of employees of one type (skilled, entry level clerical).
+
+--
+
+- The data is in the file `wagediscrim.txt` on Sakai.
+
+--
+
+- We are interested in answering the question: **did female employees tend to receive lower base/starting salaries than similarly qualified and experienced male employees?**
+
+--
+&lt;div class="question"&gt;
+Which statistical tests can we use to probe the question above?
+&lt;/div&gt;
+
+
+---
+## Data
+
+93 employees on data file (61 female, 32 male).
+
+Variable    | Description
+:------------- | :------------ 
+bsal | Annual salary at time of hire
+sal77 | Annual salary in 1977.
+educ | years of education.
+exper | months previous work prior to hire at bank.
+fsex | 1 if female, 0 if male
+senior | months worked at bank since hired
+age | months
+
+Since we care about inference on .hlight[bsal], as our response variable, we will exclude .hlight[sal77] for all analysis.
+
+--
+&lt;div class="question"&gt;
+Is this reasonable? Why or why not?
+&lt;/div&gt;
+
+
+---
+## Data
+
+How many rows? How many columns?
+
+```r
+wages &lt;- read.csv("data/wagediscrim.txt", header= T)
+dim(wages)
+```
+
+```
+## [1] 93  8
+```
+
+Take a look at the first few rows of the data.
+
+```r
+head(wages)
+```
+
+```
+##   bsal sal77  sex senior age educ exper fsex
+## 1 5040 12420 Male     96 329   15  14.0    0
+## 2 6300 12060 Male     82 357   15  72.0    0
+## 3 6000 15120 Male     67 315   15  35.5    0
+## 4 6000 16320 Male     97 354   12  24.0    0
+## 5 6000 12300 Male     66 351   12  56.0    0
+## 6 6840 10380 Male     92 374   15  41.5    0
+```
+
+
+
+---
+## Data
+
+Check variable types.
+
+```r
+wages$sex &lt;- factor(wages$sex,levels=c("Male","Female"))
+wages$fsex &lt;- factor(wages$fsex)
+str(wages)
+```
+
+```
+## 'data.frame':	93 obs. of  8 variables:
+##  $ bsal  : int  5040 6300 6000 6000 6000 6840 8100 6000 6000 6900 ...
+##  $ sal77 : int  12420 12060 15120 16320 12300 10380 13980 10140 12360 10920 ...
+##  $ sex   : Factor w/ 2 levels "Male","Female": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ senior: int  96 82 67 97 66 92 66 82 88 75 ...
+##  $ age   : int  329 357 315 354 351 374 369 363 555 416 ...
+##  $ educ  : int  15 15 15 12 12 15 16 12 12 15 ...
+##  $ exper : num  14 72 35.5 24 56 41.5 54.5 32 252 132 ...
+##  $ fsex  : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+
+---
+## Exploratory data analysis (EDA)
+
+Next, quick summaries of each variable.
+
+```r
+summary(wages)
+```
+
+```
+##       bsal          sal77           sex         senior           age       
+##  Min.   :3900   Min.   : 7860   Male  :32   Min.   :65.00   Min.   :280.0  
+##  1st Qu.:4980   1st Qu.: 9000   Female:61   1st Qu.:74.00   1st Qu.:349.0  
+##  Median :5400   Median :10020               Median :84.00   Median :468.0  
+##  Mean   :5420   Mean   :10393               Mean   :82.28   Mean   :474.4  
+##  3rd Qu.:6000   3rd Qu.:11220               3rd Qu.:90.00   3rd Qu.:590.0  
+##  Max.   :8100   Max.   :16320               Max.   :98.00   Max.   :774.0  
+##       educ           exper       fsex  
+##  Min.   : 8.00   Min.   :  0.0   0:32  
+##  1st Qu.:12.00   1st Qu.: 35.5   1:61  
+##  Median :12.00   Median : 70.0         
+##  Mean   :12.51   Mean   :100.9         
+##  3rd Qu.:15.00   3rd Qu.:144.0         
+##  Max.   :16.00   Max.   :381.0
+```
+
+
+---
+## EDA
+
+Since we only care about comparing starting salaries for male and female employees for now, let's look at boxplots of .hlight[bsal] by .hlight[sex].
+
+```r
+ggplot(wages,aes(x=sex, y=bsal, fill=sex)) +
+  geom_boxplot() + coord_flip() +
+  scale_fill_brewer(palette="Blues") +
+  labs(title="Baseline Salary vs Sex",y="Base Salary",x="Sex") + 
+   theme_classic() + theme(legend.position="none")
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+--
+&lt;div class="question"&gt;
+What do you think? What can you infer from this plot?
+&lt;/div&gt;
+
+
+---
+## T-test?
+
+We could go further and try a t-test for the hypotheses.
+.small[
+`$$H_0: \mu_{\textrm{male}} - \mu_{\textrm{female}} \leq 0 \ \ \textrm{vs.} \ \ H_A: \mu_{\textrm{male}} - \mu_{\textrm{female}} &gt; 0$$`
+
+```r
+t.test(bsal~sex,data=wages,alternative="greater")
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  bsal by sex
+## t = 5.83, df = 51.329, p-value = 1.855e-07
+## alternative hypothesis: true difference in means between group Male and group Female is greater than 0
+## 95 percent confidence interval:
+##  582.9857      Inf
+## sample estimates:
+##   mean in group Male mean in group Female 
+##             5956.875             5138.852
+```
+]
+
+--
+&lt;div class="question"&gt;
+Is a t-test sufficient here? Any concerns?
+&lt;/div&gt;
+
+
+
+---
+## SLR?
+
+How about fitting a SLR model to the two variables.
+.block[
+.small[
+$$ \textrm{bsal}_i = \beta_0 + \beta_1 \textrm{sex}_i + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} \mathcal{N}(0, \sigma^2), \ \ \ i = 1,\ldots, n.$$
+]
+]
+
+```r
+model1 &lt;- lm(bsal~sex,data=wages); summary(model1)
+```
+
+```
+## 
+## Call:
+## lm(formula = bsal ~ sex, data = wages)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1336.88  -338.85    43.12   261.15  2143.12 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)   5956.9      105.3  56.580  &lt; 2e-16
+## sexFemale     -818.0      130.0  -6.293 1.08e-08
+## 
+## Residual standard error: 595.6 on 91 degrees of freedom
+## Multiple R-squared:  0.3032,	Adjusted R-squared:  0.2955 
+## F-statistic:  39.6 on 1 and 91 DF,  p-value: 1.076e-08
+```
+
+--
+&lt;div class="question"&gt;
+What can we infer from these results?
+&lt;/div&gt;
+
+
+---
+## EDA
+
+- .block[
+T-test shows men started at higher salaries than women `\((t=5.83, p &lt; .0001)\)`; same conclusion from the regression.
+]
+
+- But one could argue this is so because both methods **do not** control for other characteristics. Indeed, we have ignored the other variables.
+
+- There are other variables that are correlated with .hlight[bsal]. Here's the correlation matrix of all numerical variables using the .hlight[corr] function in R.
+&lt;table class="table" style="font-size: 20px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bsal &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; sal77 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; senior &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; age &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; educ &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; exper &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; bsal &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.17 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; sal77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; senior &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; age &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.80 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; educ &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.10 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; exper &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+---
+## EDA
+
+Or visually (using the `ggcorrplot` package),
+
+```r
+wages_corr &lt;- round(cor(wages[,!is.element(colnames(wages),c("sex","fsex"))]),2)
+ggcorrplot(wages_corr, method = "circle",type = "lower",
+           colors = c("#6D9EC1", "white", "#E46726"))
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## EDA
+
+- So, let's take a look at scatter plots of all variables
+
+- First, recall the description of all the variables.
+
+Variable    | Description
+:------------- | :------------ 
+bsal | Annual salary at time of hire
+sal77 | Annual salary in 1977.
+educ | years of education.
+exper | months previous work prior to hire at bank.
+fsex | 1 if female, 0 if male
+senior | months worked at bank since hired
+age | months
+
+
+---
+## EDA
+
+
+```r
+ggpairs(wages[,!is.element(colnames(wages),c("sal77","sex","fsex"))],
+        mapping=ggplot2::aes(colour = "red4",alpha=0.6)) #GGally package
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+This plot looks very busy! 
+
+
+---
+## EDA
+
+Let's take a closer look one variable at a time. First, .hlight[bsal] vs. .hlight[senior].
+
+```r
+ggplot(wages,aes(x=senior, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Seniority",x="Seniority",y="Base Salary")
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## EDA
+
+Next, .hlight[bsal] vs. .hlight[age]
+
+```r
+ggplot(wages,aes(x=age, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Age",x="Age",y="Base Salary")
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## EDA
+
+.hlight[bsal] vs. .hlight[educ]
+
+```r
+ggplot(wages,aes(x=educ, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Education",x="Education",y="Base Salary")
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## EDA
+
+Finally, .hlight[bsal] vs. .hlight[exper]
+
+```r
+ggplot(wages,aes(x=exper, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Experience",x="Experience",y="Base Salary")
+```
+
+&lt;img src="1-1-MLR-motivating-example_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Takeaways
+
+- Clearly, they are other variables that may be relevant in explaining baseline salary.
+
+--
+
+- We need to explore other statistical methods than the t-test and simple linear regression.
+
+--
+
+- We need methods that can explore the relationship between baseline salary and sex while also controlling for the other variables that clearly may be relevant.
+
+--
+
+- This brings us to .hlight[multiple linear regression (MLR)].
+
+--
+
+- .block[
+Something to keep in mind, the overall conclusions may not change after using a better model for this data.
+
+In general, this should never stop you from exploring and reporting the results from better models; you should always be rigorous when doing analyses and be honest when reporting the results!
+]
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

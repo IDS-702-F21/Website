@@ -1,0 +1,57 @@
+---
+title: "Conceptual review questions about hypothesis tests and confidence intervals"
+date: "Due: start of class, Thursday, August 20"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    fig_caption: false
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+## Instructions
+
+You are not expected to submit this on Gradescope. Just document your responses and be ready to discuss them in class.
+
+## Questions
+
+### Confidence Intervals
+
+Decide whether the following statements are true or false.  Explain your reasoning.
+
+  1. For a given standard error, lower confidence levels produce wider confidence intervals.
+  2. If you increase sample size, the width of confidence intervals will increase.
+  3. The statement, "the 95% confidence interval for the population mean is (350, 400)", is equivalent to the statement, "there is a 95% probability that the population mean is between the numbers 350 and 400".
+  4. To reduce the width of a confidence interval by roughly a factor of two (i.e., in half), you have to quadruple the sample size.
+  5. The statement, "the 95% confidence interval for the population mean is (350, 400)" means that 95% of the population values are between 350 and 400.
+  6. If you take large random samples over and over again from the same population, and make 95% confidence intervals for the population average, about 95% of the intervals should contain the population average.
+  7. If you take large random samples over and over again from the same population, and make 95% confidence intervals for the population average, about 95% of the intervals should contain the sample average.
+  8. When constructing a confidence interval for the population mean of a variable, it is necessary that the distribution of the variable itself follows a normal curve.
+  9. A 95% confidence interval obtained from a random sample of 1000 people has a better chance of containing the population percentage than a 95% confidence interval obtained from a random sample of 500 people.
+  10. If you go through life making 99% confidence intervals for all sorts of population means, about 1% of the time the intervals won't cover their respective population means. 
+  
+### Hypothesis Testing
+
+Decide whether the following statements are true or false.  Explain your reasoning.
+
+  1. A p-value of .08 is more evidence against the null hypothesis than a p-value of .04.
+  2. The statement, "the p-value is .003", is equivalent to the statement, "there is a 0.3% probability that the null hypothesis is true".
+  3. Even though you rejected the null hypothesis,  it may still be true.
+  4. A researcher who tried to learn statistics without taking a formal course does a hypothesis test and gets a p-value of .014.   He says, "there is a 98.6% chance that the alternative hypothesis is false, so the null hypothesis is true."    What, if anything, is wrong with his statement?
+  5. You perform a hypothesis test using a sample size of four units, and you do not reject the null hypothesis.   Your research colleague says this statistical test provides conclusive evidence against the alternative hypothesis.   Do you agree or disagree with his conclusion?  Explain your reasoning in three or less sentences.
+  6. You are the head of the Food and Drug Administration (F.D.A.), in charge of deciding whether new drugs are effective and should be allowed to be sold to people.   A pharmaceutical company trying to win approval for a new drug they manufacture claims that their drug is better than the standard drug at curing a certain disease.   The company bases this claim on a study in which they gave their drug to 1000 volunteers with the disease.   They compared these volunteers to a group of 1000 hospital patients who were treated with the standard drug and whose information is obtained from existing hospital records.  The company found a "statistically significant" difference between the percentage of volunteers who were cured and the percentage of the comparison group who were cured.   That is, they did a statistical hypothesis test and rejected the null hypothesis that the percentages are equal.  As director of the F.D.A., should you permit the new drug to be sold?  Explain your reasoning in three or less sentences.
+  7. If you get a p-value of .13, it means there is a 13% chance that the sample average equals the population average.
+  8. If you get a p-value of .13, it means there is a 13% chance that the sample average does not equal the population average.
+  9. If you get a p-value of .13, it means there is an 87% chance that the sample average equals the population average.
+  10. If you get a p-value of .13, it means there is an 87% chance that the sample average does not equal the population average.
+  11. If you get a p-value of .13, it means that the null hypothesis is true in 13% of all samples.
+  12. If you get a p-value of .13, it means that when the null hypothesis is true, a value of the test statistic as or more extreme than what was observed occurs in about 13% of all samples.
+  
+## Grading
+
+Check / no check
+  
+  

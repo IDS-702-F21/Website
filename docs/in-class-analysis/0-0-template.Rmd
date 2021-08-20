@@ -1,0 +1,70 @@
+---
+title: "IDS 702 In-class analysis 0"
+subtitle: "Template"
+date: ", 2020"
+#date: "August 20, 2020"
+output: 
+  tufte::tufte_html:
+    tufte_variant: "envisioned"
+    highlight: pygments
+    css: "in-class-analysis.css"
+    toc: true
+link-citations: yes
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tufte)
+library(knitr)
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  digits = 2
+  )
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+**Due:** 30 minutes after class ends
+
+
+# Housekeeping
+
+## Structure and format
+
+You will work in your pre-assigned teams. Each team should submit ONLY ONE report for this exercise. You must write the names of all team members at the top of the report containing your responses. You all must do the work using one student's computer and R/RStudio. 
+
+Have one team member open R/RStudio on their computer and share their screen with the other team members within the breakout room. At the top of the team report, write **"host"** in parenthesis besides this student's name. Have another team member be responsible for documenting the responses. At the top of the team report, write **"writer"** in parenthesis besides this student's name. 
+
+**NOTE**: Generally, you will not be penalized for not taking on these roles many times during the semester. This is to simply ensure that you do switch the roles around a "decent number" of times within each team throughout the semester. That said, I will penalize any student who obviously dominates these roles over everyone else, so be sure to give other students an opportunity to do them.
+
+## R/RStudio
+
+You all should have R and RStudio installed on your computers by now. If you do not, first install the latest version of R here: https://cran.rstudio.com (remember to select the right installer for your operating system). Next, install the latest version of RStudio here: https://www.rstudio.com/products/rstudio/download/. Scroll down to the "Installers for Supported Platforms" section and find the right installer for your operating system.
+
+
+## Gradescope
+
+Gradescope will let you select your team mates when submitting, so make sure to do so. Only one person needs to submit the sheet on Gradescope. You can submit your document in the most common formats, but **pdf** files are preferred. Submit on Gradescope here: https://www.gradescope.com/courses/157499/assignments. Be sure to submit under the right assignment entry.
+
+
+
+# Introduction
+
+
+
+# The Data
+
+
+
+# Exercises
+
+
+
+
+# Acknowledgement
+
+<!-- This exercise is based on ideas proposed by [Sam Voisin](https://stat.duke.edu/people/sam-voisin). -->
+
+
+

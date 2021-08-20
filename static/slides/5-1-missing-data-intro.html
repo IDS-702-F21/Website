@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 5.1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 5.1
+## Introduction to missing data
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Motivation
+
+- Most real world datasets often suffer from nonresponse, that is, they contain missing values.
+
+--
+
+- Ideally, analysts should first decide on how to deal with missing data before moving on to analysis. 
+
+--
+
+- One needs to make assumptions and ask tons of questions, for example,
+  + why are the values missing?
+  + what is the pattern of missingness?
+  + what is the proportion of missing values in the data?
+
+--
+
+- As a Bayesian, one could treat the missing values as parameters and estimate them simultaneously with the analysis, but even in that case, one must still ask the same questions.
+
+--
+
+- Ask as many questions as possible to help you figure out the most plausible assumptions!
+
+
+---
+## Motivation
+
+- Simplest approach: complete/available case analyses -- delete cases with missing data. Often problematic because:
+  + it is just not feasible sometimes (small `\(n\)` large `\(p\)` problem) -- when we have a small number of observations but a large number of variables, we simply can not afford to throw away data, even when the proportion of missing data is small.
+  
+--
+
+  + information loss -- even when we do not have the small `\(n\)`, large `\(p\)` problem, we still lose information when we delete cases.
+  
+--
+
+  + biased results -- because the missing data mechanism is rarely random, features of the observed data can be completely different from the missing data.
+
+--
+  
+- More principled approach: impute the missing data (in a statistically proper fashion) and analyze the imputed data.
+
+
+
+---
+## Why should we care?
+
+- &lt;font color="red"&gt;Loss of power&lt;/font&gt; due to the the smaller sample size
+  + can't regain lost power
+
+--
+  
+- Any analysis must make an &lt;font color="red"&gt;untestable assumption&lt;/font&gt; about the missing data
+  + wrong assumption `\(\Rightarrow\)` &lt;font color="red"&gt;biased estimates&lt;/font&gt;
+
+--
+  
+- Some popular analyses with missing data get &lt;font color="red"&gt;biased standard errors&lt;/font&gt;
+  + resulting in wrong p-values and confidence intervals
+
+--
+
+- Some popular analyses with missing data are &lt;font color="red"&gt;inefficient&lt;/font&gt;
+  + so that confidence intervals are wider than they need be
+
+
+---
+## What to do: loss of power
+
+Approach by design:
+
+- minimize amount of missing data
+  + good communications with participants, for example, patients in clinical trial, participants in surveys and censuses, etc
+  + follow up as much as possible; make repeated attempts using different methods
+
+--
+    
+- reduce the impact of missing data
+  + collect reasons for missing data
+  + collect information predictive of missing values
+    
+    
+---
+## What to do: analysis
+
+- A suitable method of analysis would:
+  + make the correct (or plausible) assumption about the missing data
+  + give an unbiased estimate (under that assumption)
+  + give an unbiased standard error (so that p-values and confidence intervals are correct)
+  + be efficient (make best use of the available data)
+
+--
+  
+- However, we can never be sure about what the correct assumption is `\(\Rightarrow\)` sensitivity analyses are essential!
+
+
+---
+## How to approach the analysis?
+
+- Start by knowing:
+  + extent of missing data
+  + pattern of missing data (e.g. is `\(X_1\)` always missing whenever `\(X_2\)` is also missing?)
+  + predictors of missing data and of outcome
+
+--
+  
+- Principled approach to missing data:
+  + identify a plausible assumption (through discussions between you as a data scientist and your clients)
+  + choose an analysis method that's valid under that assumption
+  
+--
+
+- Just because a method is simple to use does not make it plausible; some analysis methods are simple to describe but have complex and/or implausible assumptions.
+
+
+---
+## Types of nonresponse (missing data)
+
+- .hlight[Unit nonresponse]: the individual has no values recorded for any of the variables. For example, when participants do not complete a survey questionnaire at all.
+
+- .hlight[Item nonresponse]: the individual has values recorded for at least one variable, but not all variables.
+
+&lt;table&gt;
+  &lt;caption&gt;Unit nonresponse vs item nonresponse&lt;/caption&gt;
+  &lt;tr&gt;
+    &lt;th&gt; &lt;/th&gt;
+    &lt;th height="30px" colspan="3"&gt;Variables&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt;  &lt;/th&gt;
+    &lt;td height="30px" style="text-align:center" width="100px"&gt; X&lt;sub&gt;1&lt;/sub&gt; &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; X&lt;sub&gt;2&lt;/sub&gt; &lt;/td&gt;
+    &lt;td style="text-align:center" width="100px"&gt; Y &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:left"&gt; Complete cases &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td rowspan="3"&gt; Item nonresponse &lt;/td&gt;
+    &lt;td rowspan="3" style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+    &lt;td height="30px" style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td height="30px" style="text-align:left"&gt; Unit nonresponse &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+    &lt;td style="text-align:center"&gt; &amp;#10067 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+
+
+---
+## Types of Missing Data Mechanism
+
+- Data are said to be .hlight[missing completely at random (MCAR)] if the reason for missingness does not depend on the values of the observed data or missing data.
+
+--
+
+- For example, suppose
+  - you handed out a double-sided survey questionnaire of 20 questions to a sample of participants;
+  - questions 1-15 were on the first page but questions 16-20 were at the back; and
+  - some of the participants did not respond to questions 16-20.
+ 
+--
+ 
+- Then, the values for questions 16-20 for those people who did not respond would be .hlight[missing completely at random] if they simply did not realize the pages were double-sided; they had no reason to ignore those questions.
+ 
+--
+ 
+- This is rarely plausible in practice!
+
+
+---
+## Types of Missing Data Mechanism
+
+- Data are said to be .hlight[missing at random (MAR)] if the reason for missingness may depend on the values of the observed data but not the missing data (conditional on the values of the observed data).
+
+--
+
+- Using our previous example, suppose
+  - questions 1-15 include demographic information such as age and education;
+  - questions 16-20 include income related questions; and
+  - once again, some of the participants did not respond to questions 16-20.
+
+--
+  
+- Then, the values for questions 16-20 for those people who did not respond would be .hlight[missing at random] if younger people are more likely not to respond to those income related questions than old people, where age is observed for all participants.
+  
+--
+
+- This is the most commonly assumed mechanism in practice!
+
+
+---
+## Types of Missing Data Mechanism
+
+- Data are said to be .hlight[missing not at random (MNAR or NMAR)] if the reason for missingness depends on the actual values of the missing (unobserved) data.
+
+--
+
+- Continuing with our previous example, suppose again that
+  - questions 1-15 include demographic information such as age and education;
+  - questions 16-20 include income related questions; and
+  - once again, some of the participants did not respond to questions 16-20.
+
+--
+  
+- Then, the values for questions 16-20 for those people who did not respond would be .hlight[missing not at random] if people who earn more money are less likely to respond to those income related questions than old people.
+
+--
+  
+- This is usually the case in real analysis, but analysis can be complex!
+
+
+---
+## Types of missing data mechanisms: how to tell in practice?
+
+So how can we tell the type of mechanism we are dealing with? 
+
+--
+
+In general, we don't know!!!
+
+--
+
+- Rare that data are MCAR (unless planned beforehand)
+
+--
+
+- Possible that data are MNAR
+
+--
+
+- Compromise: assume data are MAR if we include enough variables in model for the missing data indicator `\(\boldsymbol{R}\)`.
+
+
+---
+## Why should we care?
+
+- &lt;div class="question"&gt;
+Why should we care in practice? What does bias really mean here? How exactly does using only the complete cases affect our results for the three mechanisms?
+&lt;/div&gt;
+
+- Let's attempt to answer these questions via simulations. 
+
+- Set `\(n = 10,000\)`. For `\(i=1,\ldots,n\)`, generate
+  + `\(x_i \overset{iid}{\sim} N(2, 1); \ \  \ y_i|x_i \overset{iid}{\sim} N(-1 + 2 x_{i}, \sigma^2=5^2)\)`
+  + `\(r_i|y_i, x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \theta_0 + \theta_1 y_i + \theta_2 x_i\)`
+  
+- Next, set `\(y_i\)` missing whenever `\(r_i = 1\)`.
+
+- Set different values for `\(\boldsymbol{\theta} = (\theta_0, \theta_1, \theta_2)\)` to reflect MCAR, MAR and MNAR.
+
+- Let's use the R script [here](https://ids702-f21.olanrewajuakande.com/slides/MissingDataSim.R).
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

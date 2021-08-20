@@ -1,0 +1,142 @@
+---
+title: "IDS 702 In-class analysis 3"
+subtitle: "Beer consumption in Sao Paulo III"
+#date: "August 27, 2020"
+output: 
+  tufte::tufte_html:
+    tufte_variant: "envisioned"
+    highlight: pygments
+    css: "in-class-analysis.css"
+    toc: true
+link-citations: yes
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tufte)
+library(knitr)
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  digits = 2
+  )
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+**Due:** 1 hour after class ends
+
+
+
+# Housekeeping
+## Structure and format
+You will work in your pre-assigned teams. Each team should submit ONLY ONE report for this exercise. You must write the names of all team members at the top of the report containing your responses. You all must do the work using one student's computer and R/RStudio. 
+
+Have one team member open R/RStudio on their computer and share their screen with the other team members within the breakout room. At the top of the team report, write **"host"** in parenthesis besides this student's name. Have another team member be responsible for documenting the responses. At the top of the team report, write **"writer"** in parenthesis besides this student's name. 
+
+**NOTE**: Generally, you will not be penalized for not taking on these roles many times during the semester. This is to simply ensure that you do switch the roles around a "decent number" of times within each team throughout the semester. That said, I will penalize any student who obviously dominates these roles over everyone else, so be sure to give other students an opportunity to do them.
+
+## R/RStudio
+You all should have R and RStudio installed on your computers by now. If you do not, first install the latest version of R here: https://cran.rstudio.com (remember to select the right installer for your operating system). Next, install the latest version of RStudio here: https://www.rstudio.com/products/rstudio/download/. Scroll down to the "Installers for Supported Platforms" section and find the right installer for your operating system.
+
+
+## Gradescope
+Gradescope will let you select your team mates when submitting, so make sure to do so. Only one person needs to submit the sheet on Gradescope. You can submit your document in the most common formats, but **pdf** files are preferred. Submit on Gradescope here: https://www.gradescope.com/courses/280392/assignments. Be sure to submit under the right assignment entry.
+
+
+
+# Introduction
+The purpose of this exercise is to give you additional practice working with multiple linear regression. We will continue with the Kaggle beer consumption dataset (https://www.kaggle.com/dongeorge/beer-consumption-sao-paulo/). You will demonstrate the impacts of some variables on beer consumption in a given region and the consumption forecast for certain scenarios. The data (sample) were collected in Sao Paulo, Brazil, in a university area, where there are some parties with groups of students from 18 to 28 years of age (average).
+
+Kaggle is a great online community of data scientists. To learn more about Kaggle, follow this link: https://www.kaggle.com/getting-started/44916.
+
+
+
+# The data
+This is the same data from the last in-class exercise. so you should already have it saved locally. Just in case you do not, follow the instructions below.
+
+Download the data (named `consumo_cerveja.csv`) from Sakai and save it locally to the same directory as your R markdown file. To find the data file on Sakai, go to Resources $\rightarrow$ Datasets $\rightarrow$ In-Class Analyses. Once you have downloaded the data file into the SAME folder as your R markdown file, load and clean the data by using the following R code.
+
+```{marginfigure}
+It is always a good idea to take a look at the first few rows of the raw file to see what the data looks like before loading the data. In this raw 'consumo_cerveja' file, you will notice that commas are actually used both as decimals and to separate the columns. Thus, you need to let R know by specifying the *sep* and *dec* options as in the code below.
+```
+
+```{r eval = FALSE}
+beer <- read.csv("data/consumo_cerveja.csv",
+                 stringsAsFactors = FALSE, sep = ",",
+                 dec=",",nrows=365)
+# rename the variables
+beer$date <- beer$Data
+beer$temp_median_c <- beer$Temperatura.Media..C.
+beer$temp_min_c <- beer$Temperatura.Minima..C.
+beer$temp_max_c <- beer$Temperatura.Maxima..C.
+beer$precip_mm <- beer$Precipitacao..mm.
+beer$weekend <- factor(beer$Final.de.Semana)
+beer$beer_cons_liters <- as.numeric(beer$Consumo.de.cerveja..litros.)
+beer <- beer[ , 8:ncol(beer)]
+```
+
+After renaming the variables using the code above, your data will be saved in the object `beer`, and the relevant variables plus their meanings are given in the table below:
+
+Variable    | Description
+:------------- | :------------ 
+date | Date the data for each observation was recorded.
+temp_median_c | Median temperature in $^0C$.
+temp_min_c | Minimum temperature in $^0C$.
+temp_max_c | Maximum temperature in $^0C$.
+precip_mm  | Precipitation in $mm$.
+weekend | Indicator variable for weekend: 1 = weekend, 0 = weekday.
+beer_cons_liters | Beer consumption in liters.
+
+
+# Exercises
+
+Time to address the issues with the `precip_mm` variable. As hopefully everyone has figured out by now, most of the days in the dataset are "dry" days, so that there is a "point mass" at zero for this variable. There are a few ways to get around this problem but we will only look at one.  
+*Please note that there is a bit more wiggle room in terms of potential fixes because this is a predictor and not a response variable. Also, by making this transformation, we are actually losing some of the information encoded in the original variable. We will revisit this much later in the course.*
+
+Create a new variable called `rain` from `precip_mm`. Make this a categorical/factor variable with three levels: <font color="blue">**0 = no rain**</font>, <font color="blue">**1 = light to moderate rain**</font>, and <font color="blue">**2 = heavy rain**</font>. Set the cutoff values for these levels as you like, but they MUST be scientifically meaningful **(ok to google meaningful ranges)**. In R, remember to treat the variable as a factor variable and not a discrete variable.
+
+1. Fit a linear model for `log(beer_cons_liters)` using `weekend`, `rain`, and `temp_median_c` as your predictors. Interpret the coefficient(s) of `rain`.
+
+2. From the residual plots, are there any clear violations of any of the assumptions? You do not need to discuss all the assumptions. Just point out the ones that are violated, if any.
+
+3. Are there any (potential) outliers, leverage points or influential points?
+
+4. Compute the "in-sample" <font color="blue">root mean squared error (RMSE)</font> for your regression model. Refer back to the class notes for details on how to compute in-sample (or within-sample) RMSE. 
+
+5. Write a code for doing $k$-fold cross validation. Refer back to the class notes for details on $k$-fold cross validation. Let $k=10$ and use <font color="blue">average RMSE</font> as the metric for quantifying predictive error. What is the <font color="blue">average RMSE</font> for your regression model?
+
+    *Hint: if you are not sure how to begin writing your code for doing the cross validation, you should consider writing a "for loop". A "for loop" is actually not the most efficient way to get this done but it will work just fine here. If you don't know how to write a "for loop", use the skeleton code below as a guide for writing your own "for loop" for this question.*
+    ```{r eval = FALSE}
+# Suppose your data is stored in the object "Data"
+# First set a seed to ensure your results are reproducible
+set.seed(...) # use whatever number you want
+# Now randomly re-shuffle the data
+Data <- Data[sample(nrow(Data)),]
+# Define the number of folds you want
+K <- ...
+# Define a matrix to save your results into
+RSME <- matrix(0,nrow=K,ncol=1)
+# Split the row indexes into k equal parts
+kth_fold <- cut(seq(1,nrow(Data)),breaks=K,labels=FALSE)
+# Now write the for loop for the k-fold cross validation
+for(k in 1:K){
+# Split your data into the training and test datasets
+test_index <- which(kth_fold==k)
+train <- Data[-test_index,]
+test <- Data[test_index,]
+# Now that you've split the data, 
+RSME[k,] <- ... # write your code for computing RMSE for each k here
+# You should consider using your code for question 7 above
+}
+... #Calculate the average of all values in the RSME matrix here.
+```
+
+
+
+# Acknowledgement
+
+This exercise is based on ideas proposed by [Sam Voisin](https://stat.duke.edu/people/sam-voisin).
+
+
+

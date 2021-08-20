@@ -1,0 +1,110 @@
+---
+title: "IDS 702 In-class analysis 9"
+subtitle: "Do more beautiful professors get higher evaluations III"
+#date: "October 8, 2020"
+output: 
+  tufte::tufte_html:
+    tufte_variant: "envisioned"
+    highlight: pygments
+    css: "in-class-analysis.css"
+    toc: true
+link-citations: yes
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tufte)
+library(knitr)
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  digits = 2
+  )
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+
+**Due:** 1 hour after class ends
+
+
+# Housekeeping
+## Structure and format
+You will work in your pre-assigned teams. Each team should submit ONLY ONE report for this exercise. You must write the names of all team members at the top of the report containing your responses. You all must do the work using one student's computer and R/RStudio. 
+
+Have one team member open R/RStudio on their computer and share their screen with the other team members within the breakout room. At the top of the team report, write **"host"** in parenthesis besides this student's name. Have another team member be responsible for documenting the responses. At the top of the team report, write **"writer"** in parenthesis besides this student's name. 
+
+**NOTE**: Generally, you will not be penalized for not taking on these roles many times during the semester. This is to simply ensure that you do switch the roles around a "decent number" of times within each team throughout the semester. That said, I will penalize any student who obviously dominates these roles over everyone else, so be sure to give other students an opportunity to do them.
+
+## R/RStudio
+You all should have R and RStudio installed on your computers by now. If you do not, first install the latest version of R here: https://cran.rstudio.com (remember to select the right installer for your operating system). Next, install the latest version of RStudio here: https://www.rstudio.com/products/rstudio/download/. Scroll down to the "Installers for Supported Platforms" section and find the right installer for your operating system.
+
+
+## Gradescope
+Gradescope will let you select your team mates when submitting, so make sure to do so. Only one person needs to submit the sheet on Gradescope. You can submit your document in the most common formats, but **pdf** files are preferred. Submit on Gradescope here: https://www.gradescope.com/courses/280392/assignments. Be sure to submit under the right assignment entry.
+
+
+# Introduction
+
+The purpose of this exercise is to help you gain more experience working with multilevel linear regression models. The exercise is based on Exercise 6 of Section 12.11 of [Data Analysis Using Regression and Multilevel/Hierarchical Models](https://www.amazon.com/gp/product/052168689X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052168689X&linkCode=as2&tag=andrsblog0f-20&linkId=PX5B5V6ZPCT2UIYV) by Gelman A., and Hill, J. The data is from the following article:  
+[Hamermesh, D. S. and Parker, A. (2005), "Beauty in the classroom: instructors' pulchritude and putative pedagogical productivity", *Economics of Education Review*, v. 24 (4), pp. 369-376](https://www.sciencedirect.com/science/article/pii/S0272775704001165). 
+
+The data contains information about student evaluations of instructor's beauty and teaching quality for several courses at the University of Texas from 2000 to 2002. Evaluations were carried out during the last 3 weeks of the 15-week semester. Students administer the evaluation instrument while the instructor is absent from the classroom. The beauty judgements were made later using each instructor's pictures by six undergraduate students (3 women and 3 men) who had not attended the classes and were not aware of the course evaluations. The sample contains a total of 94 professors across 463 classes, with the number of classes taught by each professor ranging from 1 to 13. Underlying the 463 observations are 16,957 completed evaluations from 25,547 registered students. The data you will use for this exercise excludes some variables in the original dataset.
+
+*Read the article (available via Duke library) for more information about the problem.*
+
+
+
+# The data
+This is the same data from the last in-class exercise. so you should already have it saved locally. Just in case you do not, follow the instructions below.
+
+Download the data (named `Beauty.txt`)  from Sakai and save it locally to the same directory as your R markdown file. To find the data file on Sakai, go to Resources $\rightarrow$ Datasets $\rightarrow$ In-Class Analyses. Once you have downloaded the data file into the SAME folder as your R markdown file, load and clean the data by using the following R code.
+
+```{marginfigure}
+Remember to double-check the dimensions and first few rows of the data to confirm you have the right file.
+```
+
+```{r eval = FALSE}
+Beauty <- read.table ("Beauty.txt", header=T, sep=" ")
+```
+
+
+## Code book  
+
+Variable       | Description
+:------------- | :------------ 
+profnumber |  Id for each professor
+beauty | Average of 6 standardized beauty ratings
+eval | Average course rating
+CourseID | Id for 30 individual courses. The remaining classes were not identified in the original data, so that they have value 0.
+tenured    |  Is the professor tenured? 1 = yes, 0 = no
+minority  |  Is the professor from a minority group? 1 = yes, 0 = no
+age      |    Professor's age
+didevaluation   |   Number of students filling out evaluations
+female   |  1 = female, 0 = male
+formal   | Did the instructor dress formally (that is, wears tie--jacket/blouse) in the pictures used for the beauty ratings? 1 = yes, 0 = no
+lower   |  Lower division course? 1 = yes, 0 = no
+multipleclass | 1 =  more than one professor teaching sections in course in sample, 0 = otherwise
+nonenglish |  Did the Professor receive an undergraduate education from a non-English speaking country? 1 = yes, 0 = no
+onecredit   |   1 = one-credit course, 0 = otherwise
+percentevaluating float  | didevaluation/students
+profevaluation | Average instructor rating
+students  |  Class enrollment
+tenuretrack  | Is the professor tenure track faculty? 1 = yes, 0 = no
+
+
+# Exercises
+
+Continue with the varying-intercepts model from last time, that is, a multilevel for `eval` (or `log(eval)`) grouped by `profnumber`, with a fixed slope for `beauty`, plus fixed slopes for the other three variables you identified as potential predictors.
+
+1. Extend that model by also allowing for varying intercepts and slopes for `beauty` by `CourseID`. Fit the model in R and interpret the results: the fixed effect estimates and the estimated standard deviations. 
+
+2. Did any of the results for the fixed effects change? If yes, why do you think that is?
+
+3. What are your most interesting or surprising findings, especially by `profnumber` and `CourseID`?
+
+4. Identify one course-level predictor (with `CourseID` being the course-level identifier) that you think we should control for in the model. Include it as a "fixed" predictor in the model from Question 1. Is the variable significant? If yes, interpret the coefficient.
+
+
+
+

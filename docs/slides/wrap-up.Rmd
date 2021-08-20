@@ -1,0 +1,153 @@
+---
+title: "IDS 702"
+subtitle: "Wrap Up"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+
+## Final project presentations
+
+- Each student will create/record a 6 minute video presentation of their findings.
+  
+--
+
+- Findings can be (mostly!) preliminary.
+  
+--
+
+- Presentations will be graded for:
+  + Understanding of the data/project
+  
+  + Clarity
+  
+  + Communication of findings
+
+--
+
+- Each student's presentation must be uploaded by 11:59pm on Sunday, November 15.
+
+--
+
+- The presentations MUST be uploaded using the VoiceThread tool on Sakai.
+
+--
+
+- Final project reports are due Sunday, November 22, on Gradescope.
+
+
+
+---
+## Final project presentations
+
+- To upload your presentation, go to .hlight[Sakai] $\rightarrow$ .hlight[VoiceThread] $\rightarrow$ .hlight[Add your own].
+
+--
+
+- Click .hlight[Create a new VoiceThread] and drop your media file from your local computer.
+
+--
+
+- The title of your file must be written as .hlight[Title of Your Project (Your Full Name)].
+
+--
+
+- Next, click on .hlight[Share].
+
+--
+
+- Under the .hlight[Secure] tab, be sure to select .hlight[IDS.702.01.F20].
+
+--
+
+- Next, click on .hlight[Share] again, and you can close the window once you see .hlight[Success].
+
+
+---
+## Final project presentations
+
+- Finally, each student MUST also watch .hlight[at least four presentations] from the other students.
+
+--
+
+- Browse through the titles to find the topics you find interesting.
+
+--
+
+- You must leave at least one comment under each video you watch using the .hlight[comment button].
+
+--
+
+- Please leave constructive feedback, questions or suggestions for your classmates.
+
+--
+
+- **You will be helping each other a ton by doing so!**
+
+--
+
+- Please make sure to watch the videos by Wednesday, November 18.
+  
+
+
+---
+## Other announcements
+
+- Please complete the final course surveys in class today.
+
+--
+
+- A staff member will join us to help proctor.
+
+--
+
+- Also, instrutor and TA office hours will continue until November 20, 2020.
+
+
+
+---
+class: center, middle
+
+# Course Wrap Up (Other)
+
+### To be done on the board
+
+
+
+

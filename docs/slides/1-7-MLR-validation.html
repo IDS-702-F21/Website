@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 1.7</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 1.7
+## Mean squared error and cross validation
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Mean squared error
+
+- One particularly useful metric for measuring model fit (especially when the goal is prediction) is the mean squared error (MSE):
+.block[
+.small[
+`$$\textrm{MSE} = \dfrac{1}{n} \sum_{i=1}^{n} \left(y_i - \hat{y}_i \right)^2.$$`
+]
+]
+
+--
+
+- This value will be small when our predictions `\(\hat{y}_i\)` are close to the true `\(y_i\)`'s. Some analysts and data scientists will often report the root mean squared error (RMSE) instead, which is simply the square root of MSE.
+
+--
+
+- While it may be useful to calculate .hlight[within-sample MSE] using the same dataset that was used to fit the model (usually referred to as .hlight[training data]), it is often more useful to calculate .hlight[out-of-sample MSE] using a different dataset (usually referred to as  .hlight[test data]).
+
+--
+
+- In other words, while it may be great to know that our model fits the data used in fitting it well, it would be even better to see that our model also fits new or future data well.
+
+--
+
+- This is essentially asking the question: what does our model tell us about what might happen in the future?
+
+
+---
+## Mean squared error
+
+- If we have a large amount of data, we can split our sample into training and test datasets.
+
+--
+
+- The test dataset should contain new observations `\((y_{1i},\boldsymbol{x}_{1i})\)` that are not represented in the training dataset `\((y_{0i},\boldsymbol{x}_{0i})\)`.
+
+--
+
+- Then the .hlight[test MSE] or .hlight[out-of-sample MSE] is given by
+.block[
+.small[
+`$$\textrm{MSE}_\textrm{test} = \dfrac{1}{n_\textrm{test}} \sum_{i=1}^{n_\textrm{test}} \left(y_{1i} - \hat{y}_{1i} \right)^2.$$`
+]
+]
+
+  where `\(\hat{y}_{1i}\)` is the predicted response for a new observation in the test dataset **using the model fitted using the training dataset**, and `\(n_\textrm{test}\)` is the number of new observations in the test dataset. 
+
+--
+
+- The smaller the MSE (whether in-sample or out-of-sample), the better. 
+
+--
+
+- However, because "small" can be relative depending on the scale of `\(y\)`, we often use MSEs when comparing different models (again, particularly when the goal is prediction). We will see this later.
+
+
+---
+## Training and test data
+
+- Using test data is often important because of the problem of .hlight[overfitting].
+
+--
+
+- Overfitting arises when the model is working too hard to find the perfect predictions in the training data and is not broadly generalizable because it ends up picking up patterns that are just reflecting random error.
+
+--
+
+- We generally expect the test MSE to be somewhat larger than the training MSE because our model has been developed to minimize the training MSE.
+
+--
+
+- Overfitting refers to a situation in which a different model (generally a simpler one) fit to the training data would result in a smaller test MSE (indicating better out-of-sample prediction).
+
+--
+
+- We may be able to identify this problem when comparing the out-of-sample MSEs of different models (including the parsimonious models).
+
+--
+
+- Note that in small datasets, the random split of the data can have considerable impact on the results; out-of-sample MSEs can differ greatly depending on which random sample we take. 
+
+
+---
+## Training and test data
+
+Let's explore this concept using the last fitted regression. We will use three different random splits. For the first split, we have
+
+```r
+#set the seed to ensure we can replicate the same result
+set.seed(123)
+train_index &lt;- sample(nrow(wages),round(0.7*nrow(wages)),replace=F)
+train &lt;- wages[train_index,]
+test &lt;- wages[-train_index,]
+regwagecsquares_train &lt;- lm(bsal~sex+seniorc+agec+agec2+educc+experc+experc2,data=train)
+y_test_pred &lt;- predict(regwagecsquares_train,test)
+temp &lt;- cbind(test$bsal,y_test_pred);
+colnames(temp) &lt;- c("Truth","Predicted"); temp[1:5,]
+```
+
+```
+##    Truth Predicted
+## 1   5040  5705.432
+## 2   6300  6254.975
+## 3   6000  6376.807
+## 10  6900  6548.043
+## 11  6900  6103.975
+```
+
+```r
+testMSE &lt;- mean((test$bsal - y_test_pred)^2); testMSE
+```
+
+```
+## [1] 273782.4
+```
+
+```r
+sqrt(testMSE)
+```
+
+```
+## [1] 523.2422
+```
+
+
+---
+## Training and test data
+
+For the second split, we have
+
+```r
+#now change the seed
+set.seed(1234)
+train_index &lt;- sample(nrow(wages),round(0.7*nrow(wages)),replace=F)
+train &lt;- wages[train_index,]
+test &lt;- wages[-train_index,]
+regwagecsquares_train &lt;- lm(bsal~sex+seniorc+agec+agec2+educc+experc+experc2,data=train)
+y_test_pred &lt;- predict(regwagecsquares_train,test)
+temp &lt;- cbind(test$bsal,y_test_pred);
+colnames(temp) &lt;- c("Truth","Predicted"); temp[1:5,]
+```
+
+```
+##    Truth Predicted
+## 1   5040  5705.884
+## 7   8100  6390.656
+## 11  6900  6136.419
+## 12  5400  5795.275
+## 13  6000  6385.950
+```
+
+```r
+testMSE &lt;- mean((test$bsal - y_test_pred)^2); testMSE
+```
+
+```
+## [1] 328104.3
+```
+
+```r
+sqrt(testMSE)
+```
+
+```
+## [1] 572.8039
+```
+
+
+---
+## Training and test data
+
+For the final split, we have
+
+```r
+#change the seed one more time
+set.seed(12345)
+train_index &lt;- sample(nrow(wages),round(0.7*nrow(wages)),replace=F)
+train &lt;- wages[train_index,]
+test &lt;- wages[-train_index,]
+regwagecsquares_train &lt;- lm(bsal~sex+seniorc+agec+agec2+educc+experc+experc2,data=train)
+y_test_pred &lt;- predict(regwagecsquares_train,test)
+temp &lt;- cbind(test$bsal,y_test_pred);
+colnames(temp) &lt;- c("Truth","Predicted"); temp[1:5,]
+```
+
+```
+##    Truth Predicted
+## 4   6000  5354.919
+## 6   6840  5754.380
+## 8   6000  5672.324
+## 18  5280  4682.765
+## 21  5400  5008.557
+```
+
+```r
+testMSE &lt;- mean((test$bsal - y_test_pred)^2); testMSE
+```
+
+```
+## [1] 199045.4
+```
+
+```r
+sqrt(testMSE)
+```
+
+```
+## [1] 446.145
+```
+
+
+---
+## K-fold cross-validation
+
+- This train/test method of model validation is often referred to as .hlight[cross-validation]. In general, one can use other metrics instead of just the MSE.
+
+- .hlight[K-fold cross-validation] is a type of cross-validation that aims to address the issue of sensitivity of results to particular random data splits.
+
+--
+
+- Specifically, under `\(K\)`-fold cross-validation, split the data into `\(K\)` mutually-exclusive groups, called folds. 
+
+--
+
+- For the `\(k^{\textrm{th}}\)` fold, with `\(k=1,\ldots,K\)`, fit the model on all the remaining data excluding that `\(k^{\textrm{th}}\)` fold (that is, all the other folds combined) and use the `\(k^{\textrm{th}}\)` fold as the test or validation set.
+
+--
+
+- Repeat this `\(k\)` times, so that each fold has a turn as the validation set. Obtain the `\(\textrm{MSE}_\textrm{test}^{(k)}\)` for each `\(k\)`, and summarize the error using
+.block[
+.small[
+`$$\textrm{Avg.MSE} = \dfrac{1}{K} \sum_{k=1}^{K} \textrm{MSE}_\textrm{test}^{(k)}.$$`
+]
+]
+
+
+---
+## Leave-one-out cross-validation
+
+- A special case of .hlight[K-fold cross-validation] is the .hlight[Leave-one-out cross-validation], in which `\(K=n\)` (very computationally intensive except in special cases).
+
+--
+
+- Test error estimates using `\(k=5\)` or `\(k=10\)` have been shown to have good statistical properties, motivating these common choices.
+
+--
+
+- In the case of least squares, we can get an estimate of the average MSE from leave-one-out cross-validation using a simple formula (sadly, this does not hold in most models) based on the fit of only one model!
+
+--
+
+- The estimate is 
+.block[
+.small[
+`$$\textrm{Avg.MSE} = \dfrac{1}{n} \sum_{i=1}^{n} \left(\dfrac{y_i - \hat{y}_i}{1-h_{ii}} \right)^2.$$`
+]
+]
+
+  where `\(h_{ii}\)` is the leverage score of observation `\(i\)`. 
+  
+--
+
+  &lt;div class="question"&gt;
+How would high leverage points affect Avg.MSE in this case?
+&lt;/div&gt;
+
+
+
+---
+## Final notes
+
+- Again, after fitting your model, model assessment and validation is A MUST! 
+
+--
+
+- In this class and outside of it, you should always assess and validate your models!
+
+--
+
+- You will write your own code for doing `\(k\)`-fold cross validation in class.
+
+--
+
+- We will look at other metrics for validating models later in the class when we get to other models. 
+
+--
+
+- For example, the MSE may not be the best metric to look at when dealing with binary outcomes. Or can it still be useful? We will see!
+
+--
+
+- Over the next few modules, we will explore methods for model selection and including interaction effects in MLRs.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

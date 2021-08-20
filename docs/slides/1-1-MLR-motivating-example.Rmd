@@ -1,0 +1,343 @@
+---
+title: "IDS 702: Module 1.1"
+subtitle: "Motivating example"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(knitr)
+library(kableExtra)
+library(lattice)
+library(ggplot2)
+library(ggcorrplot)
+library(GGally)
+```
+
+
+
+## Introduction
+
+- By now, you should already be familiar with t-tests and simple linear regression (SLR). 
+
+--
+
+- At the very least, you should know the basics.
+
+--
+
+- Specifically, you should know how to fit a SLR model and assess whether or not the model assumptions are violated. 
+
+--
+
+- We will use those ideas as building blocks for the models we will explore throughout this course.
+
+
+
+---
+## Motivating example
+
+- In the 1970’s, Harris Trust and Savings Bank was sued for discrimination on the basis of sex.  
+
+--
+
+- As evidence, the defense presented analysis of salaries of employees of one type (skilled, entry level clerical).
+
+--
+
+- The data is in the file `wagediscrim.txt` on Sakai.
+
+--
+
+- We are interested in answering the question: **did female employees tend to receive lower base/starting salaries than similarly qualified and experienced male employees?**
+
+--
+<div class="question">
+Which statistical tests can we use to probe the question above?
+</div>
+
+
+---
+## Data
+
+93 employees on data file (61 female, 32 male).
+
+Variable    | Description
+:------------- | :------------ 
+bsal | Annual salary at time of hire
+sal77 | Annual salary in 1977.
+educ | years of education.
+exper | months previous work prior to hire at bank.
+fsex | 1 if female, 0 if male
+senior | months worked at bank since hired
+age | months
+
+Since we care about inference on .hlight[bsal], as our response variable, we will exclude .hlight[sal77] for all analysis.
+
+--
+<div class="question">
+Is this reasonable? Why or why not?
+</div>
+
+
+---
+## Data
+
+How many rows? How many columns?
+```{r}
+wages <- read.csv("data/wagediscrim.txt", header= T)
+dim(wages)
+```
+
+Take a look at the first few rows of the data.
+```{r}
+head(wages)
+```
+
+
+
+---
+## Data
+
+Check variable types.
+```{r}
+wages$sex <- factor(wages$sex,levels=c("Male","Female"))
+wages$fsex <- factor(wages$fsex)
+str(wages)
+```
+
+
+---
+## Exploratory data analysis (EDA)
+
+Next, quick summaries of each variable.
+```{r}
+summary(wages)
+```
+
+
+---
+## EDA
+
+Since we only care about comparing starting salaries for male and female employees for now, let's look at boxplots of .hlight[bsal] by .hlight[sex].
+```{r fig.height=2.4}
+ggplot(wages,aes(x=sex, y=bsal, fill=sex)) +
+  geom_boxplot() + coord_flip() +
+  scale_fill_brewer(palette="Blues") +
+  labs(title="Baseline Salary vs Sex",y="Base Salary",x="Sex") + 
+   theme_classic() + theme(legend.position="none")
+```
+
+--
+<div class="question">
+What do you think? What can you infer from this plot?
+</div>
+
+
+---
+## T-test?
+
+We could go further and try a t-test for the hypotheses.
+.small[
+$$H_0: \mu_{\textrm{male}} - \mu_{\textrm{female}} \leq 0 \ \ \textrm{vs.} \ \ H_A: \mu_{\textrm{male}} - \mu_{\textrm{female}} > 0$$
+```{r}
+t.test(bsal~sex,data=wages,alternative="greater")
+```
+]
+
+--
+<div class="question">
+Is a t-test sufficient here? Any concerns?
+</div>
+
+
+
+---
+## SLR?
+
+How about fitting a SLR model to the two variables.
+.block[
+.small[
+$$ \textrm{bsal}_i = \beta_0 + \beta_1 \textrm{sex}_i + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} \mathcal{N}(0, \sigma^2), \ \ \ i = 1,\ldots, n.$$
+]
+]
+```{r}
+model1 <- lm(bsal~sex,data=wages); summary(model1)
+```
+
+--
+<div class="question">
+What can we infer from these results?
+</div>
+
+
+---
+## EDA
+
+- .block[
+T-test shows men started at higher salaries than women $(t=5.83, p < .0001)$; same conclusion from the regression.
+]
+
+- But one could argue this is so because both methods **do not** control for other characteristics. Indeed, we have ignored the other variables.
+
+- There are other variables that are correlated with .hlight[bsal]. Here's the correlation matrix of all numerical variables using the .hlight[corr] function in R.
+```{r echo=FALSE}
+kable(round(cor(wages[,!is.element(colnames(wages),c("sex","fsex"))]),2)) %>%
+  kable_styling(font_size = 20)
+```
+
+
+
+---
+## EDA
+
+Or visually (using the `ggcorrplot` package),
+```{r fig.height=3.7, warning=F, message=F}
+wages_corr <- round(cor(wages[,!is.element(colnames(wages),c("sex","fsex"))]),2)
+ggcorrplot(wages_corr, method = "circle",type = "lower",
+           colors = c("#6D9EC1", "white", "#E46726"))
+```
+
+
+
+---
+## EDA
+
+- So, let's take a look at scatter plots of all variables
+
+- First, recall the description of all the variables.
+
+Variable    | Description
+:------------- | :------------ 
+bsal | Annual salary at time of hire
+sal77 | Annual salary in 1977.
+educ | years of education.
+exper | months previous work prior to hire at bank.
+fsex | 1 if female, 0 if male
+senior | months worked at bank since hired
+age | months
+
+
+---
+## EDA
+
+```{r fig.height=3.8}
+ggpairs(wages[,!is.element(colnames(wages),c("sal77","sex","fsex"))],
+        mapping=ggplot2::aes(colour = "red4",alpha=0.6)) #GGally package
+```
+
+This plot looks very busy! 
+
+
+---
+## EDA
+
+Let's take a closer look one variable at a time. First, .hlight[bsal] vs. .hlight[senior].
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=senior, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Seniority",x="Seniority",y="Base Salary")
+```
+
+
+---
+## EDA
+
+Next, .hlight[bsal] vs. .hlight[age]
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=age, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Age",x="Age",y="Base Salary")
+```
+
+
+---
+## EDA
+
+.hlight[bsal] vs. .hlight[educ]
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=educ, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Education",x="Education",y="Base Salary")
+```
+
+
+---
+## EDA
+
+Finally, .hlight[bsal] vs. .hlight[exper]
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=exper, y=bsal)) +
+  geom_point(alpha = .7,aes(color=sex)) +
+  geom_smooth(method="lm",col="red3") + theme_classic() +
+  labs(title="Baseline Salary vs Experience",x="Experience",y="Base Salary")
+```
+
+
+---
+## Takeaways
+
+- Clearly, they are other variables that may be relevant in explaining baseline salary.
+
+--
+
+- We need to explore other statistical methods than the t-test and simple linear regression.
+
+--
+
+- We need methods that can explore the relationship between baseline salary and sex while also controlling for the other variables that clearly may be relevant.
+
+--
+
+- This brings us to .hlight[multiple linear regression (MLR)].
+
+--
+
+- .block[
+Something to keep in mind, the overall conclusions may not change after using a better model for this data.
+
+In general, this should never stop you from exploring and reporting the results from better models; you should always be rigorous when doing analyses and be honest when reporting the results!
+]
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

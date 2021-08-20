@@ -1,0 +1,169 @@
+---
+title: "IDS 702: Module 2.5"
+subtitle: "Logistic regression with multiple predictors I"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+
+
+## Logistic regression with multiple predictors: motivating example
+
+- In many developing countries, people get their drinking water from wells.
+
+--
+
+- Sometimes these wells are contaminated with the chemical arsenic, which when consumed in high concentrations causes skin and bladder cancer, as well as cardiovascular disease.
+
+--
+
+- Fortunately, in many cases people living near contaminated wells have the opportunity to get water from nearby uncontaminated wells.
+
+
+
+---
+## The contaminated wells analysis
+
+- In one study, several researchers measured the concentrations of arsenic in wells in a particular region of Bangladesh.
+
+--
+
+- They labeled wells as safe or unsafe based on the measurements.
+
+--
+
+- The researchers encouraged people drinking from unsafe wells to switch to safe wells.
+
+--
+
+- Several years later, the researchers returned to the area with the goal of seeing who had switched from unsafe to safe wells.
+
+--
+
+- They recorded information on a sample of 3020 individuals who had wells at their homes that were unsafe.
+
+--
+
+- Let's address the question: what predicts why people switch wells?
+
+--
+
+- The data is in the file `arsenic.csv` on Sakai.
+
+
+
+---
+## The contaminated wells analysis
+
+Data description
+
+Variable    | Description
+:------------- | :------------
+Switch | 1 = if respondent switched to a safe well <br /> 0 = if still using own unsafe well
+Arsenic | amount of arsenic in well at respondent's home (100s of micro-grams per liter)
+Dist | distance in meters to the nearest known safe well
+Assoc | 1 = if any members of household are active in community organizations <br /> 0 = otherwise
+Educ | years of schooling of the head of household
+
+Treat `switch` as the response variable and others as potential predictors.
+
+
+
+---
+## Logistic regression with multiple predictors
+
+- We can then formally extend the .hlight[logistic regression model] we had before to allow for multiple predictors.
+
+--
+
+- We still have
+.block[
+.small[
+$$\Pr[y_i = 1 | x_i]  = \pi_i \ \ \textrm{and} \ \ \Pr[y_i = 0 | x_i] = 1-\pi_i,$$
+]
+]
+
+--
+
+  or
+  .block[
+.small[
+$$y_i | x_i \sim \textrm{Bernoulli}(\pi_i)$$
+]
+]
+
+--
+
+  as before, but with
+  .block[
+.small[
+$$\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \ldots + \beta_p x_{ip}$$
+]
+]
+
+  now in both cases.
+
+--
+
+- Let's fit the model to our motivating example.
+
+
+---
+## The contaminated wells analysis: EDA
+
+```{r fig.height=3.4}
+arsenic <- read.csv("data/arsenic.csv",header=T,
+                    colClasses=c("numeric","numeric","numeric","factor","numeric"))
+head(arsenic)
+summary(arsenic[,-1])
+table(arsenic$switch)
+```
+
+
+
+---
+class: center, middle
+
+# Move to the R script [here](https://ids702-f21.olanrewajuakande.com/slides/Arsenic-I.R).
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

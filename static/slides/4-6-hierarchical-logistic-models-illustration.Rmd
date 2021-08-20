@@ -1,0 +1,336 @@
+---
+title: "IDS 702: Module 4.6"
+subtitle: "Multilevel/hierarchical logistic models (illustration)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+#library(lattice)
+#library(dplyr)
+#library(ggplot2)
+library(lme4)
+library(arm)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+## 1988 elections analysis recap
+
+2193 observations from one of eight CBS News surveys.
+
+.small[
+Variable    | Description
+:------------- | :------------
+org | cbsnyt = CBS/NYT
+bush | 1 = preference for Bush Sr., 0 = otherwise
+state | 1-51: 50 states including DC (number 9)
+edu | education: 1=No HS, 2=HS, 3=Some College, 4=College Grad
+age | 1=18-29, 2=30-44, 3=45-64, 4=65+
+female | 1=female, 0=male
+black | 1=black, 0=otherwise
+region | 1=NE, 2=S, 3=N, 4=W, 5=DC
+v_prev | average Republican vote share in the three previous elections (adjusted for home-state and home-region effects in the previous elections)
+]
+
+The data is in the file `polls_subset.txt` on Sakai.
+
+
+---
+## 1988 elections analysis recap
+
+```{r}
+polls_subset <- read.table("data/polls_subset.txt",header=TRUE)
+polls_subset$v_prev <- polls_subset$v_prev*100 #rescale 
+polls_subset$region_label <- factor(polls_subset$region,levels=1:5,
+                                    labels=c("NE","S","N","W","DC"))
+polls_subset$edu_label <- factor(polls_subset$edu,levels=1:4,
+                                 labels=c("No HS","HS","Some College","College Grad"))
+polls_subset$age_label <- factor(polls_subset$age,levels=1:4,
+                                 labels=c("18-29","30-44","45-64","65+"))
+data(state) 
+state_abbr <- c (state.abb[1:8], "DC", state.abb[9:50])
+polls_subset$state_label <- factor(polls_subset$state,levels=1:51,labels=state_abbr)
+rm(list = ls(pattern = "state"))
+```
+
+
+
+---
+## 1988 elections analysis
+
+- I will not do any substantial EDA here.
+
+--
+
+- I expect you to be able to do this yourself.
+
+--
+
+- Let's just take a look at the amount of data we have for "bush" and the age:edu interaction.
+
+  ```{r}
+###### Exploratory data analysis
+table(polls_subset$bush) #well split by the two values
+table(polls_subset$edu,polls_subset$age)
+```
+
+
+---
+## 1988 elections analysis
+
+- As a start, we will consider a simple model with fixed effects of race and sex and a random effect for state (50 states + the District of Columbia).
+.block[
+.small[
+$$
+\begin{split}
+\textrm{bush}_i | \boldsymbol{x}_i & \sim \textrm{Bernoulli}(\pi_i); \ \ \ i = 1, \ldots, n; \ \ \ j = 1, \ldots, J=51; \\
+\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) & = \beta_{0} + \gamma_{0j[i]} + \beta_1 \textrm{female}_{i} + \beta_2 \textrm{black}_{i}; \\
+\gamma_{0j} & \sim N(0, \sigma_{\textrm{state}}^2).
+\end{split}
+$$
+]
+]
+
+--
+
+- We can also write
+.block[
+.small[
+$$
+\begin{split}
+\textrm{bush}_i | \boldsymbol{x}_i & \sim \textrm{Bernoulli}(\pi_i); \ \ \ i = 1, \ldots, n; \ \ \ j = 1, \ldots, J=51; \\
+\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) & = \beta_{0} + \gamma_{0j[i]}^{\textrm{state}} + \beta_{\textrm{female}} \textrm{female}_{i} + \beta_{\textrm{black}} \textrm{black}_{i}; \\
+\gamma_{0j} & \sim N(0, \sigma_{\textrm{state}}^2).
+\end{split}
+$$
+]
+]
+
+--
+
+- In `R`, we have
+  ```{r results = 'hide'}
+library(lme4)
+model1 <- glmer(bush ~ black+female+(1|state_label),family=binomial(link="logit"),
+data=polls_subset)
+summary(model1)
+```
+
+
+---
+## 1988 elections analysis
+```{r echo=F}
+summary(model1)
+```
+
+
+---
+## 1988 elections analysis
+
+- Looks like we dropped some NAs.
+  ```{r}
+c(sum(complete.cases(polls_subset)),sum(!complete.cases(polls_subset)))
+```
+
+--
+
+- Not ideal; we'll learn about methods for dealing with missing data soon.
+
+--
+
+- Interpretation of results:
+  + For a fixed state (or across all states), a non-black male respondent has odds of $e^{0.45}=1.57$ of supporting Bush.
+  
+--
+
+  + For a fixed state and sex, a black respondent as $e^{-1.74}=0.18$ times (an 82% decrease)  the odds of supporting Bush as a non-black respondent; you are much less likely to support Bush if your race is black compared to being non-black.
+  
+--
+
+  + For a given state and race, a female respondent has $e^{-0.10}=0.91$ (a 9% decrease)  times the odds of supporting Bush as a male respondent. However, this effect is not actually statistically significant!
+
+
+
+---
+## 1988 elections analysis
+
+- The state-level standard deviation is estimated at 0.41, so that the states do vary some, but not so much.
+
+--
+
+-   <div class="question">
+We no longer have a term for residual standard deviation (residual standard error). Why is that?
+</div>
+
+--
+
+
+- I expect that you will be able to interpret the corresponding confidence intervals.
+  ```{r echo=F}
+confint(model1)
+```
+
+
+---
+## 1988 elections analysis
+
+- Let’s fit a more sophisticated model that includes other relevant survey factors, such as 
+  + region
+  + prior vote history (note that this is a state-level predictor),
+  + age, education, and the interaction between them.
+
+--
+
+- In `R`, we have
+  ```{r results = 'hide',cache=T}
+model2 <- glmer(bush ~ black + female + v_prev + edu_label:age_label +
+                (1|state_label) + (1|region_label),
+                family=binomial(link="logit"),data=polls_subset)
+```
+
+--
+
+-   <div class="question">
+Why do we have a rank deficient model?
+</div>
+
+
+
+---
+## 1988 elections analysis
+
+- Also, it looks like we have a convergence issue. This can happen when dealing with multilevel models. We have so many parameters to estimate from the interaction terms `edu_label:age_label` (16 actually), and it looks like that's causing a problem. 
+
+--
+
+- Could be that we have too many $\textrm{bush}_i = 1$ or $0$ values for certain combinations. You should check!
+
+--
+
+- Let's treat those as varying effects instead. That is,
+.block[
+.small[
+$$
+\begin{split}
+\textrm{logit}\left(\Pr[\textrm{bush}_i = 1] \right) & = \beta_{0} + \gamma_{0m[i]}^{\textrm{region}} + \gamma_{0j[i]}^{\textrm{state}} + \gamma_{0k[i],l[i]}^{\textrm{age.edu}} \\
+& + \beta_{\textrm{f}} \textrm{female}_{i} + \beta_{\textrm{b}} \textrm{black}_{i} + \beta_{\textrm{v_prev}} \textrm{v_prev}_{j[i]}; \\
+\gamma_{0m} & \sim N(0, \sigma_{\textrm{region}}^2), \ \ \ \gamma_{0j} \sim N(0, \sigma_{\textrm{state}}^2), \ \ \ \gamma_{0k,l} \sim N(0, \sigma_{\textrm{age.edu}}^2).
+\end{split}
+$$
+]
+]
+
+- In `R`, we have
+  ```{r results = 'hide',cache=T}
+model3 <- glmer(bush ~ black + female + v_prev + (1|state_label)
+                + (1|region_label) + (1|edu_label:age_label),
+                family=binomial(link="logit"),data=polls_subset)
+```
+
+--
+
+- This seems to run fine; we are able to borrow information which helps.
+
+
+---
+## 1988 elections analysis
+
+.small[
+```{r echo=F}
+summary(model3)
+```
+]
+
+
+
+---
+## 1988 elections analysis
+
+- Remember that in the first model, the state-level standard deviation was estimated as 0.41. Looks like we are now able to separate that (for the most part) into state and region effects.
+
+--
+
+- Interpretation of results:
+  + For a fixed state, education and age bracket, a non-black male respondent with zero prior average Republican vote share, has odds of $e^{-3.51}=0.03$ of supporting Bush (no one really has 0 value for `v_prev`).
+  
+--
+
+  + For a fixed state, sex, education level, age bracket and zero prior average Republican vote share, a black respondent has $e^{-1.75}=0.17$ times (an 83% decrease) the odds of supporting Bush as a non-black respondent, which is about the same as before.
+  
+--
+
+  + For each percentage point increase in prior average Republican vote share, residents of a given state, race, sex, education level  age bracket have $e^{0.07}=1.07$ times the odds of supporting Bush.
+
+
+---
+## 1988 elections analysis
+
+- Due to the number of categories, the inference in the frequentist model is not entirely reliable as
+  + it does not fully account for uncertainty in the estimated variance parameters, and 
+  + it uses an approximation for inference. 
+  
+--
+
+- We can fit the model under the Bayesian paradigm in the `brms` package, using mildly informative priors and quantify uncertainty based on the posterior samples.
+
+--
+
+- Windows users: install Rtools for windows, then the `rstan` package in R.
+
+--
+
+- Mac users: install Xcode, open it to accept the license agreement, then open R/RStudio and install the `rstan` package.
+
+--
+
+- .hlight[In-class analysis: move to the R script] [here](https://ids702-f21.olanrewajuakande.com/slides/Elections88.R).
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

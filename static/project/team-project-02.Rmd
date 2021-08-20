@@ -1,0 +1,195 @@
+---
+title: "Team Project 2"
+subtitle: "Estrogen Bioassay and Voting in NC"
+output: 
+  html_document: 
+    css: hw.css
+    theme: yeti
+    toc: true
+    toc_float: true
+    fig_caption: true
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(tufte)
+library(knitr)
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  digits = 2
+  )
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+## Due dates
+
+- In-class presentations: 10:15 - 11:30am, Thursday, October 21.
+- Final reports: 11:59pm, Sunday, October 24.
+- Evaluation of team members: 11:59pm, Monday, October 25.
+
+
+
+## General instructions
+### Team work
+You MUST work within your assigned teams.
+
+- <font color="red">Each team member must work on understanding the data, exploring the data, building the models and providing answers to the questions of interest. This should be the focus of the team meetings.</font>
+- The other responsibilities must be divided according to the following designations:
+  + <font color="green">Checker:</font> Double-checks the work for reproducibility and errors. Also responsible for submitting the report and presentation files.
+  + <font color="green">Coordinator:</font> Keeps everyone on task and makes sure everyone is involved. Also responsible for coordinating team meetings and defining the objectives for each meeting.
+  + <font color="green">Presenter:</font> Primarily responsible for putting the team presentations together, including the presentation slides and recorded videos.
+  + <font color="green">Programmer:</font> Primarily responsible for all things coding. The programmer is responsible for putting everyone's code together and making sure the final product is "readable".
+  + <font color="green">Writer:</font> Prepares the final report.
+- <font color="red">Four-person teams should combine the roles of checker and coordinator into a single role. Three-person teams should combine the roles of checker and writer into a single role, and the roles of coordinator and presenter into a single role.</font>
+- <font color="red">All teams must rotate all designations from Team Project 1. That is, each role from Team Project 1 must be handled by a different team member for this project.</font>
+
+
+### GitHub
+
+Each MIDS team MUST collaborate using GitHub. This is not compulsory for non-MIDSters, however, I would recommend also collaborating using GitHub.
+A blank repository has been created for this project. Follow this link: https://classroom.github.com/g/xaKEvdM8 to gain access. You should already know how to clone the repository locally once you gain access. The first student to accept the invitation within each team will be responsible for creating the team name. All other members of the team will be able to join the team once the first person has added the team name. You should only join your pre-assigned team. Feel free to create other folders within the repository as needed but you must push your final reports and presentation videos and/or slides to the corresponding folders already created for you.
+
+
+### Presentations
+<font color="red">Each team will create/record a 6 minute video presentation of their findings. Feel free to get creative; fun animations are welcome!</font>
+
+  + In the videos, <font color="red">Teams 2, 4, 6, and 8 should only present findings and results for Part I of this project, while Teams 1, 3, 5, 7, and 9 should only present findings and results for Part II</font>.
+  + The presentation for each team should only cover a brief introduction as well as your most interesting and important findings. At least one EDA plot must be included.
+  + If you choose to use presentation slides, you should create them with the time limit in mind. You should consider making between 5 and 6 slides (excluding the title slide), so that you have approximately one minute to get through each one. You are free to create your presentation slides using PowerPoint, LaTeX or any other application you choose. 
+  + You are free to record the presentation videos using any application you choose.
+  + The order of the in-class presentations will be randomized for each part of the project; each team is expected to come to class fully prepared to present first.
+  +  <font color="red">Each team's presentation files (videos and slides) must be submitted on Sakai by 9:00am on Thursday, October 21. The checker should upload the files to their Dropbox folder on Sakai.</font> 
+
+
+### Reports
+Each team MUST turn in only one report with team members' names at the top of the report, and the different designations (checker, coordinator, presenter, programmer, and writer).
+
+  + Please limit your combined PDF document for both parts of the project to 10 pages in total. <font color="red">You will be penalized should your combined report exceed 10 pages!</font>
+  + Please type your reports using R Markdown, LaTeX or any other word processor but be sure to knit or convert the final output file to `.pdf`. 
+  + <font color="red">**DO NOT INCLUDE R CODE OR OUTPUT IN YOUR SOLUTIONS/REPORTS** *All R code can be included in an appendix, and R outputs should be converted to nicely formatted tables. Feel free to use R packages such as `kable`, `xtable`, `stargazer`, etc.*</font>
+  + All R-code must be included in the appendix. Feel free to also include any supplemental material that is important for your analysis, such as diagnostic checks or exploratory plots that you feel justify the conclusions in your report.
+  + All reports must be submitted on Gradescope: go to Assignments $\rightarrow$ Team Project 2 Reports. Gradescope will let you select your team mates when submitting, so make sure to do so. The checker is responsible for submitting the report.
+  
+
+
+### Evaluations
+<font color="red">All team members must complete a very short written evaluation, quickly describing the effort put forth by other team members.</font>
+
+  + The evaluation should include a list of all other team members (not including you) and considering all the work on the assignment that was not done by you, a breakdown of the fraction of work done by each other team member. For example, if you are on a 4 person team and the other team members all contributed equally, you would assign the fraction 1/3 to each of them (regardless of whether you all did 1/4 of the work overall, or whether you personally did half the work and the others each did 1/6).
+  + In the case you feel one or more team members deserves a different grade on the assignment than the others, you should provide a description of why that member or members deserves a different grade. (In this case you can talk about your own relative contribution.)
+  + Submit on Gradescope: go to Assignments $\rightarrow$ Team Project 2 Evaluations.
+
+
+
+### Analyses
+
+<font color="red">Your analyses MUST address the two sets of questions directly.</font> The report should be written so that there is a section which clearly answers the first set of questions for Part I and another section which clearly answers the second set of questions about Part II. If you prefer, you can write two 5-paged reports, one to address each set of questions. Be sure to also include the following in your report: 
+
+- the final models you ultimately decided to use,
+- clear model building, that is, justification for the models (e.g., why you chose certain transformations and why you decided the final models are reasonable),
+- model assessment for the final models,
+- the relevant regression output (includes: a table with coefficients and SEs, and confidence intervals),
+- your interpretation of the results in the context of the questions of interest, including clear and direct answers to the questions posed, and
+- any potential limitations of the analyses.
+
+
+
+## Part I: Estrogen Bioassay
+
+This data is from: https://stat.duke.edu/datasets/estrogen-bioassay
+
+### Introduction
+
+Estrogens are a group of hormones produced in both the female ovaries and male testes, with larger amounts made in females than in males. They are particularly influential during puberty, menstruation, and pregnancy, but they also help regulate the growth of bones, skin, and other organs and tissues. In general, they have a strong effect of endocrine function by disrupting these functions.
+
+Over the past 10 years, many synthetic compounds and plant products present in the environment have been found to affect hormonal functions in various ways. Those that have estrogenic activity have been labeled as environmental estrogens. There is increasing concern that chemicals in the environment referred to as environmental estrogens may be causing adverse effects through endocrine disruption. Hence, there is a need for new approaches for screening chemicals for endocrine disrupting effects. 
+
+The rat uterotrophic bioassay provides one approach for identifying agonists or antagonists of estrogen. An estrogen antagonist is a compound that blocks the binding of estrogen and so blocks the action of estrogen. An estrogen agonist is a compound that enhances the action of estrogen. Rats in this study are either immature or have their ovaries removed and therefore do not produce estrogen. 
+
+The point of the study is to use the rats as an assay to test the effect of estrogen agonists and antagonists on a particular hormonal response, the weight of the uterus. This is done by varying the amount of the agonist or antagonist give to the rat. The response is the weight of the uterus, with uterus weight expected to exhibit an increasing dose response trend for chemicals acting as estrogen agonists and with estrogen antagonists acting to block such estrogen effects. It is expected that the uterus gets heavier with the increase of estrogen agonist dose.
+
+The basic design randomizes female rats to treatment groups, with groups consisting of a control group and several groups having increasing doses of the test agent. An international multi-laboratory study was conducted to compare the results of the rat uterotrophic bioassay using a known estrogen agonist (EE) and a known estrogen antagonist (ZM). The main goal of the study was to assess whether the results were consistent across the laboratories.
+
+
+### Data
+
+The data for this part of the project can be found in the file `bioassay.txt` on Sakai.
+
+
+### Questions
+
+Use a multi-level model to answer the following questions of interest.
+
+- Is the uterotrophic bioassay successful at identifying estrogenic effects of EE and anti-estrogenic effects of ZM. That is, after controlling for predictors and random effects, does uterus weight exhibit an increasing dose response trend for EE and a decreasing dose response trend for ZM?
+- Does the dose response vary across labs? If so, are there certain labs that appear to be outliers?
+- Do the protocols differ in their sensitivity to detecting EE and ZM effects? If so, is there one protocol that can be recommended?
+
+
+### Code Book
+      
+Variable       |        Description
+:------------- | :-------------------
+protocol:      | A = immature female rats dosed by oral gavage (3 days) <br /> B = immature female rats dosed by injection (3 days) <br /> C = adult ovariectomized female rats dosed by injection (3 days) <br /> D = adult ovariectomized female rats dosed by injection (7 days)
+uterus      |  Uterus weight (mg)
+weight      |  Body weight of rat (g)
+EE       | Dose of estrogen agonist, EE in mg/kg/day
+ZM       | Dose of estrogen antagonist, ZM in mg/kg/day
+lab       | Laboratory at which assay was conducted
+group       | Lab replicate group (6 rats were used per group)
+    
+    
+
+
+## Part II: Voting in NC (2020 General Elections)
+
+### Introduction
+
+The North Carolina State Board of Elections (NCSBE) is the agency charged with the administration of the elections process and campaign finance disclosure and compliance. Among other things, they provide voter registration and turnout data online (https://www.ncsbe.gov/index.html, https://www.ncsbe.gov/results-data). Using the NC voter files for the general elections in November 2020, you will attempt to identify/estimate how different groups voted in the 2020 elections, at least out of those who registered. Here's an interesting read on turnout rates for NC in 2016: https://democracync.org/wp-content/uploads/2017/05/WhoVoted2016.pdf (you might consider creating a similar graphic to the one on page 4).
+
+### Data
+
+The data for this part of the project can be found on Sakai. The file `voter_stats_20201103.txt` contains information about the aggregate counts of registered voters by the demographic variables; the data dictionary can be found in the file `DataDictionaryForVoterStats.txt`. The file `history_stats_20201103.txt` contains information about the aggregate counts of voters who actually voted by the demographic variables. 
+
+You will only work with a subset of thoe overall data. <font color="green">Take a random sample of 30 counties out of all the counties in both datasets.</font> You should indicate the counties you sampled in your final report. You will need to merge the two files `voter_stats_20201103.txt` and `history_stats_20201103.txt` by the common variables for the counties you care about. Take a look at the set of `join` functions in the `dplyr` package in R (https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/join) or the `merge` function in base R. I recommend the functions in `dplyr`. You may choose to merge the datasets before or after selecting the samples you want, but be careful if you decide to do the latter.
+
+Unfortunately, the data dictionary from the NCSBE does not provide the exact difference between the variables `party_cd` and `voted_party_cd` in the `history_stats_20201103.txt` file (if you are able to find documentation on the difference, do let me know). However, I suspect that the voted party code encodes the information about people who changed their party affiliation as at the registration deadline, whereas the first party code is everyone's original affiliation. Voters are allowed to change their party affiliation in NC so that lines up. The two variables are thus very similar and only a small percentage of the rows in the `history_stats_20201103.txt` file have different values for the two variables. I would suggest using the voted party code (`voted_party_cd`) for the `history_stats_20201103.txt` dataset.
+
+You should discard the following variables before merging: `election_date`,`stats_type`, and `update_date`. Also, you can not really merge by or use the `voting_method` and `voting_method_desc` variables in your analysis either because that information is only available in the `history_stats_20201103.txt` data and not the other dataset. That means you should not use those two variables when merging.
+
+Before discarding the variables however, you need to aggregate to make sure that you are merging correctly. As a simple example, suppose 4 males voted in person and 3 males voted by mail, you need to aggregate out the method of voting so that you have 7 males in total. This is because we are unable to separate people who voted by different voting methods in the `voter_stats_20201103.txt` we want to merge from. So, the simplest way is to use the aggregate function in R. As an example, the code:
+```{r eval = FALSE}
+aggregated_data <- aggregate(Data$total_voters,
+                             list(Age=Data$age,Party=Data$party_cd),sum)
+```
+will sum all voters by all age groups and party. You can also use the `dplyr` package to aggregate in the same way if you prefer that.
+
+Once you have this clean data for the `history_stats_20201103.txt` file, you should then go ahead to grab the information on total registered voters from `voter_stats_20201103.txt`, by merging by all variables in `history_stats_20201103.txt`, except `total_voters`.
+
+
+### Questions of interest
+
+Your job is to use a hierarchical model to answer the following questions of interest.
+
+- How did different demographic subgroups vote in the 2020 general elections? For example, how did the turnout for males compare to the turnout for females after controlling for other potential predictors?
+- Did the overall probability or odds of voting differ by county in 2020? Which counties differ the most from other counties?
+- How did the turnout rates differ between females and males for the different party affiliations?
+- How did the turnout rates differ between age groups for the different party affiliations?
+
+
+
+## Grading
+
+40 points: 20 points for each part.
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,399 @@
+---
+title: "IDS 702: Module 7.3"
+subtitle: "AR and MA models"
+author: "Dr. Olanrewaju Michael Akande"
+date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(ggplot2)
+#library(arm)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+
+## AR models
+
+- The most common time series model is called the .hlight[autoregressive (AR)] model.
+  
+--
+
+- When only one lag matters, the zero-mean AR(1) model is
+.block[
+.small[
+$$y_t = \phi y_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- With a non-zero mean, we have
+.block[
+.small[
+$$y_t = \mu + \phi y_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- When the mean is non-zero, we can choose to de-mean (mean-center) the series and model that instead.
+  
+--
+
+- In both cases, for the AR(1) we basically have a linear regression where the value of the outcome at time $t$ depends on value of outcome at time $t-1$.
+  
+--
+
+- $\phi$ is the autocorrelation.
+
+
+---
+## AR models
+
+- For the zero-mean AR(1) model,  
+
+--
+
+  + $|\phi|<1$ represents stationary time series.
+    
+--
+
+  + $\phi=1$ is a random walk.
+    
+--
+
+  + $|\phi|>1$ implies non-stationary, "explosive" models.
+    
+--
+
+  
+- A stationary AR(1) series varies around its mean, randomly wandering off away from the mean in response to the "input" values of the random $\epsilon_t$ series, but always returning to near the mean, and never "exploding" away for more than a short time.
+  
+--
+
+- AR(1) series with $0<\phi<1$ represent short-term, positive correlations that would damp out exponentially if $\epsilon_t$ were zero.
+  
+--
+
+- Negative values of $\phi$ represent short-term, negative correlations.
+
+
+---
+## AR models
+
+- Let's explore what AR(1) models look like via simulations.
+  
+--
+
+- Move to the R script [here](https://ids-702-f20.github.io/Course-Website/slides/TS_simulations.R).
+
+--
+
+- Note that
+  
+--
+
+  + autocorrelations decay steadily with lags.
+    
+--
+
+  + partial autocorrelations go to zero after lag p.
+
+
+---
+## AR models
+
+- For a zero mean AR(p) model, we have
+.block[
+.small[
+$$y_t = \sum_{k=1}^{p} \phi_k y_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- So that for a non-zero mean AR(p) model, we have
+.block[
+.small[
+$$y_t = \mu + \sum_{k=1}^{p} \phi_k y_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- AR(p) models are capable of adequately representing a wide range of observed behaviors in time series for large enough $p$.
+
+
+---
+## AR models: how many lags?
+
+- Several ways to decide how many lags to include.
+  
+--
+
+- Use graphical techniques
+  + Look at partial autocorrelation plots.
+    
+--
+
+  + Set $p$ at lag where correlations become small enough not to be important.
+  
+--
+
+- Use a model selection criterion like BIC.
+  
+--
+
+- See section 8.6 of the assigned readings.
+  
+--
+
+- Sometimes in time series data, the partial autocorrelations are small even at lag 1.
+  
+--
+
+- In this case, it can be reasonable to skip autoregressive models and just use usual linear regression modeling approaches.
+
+
+---
+## What if the series is not stationary?
+
+- Sometimes transformations can make stationarity a reasonable assumption.
+  
+--
+
+- Differencing (subtract lagged values from outcome at time $t$) also often help; changes over time are more likely to be stationary than the raw values.
+  
+--
+
+- Including predictors can also help as we will see later with the melanoma example.
+  
+--
+
+- There are other models for non stationary time series.
+
+
+---
+## AR(p): including predictors
+
+- We also might want to account for serial correlation in regression modeling.
+  
+--
+
+- Linear regression assumes independent errors across individuals.
+  
+--
+
+- As we have already seen with the melanoma example, this may not be reasonable with time series data.
+  
+--
+
+- With a single predictor $x_t$, we have
+.block[
+.small[
+$$y_t = \mu + \sum_{k=1}^{p} \phi_k y_{t-k} + x_t + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- That is, the value of outcome at time $t$ depends on value of outcome at time $t-1, t-2, \ldots, t-k$, but also on the predictor $x$ at time $t$.
+  
+--
+
+- Easy to extend the model to multiple predictors.
+
+
+---
+## Model assumptions: stationarity
+
+- Coefficients and regression variance do not change with time.
+  
+--
+
+  + Apart from changes in explanatory variables, the behavior of the time series is the same at different segments of time.
+    
+--
+
+  + Generally, no predictable patterns in the long term
+    
+--
+
+- Diagnostics: check if patterns in residuals are similar across time.
+  
+--
+
+- Tests:
+  + Ljung-Box
+  + Augmented Dickey–Fuller (ADF)
+  + Kwiatkowski-Phillips-Schmidt-Shin (KPSS)
+  
+--
+
+- Remedies:
+  + Sometimes transformations (e.g., using logs) can make stationarity more reasonable.
+  + Use time series models that allow for drifts.
+  
+  
+---
+## Model assumptions: others
+
+- Other assumptions
+  1. Linearity
+  
+  2. Independence of errors
+  
+  3. Equal variance
+
+  4. Normality
+  
+--
+
+- Diagnose using the same methods we used for linear regression.
+  
+--
+
+- Remedies include transformations and model changes as we had before.
+
+
+---
+## MA models
+
+- The zero-mean MA(1) model is
+.block[
+.small[
+$$y_t = \phi \epsilon_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- With a non-zero mean, we have
+.block[
+.small[
+$$y_t = \mu + \phi \epsilon_{t-1} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- The value of the outcome at time $t$ depends on the value of the deviation from the mean (the error term) at time $t-1$.
+  
+--
+
+- For a zero mean MA(p) model, we have
+.block[
+.small[
+$$y_t = \sum_{k=1}^{p} \phi_k \epsilon_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+  
+--
+
+- So that for a non-zero mean MA(p) model, we have
+.block[
+.small[
+$$y_t = \mu + \sum_{k=1}^{p} \phi_k \epsilon_{t-k} + \epsilon_t; \ \ \epsilon_t \sim N(0, \sigma^2).$$
+]
+]
+
+
+---
+## MA models
+
+- Let's explore what MA(1) models looks like via simulations. Move back to the same R script.
+
+--
+
+- Note that
+  
+--
+
+  + Autocorrelations die off almost immediately after lag 1.
+    
+--
+
+  + In MA(p) model, autocorrelations (mostly!) die off after lag $p$. May not be exact since autocorrelation measures correlation between the actual outcome at different time points.
+    
+--
+
+  + Partial autocorrelations are not particularly useful.
+  
+<!-- - Contrast to AR(p) models -->
+<!--   + Autocorrelations tend to decrease over time smoothly. -->
+<!--   + Partial autocorrelations die off after lag $p$. -->
+    
+--
+
+- It is possible to write any stationary AR(p) model as an $\textrm{MA}(\infty)$ model. The reverse result holds for some constraints on the MA parameters. See the reading material.
+  
+  
+---
+## Deciding models?
+
+- Use autocorrelations and partial autocorrelations to help decide model.
+  
+--
+
+- Steady decay on autocorrelations often implies AR.
+  
+--
+
+- Non zero autocorrelations before lag $p$ and zero after lag $p$ often implies MA.
+  
+--
+
+- Sometimes use both AR and MA error structure, called an .hlight[ARMA] model.
+  
+--
+
+- Whenever we take differences in $y$ values to ensure stationarity before fitting ARMA models, we have .hlight[ARIMA] models.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+

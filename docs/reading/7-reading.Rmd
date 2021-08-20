@@ -1,0 +1,20 @@
+---
+title: "Module 7: introduction to time series models"
+output: 
+  html_document:
+    css: reading.css
+    theme: yeti
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Book sections
+
+- Hyndman, R.J., & Athanasopoulos, G. (2018) [Forecasting: principles and practice](https://otexts.com/fpp2/), 2nd edition, OTexts: Melbourne, Australia.
+    + Section 1: Getting started
+    + Section 2: Time series graphics
+    + Section 8: ARIMA models
+    + Section 9: Dynamic regression models

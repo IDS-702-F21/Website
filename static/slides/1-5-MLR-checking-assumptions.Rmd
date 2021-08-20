@@ -1,0 +1,401 @@
+---
+title: "IDS 702: Module 1.5"
+subtitle: "Checking main regression assumptions"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(rvest)
+library(ggplot2)
+wages <- read.csv("data/wagediscrim.txt", header= T)
+wages$sex <- factor(wages$sex,levels=c("Male","Female"))
+wages$fsex <- factor(wages$fsex)
+
+wages$agec <- c(scale(wages$age,scale=F))
+wages$seniorc <- c(scale(wages$senior,scale=F))
+wages$experc <- c(scale(wages$exper,scale=F))
+wages$educc <- c(scale(wages$educ,scale=F))
+```
+
+
+
+## Assumptions for MLR
+
+- Inference (CIs, p-values, or predictions) can only be meaningful when the regression assumptions are plausible.
+
+--
+
+- The main assumptions follow directly from SLR.
+
+--
+
+- They are:
+  
+  1. Linearity (response variable vs. each predictor)
+  
+  2. Independence of errors (really just independence in the observations)
+  
+  3. Equal variance (in the error term $\Rightarrow$ in the response variable)
+
+  4. Normality (in the error term $\Rightarrow$ in the response variable)
+
+
+
+---
+## First, think about validity of the model
+
+- Validity is about whether the data and model are even suitable for answering the research question. 
+
+--
+
+- To quote the Gelman and Hill book,
+
+  .block[
+  "Optimally, this means that the outcome measure should accurately reflect the phenomenon of interest, the model should include all relevant predictors, and the model should generalize to cases to which it will be applied. 
+  
+  For example, a model of earnings will not necessarily tell you about pattern of total assets, neither will a model of test scores necessarily tell you about child intelligence or cognitive development."
+  ]
+
+--
+
+- You should always keep in mind the types of questions you can and cannot answer reliably from both the data and model.
+
+
+---
+## Checking assumptions
+
+- Checking all four assumptions usually requires examining the residuals after model fitting.
+
+--
+
+- For .hlight[linearity], a plot of the residuals versus each predictor will often do.
+
+--
+
+  <div class="question">
+What should we look out for in such a plot?
+</div>
+
+--
+
+- Note that the residuals contain information about the response variable variable $y$ that has not been explained by the covariates in the model.
+
+--
+
+- Thus, when we plot the residuals against each predictor, we should NOT expect to see any pattern.
+
+--
+
+- .block[
+Some pattern in any of the plots is usually an indication of a relationship (often nonlinear) between $y$ and that predictor, which has not been captured yet in the model.
+]
+
+
+---
+## Checking assumptions
+
+- To check both .hlight[independence] of the errors and the .hlight[equal variance] assumption, usually a plot of the residuals versus the fitted values will do.
+
+--
+
+- Can also do a plot of the residuals versus the indexes of the observations.
+
+--
+
+- .block[
+The points in the plot should look random (for independence) and be "roughly" equally spread out around zero (for equal variance).
+]
+
+--
+
+- To check .hlight[normality], it is often sufficient to look at a qq-plot (quantile-quantile plot) which compares the distribution of the standardized residuals to the theoretical quantiles of a standard normal distribution.
+
+--
+
+- .block[
+Clustering of the points around the 45 degree line of the qq-plot usually implies the normality assumption is not violated.
+]
+
+--
+
+- One can also look at a histogram of the residuals, but it is much harder to judge deviations from normality through histograms.
+
+--
+
+- Can also do a test of normality: Shapiro–Wilk, Kolmogorov–Smirnov, etc.
+
+
+---
+## Checking assumptions
+
+Let's revisit the same data from last class. Recall the model we fit to the data and the results:
+.small[
+$$\textrm{bsal}_i = \beta_0 + \beta_1 \textrm{sex}_i + \beta_2 \textrm{senior}_i + \beta_3 \textrm{age}_i + \beta_4 \textrm{educ}_i + \beta_5 \textrm{exper}_i + \epsilon_i$$
+]
+```{r}
+regwagec <- lm(bsal~ sex + seniorc + agec + educc + experc, data= wages)
+summary(regwagec)
+```
+
+---
+## Checking linearity
+
+Now, let's plot the residuals against each predictor. First, let's look at .hlight[senior].
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=seniorc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Seniority",x="Seniority (centered)",y="Residuals")
+```
+
+--
+<div class="question">
+Are there any clear violations of the linearity assumption?
+</div>
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[age].
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=agec, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Age",x="Age (centered)",y="Residuals")
+```
+
+--
+<div class="question">
+Are there any clear violations of the linearity assumption?
+</div>
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[educ].
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=educc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Education",x="Education (centered)",y="Residuals")
+```
+
+--
+<div class="question">
+Education is an odd one to visualize this way. We will revisit this issue later.
+</div>
+
+
+---
+## Checking linearity
+
+Next, let's look at .hlight[exper].
+```{r fig.height=3.3,message=F}
+ggplot(wages,aes(x=experc, y=regwagec$residual)) + 
+  geom_point(alpha = .7) +  geom_hline(yintercept=0,col="red3") + theme_classic() +
+  labs(title="Residuals vs Experience",x="Experience (centered)",y="Residuals")
+```
+
+--
+<div class="question">
+Are there any clear violations of the linearity assumption?
+</div>
+
+
+---
+## Checking independence and equal variance
+
+```{r fig.height=3.8}
+plot(regwagec,which=1,col=c("blue4"))
+```
+
+--
+<div class="question">
+Are there any clear violations of the independence and equal variance assumptions?
+</div>
+
+
+---
+## Checking normality
+
+```{r fig.height=3.8}
+plot(regwagec,which=2,col=c("blue4"))
+```
+
+--
+<div class="question">
+Are there any clear violations of the normality assumption?
+</div>
+
+
+---
+## Takeaways from residual plots
+
+- Looks like we may have to worry about the assumption of linearity being violated for age and experience.
+
+--
+
+- There appears to be some quadratic trend for both variables and possible non-constant variance, so let's improve the model by adding the squared term for each variable. 
+
+--
+
+--
+
+- Let's add the squared terms of the centered age and centered experience predictors to the dataset and refit the model. 
+  ```{r}
+wages$agec2 <- wages$agec^2
+wages$experc2 <- wages$experc^2
+```
+
+
+---
+## Re-fitting the model
+
+```{r}
+regwagecsquares <- lm(bsal~sex+seniorc+agec+agec2+educc+experc+experc2,data=wages)
+summary(regwagecsquares)
+```
+
+
+---
+## How well does the model fit the data. 
+
+The first model: .hlight[NO quadratic term]
+```{r fig.height=5.5,fig.width=8,echo=F}
+preds <- predict(regwagec);
+plot(y=wages$bsal,x=wages$exper,col='red4',
+     xlab="Experience", ylab="Starting Wages",pch=17,ylim=c(4000,7800),
+     main="Observed vs Predicted")
+points(y=preds,x=wages$exper,col='seashell3',pch=11)
+legend("topright",c("Observed","Predicted"),col=c("red4","seashell3"),pch=c(17,11))
+```
+
+
+---
+## How well does the model fit the data.
+
+Now the latest model: .hlight[add quadratic term]
+```{r fig.height=5.5,fig.width=8,echo=F}
+preds <- predict(regwagecsquares);
+plot(y=wages$bsal,x=wages$exper,col='red4',
+     xlab="Experience", ylab="Starting Wages",pch=17,ylim=c(4000,7800),
+     main="Observed vs Predicted")
+points(y=preds,x=wages$exper,col='seashell3',pch=11)
+legend("topright",c("Observed","Predicted"),col=c("red4","seashell3"),pch=c(17,11))
+```
+
+---
+## Interpreting the new model
+
+Clearly, .hlight[experc2] is an important predictor given all other predictors. However, it can be tough to interpret its effect using the coefficient. Instead, let's visualize the effect of changing experience.
+
+```{r}
+#First, make the 20 values of experience that you want to examine
+newexper <- seq(from=0,to=400,by=5)
+newexperc <- newexper - mean(wages$exper)
+newexperc2 <- newexperc^2
+newdata <- data.frame(matrix(0, nrow=length(newexper), ncol=7))
+names(newdata) <- c("sex","seniorc","agec","agec2","educc","experc","experc2")
+newdata$experc <- newexperc; newdata$experc2 <- newexperc2; newdata$sex <- "Male"
+#Since we use mean-centered predictors, the rows in the new dataset correspond to 
+#people with average values of seniority, age, and education. 
+preds_male <- predict(regwagecsquares,newdata,interval="confidence"); preds_male[1:3,]
+newdata$sex <- "Female"; 
+preds_female <- predict(regwagecsquares,newdata,interval="confidence");
+preds_female[1:3,]
+```
+
+
+---
+## Interpreting the new model
+
+```{r fig.height=3.3}
+plot(y=preds_male[,"fit"],x=newexper,xlab="Experience",ylab="Predicted Wages",
+     main="Expected Change in B.Wages with Experience",col="darkblue",ylim=c(4700,6300))
+points(y=preds_female[,"fit"], x=newexper,col="orange")
+legend("bottomright",c("Male","Female"),col=c("darkblue","orange"),lty=c(2,2))
+#Remember that this is with average values of other predictors.
+```
+
+--
+<div class="question">
+Why do we have the exact same trend for male and female?
+</div>
+
+
+---
+## Interpreting the new model
+
+```{r fig.height=3.5}
+#if you want to get the 95% confidence bands on the plot as well, you can do the following
+plot(y=preds_male[,"fit"], x=newexper, xlab="Experience", ylab="Predicted Wages",
+     main="Expected Change in B.Wages with Experience",col="darkblue",ylim=c(4200,6700))
+points(y=preds_female[,"fit"], x=newexper,col="orange")
+legend("bottomright",c("Male","Female"),col=c("darkblue","orange"),lty=c(1,1))
+lines(y=preds_male[,"lwr"],x=newexper,col="darkblue",lty=2)
+lines(y=preds_male[,"upr"],x=newexper,col="darkblue",lty=2)
+lines(y=preds_female[,"lwr"],x=newexper,col="orange",lty=2)
+lines(y=preds_female[,"upr"],x=newexper,col="orange",lty=2)
+```
+
+
+---
+## Final notes
+
+- .block[
+  Generally it is a good idea to start with exploratory data analysis (which we did a bit of in the last class) rather than jumping right into modeling.
+  ]
+  
+--
+
+- After fitting your model, model assessment is A MUST! 
+
+--
+
+- In this class and outside of it, you MUST always assess your models!
+
+--
+
+- Later, we will continue with model assessment by exploring leverage, influence, and standardized residuals.
+
+--
+
+- We will also dive into model validation.
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

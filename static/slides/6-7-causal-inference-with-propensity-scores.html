@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 6.7</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 6.7
+## Causal inference using propensity scores
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Causal inference using propensity scores
+
+Propensity score analysis (in observational studies) typically involves two stages:
+
+--
+
+- .hlight[Stage 1]. Estimate the propensity score: by a logistic regression model or machine learning methods.
+
+--
+
+- .hlight[Stage 2]. Given the estimated propensity score, estimate the causal effects through one of these methods:
+  + Stratification
+  + Matching
+  + Regression
+  + Weighting (which we will not cover)
+  + Mixed combinations of the above
+  
+--
+  
+The general idea is to use the estimated propensity scores to correct for lack of balance between groups, then go on to estimate the causal effect using the "balanced" data.
+  
+  
+---
+class: center, middle
+
+# Stage 1: estimating the propensity score
+
+
+---
+## Stage 1: estimating the propensity score
+
+- The main purpose of estimating propensity score is to ensure .hlight[overlap and balance of covariates] between treatment groups, instead of “finding a perfect fit" of propensity score.
+
+--
+
+- As long as the important covariates are balanced, .hlight[model overfitting is not a concern]; underfitting can be a problem however.
+
+--
+
+- Essentially any balancing score (not necessarily propensity score) would be good enough for practical use.
+
+
+---
+## Stage 1: estimating the propensity score
+
+- A standard procedure for estimating propensity scores includes:
+  1. initial fit;
+  
+--
+
+  2. discarding outliers (with too large or too small propensity scores);
+  
+--
+
+  3. check covariate balance; and
+  
+--
+
+  4. re-fit if necessary.
+
+
+---
+## Stage 1: estimating the propensity score
+
+- .hlight[Step 1.] Estimate propensity score using a logistic regression:
+.block[
+.small[
+`$$W_i | X_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ \ \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = X_i\boldsymbol{\beta}.$$`
+]
+]
+
+--
+
+  Include all covariates in this initial model or do a stepwise selection on the covariates and interactions to get an initial estimate of the propensity scores. That is,
+.block[
+.small[
+`$$\hat{e}^0(X_i) = \dfrac{e^{X_i\hat{\boldsymbol{\beta}}}}{1 + e^{X_i\hat{\boldsymbol{\beta}}}}.$$`
+]
+]
+
+--
+
+  Can also use machine learning methods.
+
+---
+## Stage 1: estimating the propensity score
+
+- .hlight[Step 2.] Check overlap of propensity score between treatment groups. If necessary, .hlight[discard the observations with non-overlapping propensity scores].
+
+--
+
+- .hlight[Step 3.] Assess balance given by initial model in Step 1.
+
+--
+
+- .hlight[Step 4.] If one or more covariates are seriously unbalanced, include some of their higher order terms and/or interactions to re-fit the propensity score model and repeat Steps 1-3, until most covariates are balanced.
+
+--
+
+  *.block[Note: There are situations where some important covariates will still not be completely balanced after repeated trials. Then they should be taken into account in Stage 2 (outcome stage) of propensity score analysis.]*
+  
+  
+---
+## Stage 1: estimating the propensity score
+
+- In practice, balance checking in the PS estimation stage can be done via sub-classification/stratification, matching or weighting.
+--
+
+  + sub-classification/stratification: check the balance of all important covariates within `\(K\)` blocks of `\(\hat{e}^0(X_i)\)` based on its quantiles.
+--
+
+  + matching: check the balance of all important covariates in the matched sample.
+--
+
+  + in weighting, check the balance of the weighted covariates between treatment and control groups.
+  
+- The workflow is the same: .hlight[fit initial model, check balance (sub-classification, matching or weighting), then refit].
+
+
+---
+## Propensity score analysis workflow
+
+&lt;img src="img/PS-workflow.png" width="639" height="500px" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: center, middle
+
+# Stage 2: estimating the causal effect
+
+
+---
+## Stage 2: stratification
+
+- Given the estimated propensity score, we can estimate the causal estimands through  sub-classification/stratification, weighting or matching.
+
+--
+
+- Let's start with stratification.
+
+--
+
+- Recall that the result of 5 strata of a single covariate removes 90% bias.
+
+--
+
+- Stratification using propensity score as the summary score should have approximately the same effects.
+
+
+---
+## Stage 2: stratification
+
+- Divide the subjects in to `\(K\)` strata by the corresponding quantiles of the estimated propensity scores.
+
+--
+
+- .hlight[ATE]: estimate ATE within each stratum and then average by the block size. That is,
+.block[
+.small[
+`$$\hat{\tau}^{ATE} = \sum_{k=1}^K \left(\bar{Y}_{k,1} - \bar{Y}_{k,0} \right) \dfrac{N_{k,1}+N_{k,0}}{N},$$`
+]
+]
+
+  with `\(N_{k,1}\)` and `\(N_{k,0}\)` being the numbers of units in class `\(k\)` under treated and control, respectively.
+
+--
+
+- .hlight[ATT]: weight within-block ATE by proportion of treated units `\(N_{k,1}/N_1\)`.
+
+--
+
+- A variance estimator for `\(\hat{\tau}^{ATE}\)` is 
+.block[
+.small[
+`$$\mathbb{Var}\left[\hat{\tau}^{ATE}\right] = \sum_{k=1}^K \left(\mathbb{Var}[\bar{Y}_{k,1}] - \mathbb{Var}[\bar{Y}_{k,0}] \right) \left(\dfrac{N_{k,1}+N_{k,0}}{N}\right)^2,$$`
+]
+]
+
+  or use bootstrap.
+
+
+---
+## Propensity score stratification: Remarks
+
+- 5 blocks is usually not enough, consider higher number such as 10.
+
+--
+
+- Stratification is a coarsened version of matching.
+
+--
+
+- Empirical results from real applications and situations: usually not as good as matching or weighting.
+
+--
+
+- Good for cases with extreme outliers (smoothing): less sensitive, but also less efficient.
+
+--
+
+- Can be combined with regression: first estimate causal effects using regression within each block and then average the within-subclass estimates.
+
+
+---
+## Stage 2: matching
+
+- In propensity score matching, potential matches are compared using (estimated) propensity score.
+
+--
+
+- 1-to-n closest neighbor matching is common when the control group is large compared to treatment group.
+
+--
+
+- In most software packages, the default is actually 1-to-1 closest neighbor matching.
+
+--
+
+- Pros: robust, matched pairs (so you can do within pair analysis).
+
+--
+
+- Sometimes, dimension reduction via the propensity score may be too drastic, recent methods advocate matching on the multivariate covariates directly.
+
+--
+
+- Nonetheless, this is what we will focus on for our minimum wage data.
+
+
+---
+## Stage 2: regression
+
+- Remember the key propensity score property:
+.block[
+.small[
+$$
+\{Y_i(0), Y_i(1)\} \perp W_i | X_i \ \ \Rightarrow \ \ \{Y_i(0), Y_i(1)\} \perp W_i | e(X_i)
+$$
+]
+]
+
+--
+
+- Idea: in a regression estimator, adjusting for `\(e(X)\)` instead of the whole `\(X\)`; thus in regression models of `\(Y(w)\)` use
+`\(e(X)\)` as the single predictor.
+
+--
+
+- Clearly, modeling `\(\mathbb{Pr}(Y(w)|\hat{e}(X))\)` is simpler than modeling `\(\mathbb{Pr}(Y(w)|X)\)`; effectively more data to estimate essential parameters due to the dimension reduction.
+
+--
+
+- However,
+  + we lose interpretation of the effects of individual covariates, e.g. age, sex; and
+  
+--
+
+  + reduction to the one-dimensional propensity score may be too drastic.
+
+
+---
+## Stage 2: regression
+
+- Idea: instead of using the estimated `\(\hat{e}(X)\)` as the single predictor, use it as an additional predictor in the model. That is, `\(\mathbb{Pr}(Y(w)|X,\hat{e}(X))\)`.
+
+--
+
+- Turns out that `\(\mathbb{Pr}(Y(w)|X,\hat{e}(X))\)` gives both efficiency and robustness.
+
+--
+
+- Also, if we are unable to achieve full balance on some of the predictors, using `\(\mathbb{Pr}(Y(w)|X,\hat{e}(X))\)` will help further control for those unbalance predictors.
+
+--
+
+- Empirical evidences (e.g. simulations) support this claim.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

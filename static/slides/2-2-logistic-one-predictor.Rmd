@@ -1,0 +1,317 @@
+---
+title: "IDS 702: Module 2.2"
+subtitle: "Logistic regression with one predictor"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+library(knitr)
+knitr::opts_chunk$set(fig.height = 2.65, dpi = 300,fig.align='center',fig.show='hold',size='footnotesize', small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+library(lattice)
+#library(dplyr)
+library(MASS)
+library(arm)
+```
+
+
+
+## Introduction to logistic regression
+
+- Relative risk and odds ratio can be useful, but it would be great to be able to do either or both in more flexible settings, particularly when we have multiple predictors.
+
+--
+
+- Let's start small: suppose we want to use linear regression to predict binary $y$ from some predictor $x$. 
+
+--
+
+- Recall that the simple linear regression model is
+.block[
+.small[
+$$y_i = \beta_0 + \beta_1 x_{i} + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} N(0, \sigma^2).$$
+]
+]
+
+- Also recall that this means the model implies that $y$ could be any continuous value, when in fact for a binary outcome, it has to be exactly zero or one.
+
+--
+
+- Therefore, linear regression is not a reasonable model here. 
+
+--
+
+- <div class="question">
+What distribution(s) do you think would be more ideal for y?
+</div>
+
+
+---
+## More appropriate distribution for $y$
+
+- Assume for any observation $i$ that
+.block[
+.small[
+$$\Pr[y_i = 1 | x_i] = \pi_i \ \ \textrm{and} \ \ \Pr[y_i = 0 | x_i] = 1-\pi_i $$
+]
+]
+
+  where $\pi_i$ is some function of $x_i$.
+
+--
+  
+- Notice that this is simply a .hlight[Bernoulli distribution] or a .hlight[Binomial distribution] (with number of trials = 1) where the probability $\pi_i$ is allowed to be potentially different for each observation $i$.
+
+--
+
+- What then should the function that connects $\pi_i$ to $x_i$ look like? 
+
+--
+
+- Some "not so ideal" options could be:
+  + .hlight[Linear]:
+  .block[
+.small[
+$$\pi_i = \beta_0 + \beta_1 x_{i}; \ \ \ \ \ \ \textrm{But } \pi_i \textrm{ can be outside } [0,1]!$$
+]
+]
+    
+  + .hlight[Log-linear]:
+  .block[
+.small[
+$$\textrm{log}(\pi_i) = \beta_0 + \beta_1 x_{i} \ \ \Rightarrow \ \ \pi_i = e^{\beta_0 + \beta_1 x_{i}}; \ \ \ \ \ \ \textrm{But } \pi_i \textrm{ can be } > 1!$$
+]
+]
+
+
+
+---
+## Logistic regression model
+
+- From the log-linear function, we can already see a potential solution to the $\pi_i>1$ problem: we can divide $e^{\beta_0 + \beta_1 x_{i}}$ by a denominator that will always be greater than it.
+
+--
+
+- Thus, we can use the function
+.block[
+.small[
+$$\pi_i = \dfrac{e^{\beta_0 + \beta_1 x_i}}{1 + e^{\beta_0 + \beta_1 x_i}}  \ \ \Rightarrow \ \ \textrm{log} \left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i.$$
+]
+]
+  $\textrm{log} \left(\dfrac{\pi_i}{1-\pi_i}\right)$ is called the .hlight[logit function], also written as $\textrm{logit}(\pi_i)$. Notice that the logit function is essentially the .hlight[log-odds], i.e., log of the odds.
+
+--
+
+- We can then formally write the .hlight[logistic regression model] as
+.block[
+.small[
+$$
+\begin{split}
+\Pr[y_i = 1 | x_i] = \pi_i \ \ \textrm{and} \ \ \Pr[y_i = 0 | x_i] = 1-\pi_i; \ \ \ & \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i, \\
+\textrm{OR } \ \ \ y_i | x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ & \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i.
+\end{split}
+$$
+]
+]
+    
+
+
+---
+## Solving the logit equation
+
+- Let's see how to go from $\textrm{logit}(\pi_i)$ back to $\pi_i$.
+.block[
+.small[
+$$
+\begin{split}
+\textrm{logit}(\pi_i) = \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) & = \beta_0 + \beta_1 x_i \\
+\Rightarrow \ e^{\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right)} & = e^{\beta_0 + \beta_1 x_i} \\
+\Rightarrow \ \dfrac{\pi_i}{1-\pi_i} & = e^{\beta_0 + \beta_1 x_i} \\
+\Rightarrow \ \pi_i & = e^{\beta_0 + \beta_1 x_i} (1-\pi_i) \\
+\Rightarrow \ \pi_i & = e^{\beta_0 + \beta_1 x_i} - \pi_i e^{\beta_0 + \beta_1 x_i} \\
+\Rightarrow \ \pi_i + \pi_i e^{\beta_0 + \beta_1 x_i} & = e^{\beta_0 + \beta_1 x_i}  \\
+\Rightarrow \ \pi_i (1+e^{\beta_0 + \beta_1 x_i}) & = e^{\beta_0 + \beta_1 x_i}  \\
+\therefore \ \pi_i & = \dfrac{e^{\beta_0 + \beta_1 x_i}}{1 + e^{\beta_0 + \beta_1 x_i}} \\
+\end{split}
+$$
+]
+]
+
+--
+
+- By the way, another function that works well for linking $\pi_i$ to $x_i$ is the .hlight[probit function]; the quantile function (or inverse of the cumulative distribution function) associated with the standard normal distribution.
+
+--
+
+- We will formally explore the .hlight[probit regression model] later.
+
+
+
+---
+## The inverse logit function
+
+What does the .hlight[inverse logit function] look like?
+```{r fig.height=3.1}
+curve(invlogit((x)),xlim=c(-6,6),ylim=c(0,1),col="blue3",ylab="Probability Scale")
+curve(invlogit((-2+x)),col="red3",add=T)
+curve(invlogit((0.5*x)),col="yellow3",add=T)
+curve(invlogit((-x)),col="green3",add=T)
+```
+
+This will be useful for us, when doing EDA, as you will see later. Pay attention to the tails.
+
+
+
+
+---
+## Interpreting coefficients
+
+- From
+.block[
+.small[
+$$\textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i$$
+]
+]
+
+  we can see that "*as we increase $x$ by 1 unit, we increase the log-odds of $y$ being 1 by $\beta_1$*".
+
+--
+
+- Equivalently, from
+.block[
+.small[
+$$\dfrac{\pi_i}{1-\pi_i} = e^{\beta_0 + \beta_1 x_i} = e^{\beta_0}  e^{\beta_1 x_i}$$
+]
+]
+
+  we can see that "*as we increase $x$ by 1 unit, we increase the odds for $y$ by a multiplicative effect of $e^{\beta_1}$*".
+
+--
+
+- With mean-centered $x$, $\beta_0$ is the log-odds for $y$ at the mean of $x$, and $e^{\beta_0}$ is the odds for $y$ at the mean of $x$.
+
+--
+
+- Often also interesting to interpret results by graphing the (predicted) probabilities for values of $x$.
+
+
+
+---
+## Interpreting coefficients: categorical predictors
+
+When $x$ is binary,
+
+- .hlight[Odds] of $y=1$ for level $x=1$: $e^{\beta_0}  e^{\beta_1 (1)} = e^{\beta_0 + \beta_1}$
+
+--
+
+- .hlight[Odds] of $y=1$ for level $x=0$: $e^{\beta_0}  e^{\beta_1 (0)} = e^{\beta_0}$
+
+--
+
+- .hlight[Odds ratio (OR)]: $\dfrac{e^{\beta_0}  e^{\beta_1}}{e^{\beta_0}} = e^{\beta_1}$
+
+--
+
+- Thus, $e^{\beta_1}$ has a nice interpretation as the odds ratio when $x=1$ versus $x=0$, and $\beta_1$ is the corresponding log odds ratio.
+
+--
+
+When $x$ is categorical with $K > 2$ levels, the corresponding $e^{\beta_{1k}}$ is the odds ratio when $x=k$ versus whichever level is set as the baseline.
+
+--
+
+It is also easy to calculate relative risk from the results of the logistic model.
+
+---
+## Estimation of coefficients
+
+- Use maximum likelihood estimation.
+
+--
+
+- Basic idea is to find the values of $(\beta_0, \beta_1)$ that are most likely to have generated the $Y$ we see.
+
+--
+
+- Requires multivariate calculus and numerical methods (Newton Raphson algorithm) for estimation.
+
+--
+
+- Beyond the scope of this class, so we will not get into it. If interested, take a look at the textbook readings.
+
+--
+
+- R to the rescue yet again: R does it for us!!!
+
+```{r echo=FALSE, out.height="230px"}
+knitr::include_graphics("img/phew.gif")
+```
+
+
+---
+## Intervals and significance tests
+
+- As with all coefficients, the standard errors represent chance deviations in the estimated values $(\hat{\beta}_0, \hat{\beta}_1)$ from the actual values $(\beta_0, \beta_1)$
+
+--
+
+- Confidence intervals is usually based on large-sample normal distribution approximations. For example,
+  + $95%$ CI for $\hat{\beta}_1$:
+  .block[
+.small[
+$$\hat{\beta}_1 \pm 1.96 \times \textrm{SE}_{\hat{\beta}_1}$$
+]
+]
+  + $95%$ CI for $e^{\hat{\beta}_1}$:
+  .block[
+.small[
+$$e^{\left[\hat{\beta}_1 \pm 1.96 \times \textrm{SE}_{\hat{\beta}_1}\right]}$$
+]
+]
+
+--
+
+- Confidence intervals can also be computed using the profile-likelihood approach. Also beyond the scope of this class.
+
+--
+
+- Although both methods can yield similar CIs with large sample sizes, the profile-likelihood limits can often have better small-sample properties than the asymptotic approximations. Note that R can compute both.
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+

@@ -1,0 +1,254 @@
+---
+title: "IDS 702: Module 4.4"
+subtitle: "Multilevel/hierarchical linear models (illustration II)"
+author: "Dr. Olanrewaju Michael Akande"
+#date: " "
+output:
+  xaringan::moon_reader:
+    css: "slides.css"
+    logo: img/class_logo.png
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+#library(tidyverse)
+#library(magick)
+library(knitr)
+library(kableExtra)
+library(lattice)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+#library(lmerTest)
+```
+
+```{r setup, include=FALSE}
+# R options
+options(
+  htmltools.dir.version = FALSE, # for blogdown
+  #show.signif.stars = FALSE,     # for regression output
+  warm = 1
+  )
+# Set dpi and height for images
+knitr::opts_chunk$set(fig.height = 2.65,dpi =300,fig.align='center',fig.show='hold',size='footnotesize',small.mar=TRUE) 
+# For nonsese...
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# For magick
+dev.off <- function(){
+  invisible(grDevices::dev.off())
+}
+
+knit_hooks$set(small.mar = function(before, options, envir) {
+    if (before) par(mar =  c(4, 4, 1.5, 1.5)) 
+})
+```
+
+
+```{r fig.height=4,message=F,include=FALSE}
+Radon <- read.csv("data/Radon.txt", header = T,sep="")
+Radon$floor <- factor(Radon$floor,levels=c(0,1),labels=c("Basement","First Floor"))
+str(Radon)
+dim(Radon)
+head(Radon)
+summary(Radon[,-c(2,7)])
+```
+
+
+## The radon analysis cont'd
+
+Variable    | Description
+:------------- | :------------
+radon | radon levels for each house
+log_radon | log(radon)
+state | state
+floor | lowest living area of each house: 0 for basement, 1 for first floor
+countyname | county names
+countyID | ID for the county names (1-85)
+fips | state + county fips code
+uranium | county-level soil uranium
+log_uranium | log(uranium)
+
+
+---
+## Including group-level predictors
+
+-  We should also control for uranium since radon occurs naturally as an indirect decay product of uranium.
+
+--
+
+- However, since each county has one single value for `uranium`, each house within that county has the exact same value. 
+
+--
+
+- Turns out that including group-level predictors is quite straightforward in R, as long as the predictor is properly represented in the data as repeated values for all observations in the same group.
+
+--
+
+-   <div class="question">
+One can ask the question: with 85 counties in the dataset, how are we able to fit a regression with 85 different intercepts for each county as well as a county-level coefficient for uranium?
+</div>
+
+--
+
+- 
+.block[
+The simple answer is that we are actually using all the observations within each county (along with all observations from other counties in fact), when estimating each random intercept, but yes we only use 85 distinct values to estimate the effect of uranium.
+]
+
+
+---
+## The radon analysis: varying-intercepts
+
+- Word of caution: be careful when including random slopes. You should really include them if you absolutely have to and if you have enough data to estimate them accurately.
+
+--
+
+- `lme4` in R uses the frequentist approach which is not fully reliable here as it uses an approximation for inference and it does not fully account for uncertainty in the estimated variance parameters. Personally, I prefer to use Bayesian models for multilevel regressions.
+
+--
+
+- If you want to fit a multilevel model for your final project, I would suggest taking a look at the `brms` package in R for a Bayesian approach.
+
+--
+
+- Let's use AIC to see if we can exclude the random slopes.
+  ```{r fig.height=3.2,message=F}
+Model1 <- lmer(log_radon ~ floor + (floor | countyname), data = Radon) 
+Model2 <- lmer(log_radon ~ floor + (1 | countyname), data = Radon) 
+AIC(Model2); AIC(Model1) #same overall conclusions using BIC
+```
+
+--
+
+- No real difference. We will exclude them going forward. You should be able to interpret the updated coefficients of the new model.
+
+
+---
+## The radon analysis: including uranium
+
+Turns out that it also often makes sense to use `log_uranium` instead of `uranium`.
+.small[
+```{r fig.height=3.2,message=F}
+Model3 <- lmer(log_radon ~ floor + log(uranium) + (1 | countyname), data = Radon) ; summary(Model3)
+```
+]
+
+--
+
+For any house in Minnesota with a basement as the lowest living area, every unit increase in log(uranium) increases radon levels by a multiplicative effect of $e^{0.72} = 2.05$.
+
+
+---
+## How much data and how many groups?
+
+- When $J$, that is the number of groups, is small, it is difficult to estimate the across-group variation.
+
+--
+
+- Multi-level modeling often adds little in such scenarios.
+
+--
+
+- However, .hlight[it should not do any worse than including the grouping variable as a factor variable], and it can still be easier to interpret since we need not drop any level as baseline.
+
+--
+
+- Small sample sizes within the groups can be enough to fit a multilevel model when only the intercept is varying.
+
+--
+
+- With varying slopes, one can easily run into convergence issues.
+
+--
+
+- When groups do not have that many data points, .hlight[the random intercepts and slopes may not be estimated accurately] but the data within each group will still provide information that allows estimation of fixed effects and overall variance parameters.
+
+
+---
+## Extra nested levels
+
+- It is easy to envision applications where there might be more than one level of hierarchy.
+
+--
+
+- For example 
+  + students within schools within counties within states
+  + patients within hospitals within states
+  + voters within voting districts within states
+
+--
+
+- In those applications, it is straightforward to extend these ideas and create extra levels of hierarchy in the multi-level models.
+
+--
+
+- When that is the case, I once again prefer to rely on Bayesian methods to fit those models.
+
+
+---
+## Non-nested models
+
+- In other applications, there can be complicated grouping structures, where observations fall into two or more different non-nested grouping variables.
+
+--
+
+- For example
+  + patients within $J$ hospitals receiving $K$ different treatments
+  + students within $J$ schools taking classes based on $K$ different teaching techniques.
+
+--
+ 
+- Once again, it is straightforward to incorporate these within the context of multi-level models.
+  
+  
+---
+## Non-nested models
+- Suppose we want to fit a multi-level model with varying-intercepts by each grouping variable but with a fixed slope for one predictor, we would have
+.block[
+.small[
+$$
+\begin{split}
+y_{ijk} & = (\beta_{0} + \gamma_{0j} + \eta_{0k}) + \beta_1 x_{1ijk} + \epsilon_{ijk} \\
+\gamma_{0j} & \sim N(0, \tau_{\gamma(0)}^2) \\
+\eta_{0k} & \sim N(0, \tau_{\eta(0)}^2) \\
+\epsilon_{ij} & \sim N(0, \sigma^2) \\
+i & = 1, \ldots, n_{jk}; \ \ \ j = 1, \ldots, J; \ \ \ k = 1, \ldots, K. \\
+\end{split}
+$$
+]
+]
+
+--
+
+- In R, we can fit the model above as follows:
+  ```{r fig.height=3.2,message=F,eval=F}
+M1 <- lmer(y ~ x + (1 | GroupVar1) + (1 | GroupVar2)) ; summary(M1)
+```
+
+--
+
+- Adding more predictors is trivial.
+
+--
+
+- It is easy to add more group variables but it can be hard to fit the model without enough data points.
+
+
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
