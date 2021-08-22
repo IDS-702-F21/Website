@@ -92,7 +92,7 @@ Essentially, all models are wrong, but some are useful.
 
 <i class="fa fa-envelope"></i> &nbsp; [jiaman.wu@duke.edu](mailto:jiaman.wu@duke.edu) <br>
 <i class="fa fa-calendar"></i> &nbsp; Tuesdays and Thursdays (4pm - 5pm) <br>
-<i class="fa fa-university"></i> &nbsp; Virtual -- Zoom Meeting ID: **See Sakai**
+<i class="fa fa-university"></i> &nbsp; Zoom Meeting ID: **See Sakai**
 
 
 --
@@ -103,7 +103,7 @@ Essentially, all models are wrong, but some are useful.
 
 <i class="fa fa-envelope"></i> &nbsp; [xinyi.pan@duke.edu](mailto:xinyi.pan@duke.edu) <br>
 <i class="fa fa-calendar"></i> &nbsp; Mondays (8am - 9am) and Wednesdays (5pm - 6pm) <br>
-<i class="fa fa-university"></i> &nbsp; Virtual -- Zoom Meeting ID: **See Sakai**
+<i class="fa fa-university"></i> &nbsp; Zoom Meeting ID: **See Sakai**
 
 
 
