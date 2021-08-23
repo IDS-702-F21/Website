@@ -20,16 +20,20 @@ lessons:
     title: "Module 1.1: Motivating example"
     slides: "1-1-MLR-motivating-example.html"
     slidespdf: "1-1-MLR-motivating-example.pdf"
+    video: "https://api.playposit.com/go/play/1341514/1403540/1083318/0/IDS-702--Module-11-Motivating-example"
     #video: "https://api.playposit.com/go/play/802440/1403540/1083318/0/IDS-702--Module-11-Motivating-example"
+    
     
   - title: "Module 1.2: Introduction to multiple linear regression"
     slides: "1-2-MLR-intro.html"
     slidespdf: "1-2-MLR-intro.pdf"
+    video: "https://api.playposit.com/go/play/1341521/1403540/1083318/0/IDS-702--Module-12-Introduction-to-multiple-linear-regression"
     #video: "https://api.playposit.com/go/play/802494/1403540/1083318/0/IDS-702--Module-12-Introduction-to-multiple-linear-regression"
     
   - title: "Module 1.3: Model fitting and interpretation of coefficients"
     slides: "1-3-MLR-interpreting-coefficients.html"
     slidespdf: "1-3-MLR-interpreting-coefficients.pdf"
+    video: "https://api.playposit.com/go/play/1341522/1403540/1083318/0/IDS-702--Module-13-Model-fitting-and-interpretation-of-coefficients"
     #video: "https://api.playposit.com/go/play/802526/1403540/1083318/0/IDS-702--Module-13-Model-fitting-and-interpretation-of-coefficients"
     
   - title: "In-class analysis 1: Beer consumption in Sao Paulo I"
