@@ -1,8 +1,8 @@
 lessons:
   
   - title: "Conceptual review questions"
-    hw: "hw-00.html"
-    #hw: "hw-00-key.html"
+    #hw: "hw-00.html"
+    hw: "hw-00-key.html"
   
   - week: "WEEK 1"
     date: "Tue, Aug 24"
