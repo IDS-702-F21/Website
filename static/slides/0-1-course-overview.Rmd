@@ -91,7 +91,7 @@ Essentially, all models are wrong, but some are useful.
 [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu)
 
 <i class="fa fa-envelope"></i> &nbsp; [jiaman.wu@duke.edu](mailto:jiaman.wu@duke.edu) <br>
-<i class="fa fa-calendar"></i> &nbsp; Tuesdays and Thursdays (4pm - 5pm) <br>
+<i class="fa fa-calendar"></i> &nbsp; Tuesdays (12pm - 1pm) and Thursdays (5:30pm - 6:30pm) <br>
 <i class="fa fa-university"></i> &nbsp; Zoom Meeting ID: **See Sakai**
 
 

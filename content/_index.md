@@ -44,7 +44,7 @@ To gain access to the pre-recorded lecture videos, you will have to create a Pla
 <span></span>     | <span></span>     | <span></span>    | <span></span>    |  <span></span>      
 ------------------|-------------------|------------------|------------------|------------------ 
 Instructor        | [Dr. Olanrewaju Michael Akande](https://olanrewajuakande.com) | <a href="mailto:olanrewaju.akande@duke.edu" title="email"><i class="fa fa-envelope"></i></a> &nbsp; <a href="https://github.com/akandelanre" title="GitHub"><i class="fa fa-github"></i></a> | Wednesdays and Fridays (9am - 10am) | Zoom Meeting ID: **See Sakai**
-TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu) | <a href="mailto:jiaman.wu@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Tuesdays and Thursdays (4pm - 5pm) | Zoom Meeting ID: **See Sakai**
+TAs               | [Jiaman Betty Wu](https://datascience.duke.edu/jiaman-betty-wu) | <a href="mailto:jiaman.wu@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Tuesdays (12pm - 1pm) and Thursdays (5:30pm - 6:30pm) | Zoom Meeting ID: **See Sakai**
                   | [Xinyi (Iris) Pan](https://datascience.duke.edu/xinyi-iris-pan) | <a href="mailto:xinyi.pan@duke.edu" title="email"><i class="fa fa-envelope"></i></a> | Mondays (8am - 9am) and Wednesdays (6pm - 7pm) | Zoom Meeting ID: **See Sakai**
                   
 
