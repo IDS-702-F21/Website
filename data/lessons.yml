@@ -192,7 +192,7 @@ lessons:
     
   - date: "NEW ASSIGNMENT:"
     title: "Team project I"
-    project: "team-project-01.html"
+    #project: "team-project-01.html"
     
     
   - title: " "
@@ -296,7 +296,7 @@ lessons:
   
   - date: "NEW ASSIGNMENT:"
     title: "Team project II"
-    project: "team-project-02.html"
+    #project: "team-project-02.html"
   
   
   - date: "Thur, Oct 14"

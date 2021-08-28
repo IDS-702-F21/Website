@@ -24,9 +24,9 @@ For the final project, you will apply the knowledge and skills that you have lea
 
 ## Due dates
 
-- Project proposals are due Wednesday, October 28.
-- Each student will present their project (pre-recorded presentations) in class either on Tuesday, November 17, or Thursday, November 19.
-- Final project reports are due Tuesday, November 24.
+- Project proposals are due Wednesday, October 27.
+- Each student will create/record a 6 minute video presentation of their findings. The video presentations must be uploaded by 11:59pm on Monday, November 22.
+- Final project reports are due Tuesday, December 12.
 
 
 ## Scope
@@ -41,7 +41,9 @@ If you do not have a dataset or an inferential problem in mind that you might be
 
 ### GitHub
 
-Each student MUST use GitHub. A blank repository will be created for this project. Follow this link: https://classroom.github.com/a/YoXp3I7x to gain access. Feel free to create other folders within the repository as needed but you must push your final reports and presentation slides to the corresponding folders already created for you. Your repository must include your R code. Do not worry if you are not very familiar with working with GitHub. More instructions will be provided later.
+Each student MUST use GitHub. A blank repository will be created for this project. The link will be made available to you later. 
+<!-- Feel free to create other folders within the repository as needed but you must push your final reports and presentation slides to the corresponding folders already created for you. Your repository must include your R code.  -->
+Do not worry if you are not very familiar with working with GitHub. More instructions will be provided later.
 
 ## Format
 
