@@ -30,7 +30,7 @@ Questions 1 and 2 below were taken and adapted from Chapter 7 of [Ramsey, F.L. a
 
 
 1. <font color="blue">RESPIRATORY RATES FOR CHILDREN</font>.
-A high respiratory rate is a potential diagnostic indicator of respiratory infection in children. To judge whether a respiratory rate is truly "high," however, a physician must have a clear picture of the distribution of "normal" respiratory rates. To this end, Italian researchers measured the respiratory rates of 618 children between the ages of 15 days and 3 years.  
+A high respiratory rate is a potential diagnostic indicator of respiratory infection in children. To judge whether a respiratory rate is truly "high," however, a physician must have a clear picture of the distribution of "normal" respiratory rates. To this end, Italian researchers measured the respiratory rates of 618 children that are at most 3 years old.  
     *The data for this question can be found in the file "Respiratory.csv" on Sakai.*  
       + Do exploratory analysis on the data and include a useful plot that a physician could use to assess a "normal" range of respiratory rates for children of any age between 0 and 3.
       + Write down a regression model for predicting respiratory rates from age. Make sure to use the right mathematical notation.
