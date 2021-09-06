@@ -235,13 +235,12 @@ lessons:
     
     
   - week: "WEEK 7"
-    date: "Sun, Oct 3 | DELIVERABLES:"
-    title: "Team project I reports due"
-  
-  - date: "Mon, Oct 4 | DELIVERABLES:"
-    title: "Team project I evaluations due"
     
   - date: "Tue, Oct 5"
+    title: "No class: fall break"
+  
+  
+  - date: "Thur, Oct 7"
     title: "Module 3.5: Proportional odds model"
     slides: "3-5-proportional-odds.html"
     slidespdf: "3-5-proportional-odds.pdf"
@@ -253,15 +252,28 @@ lessons:
     video: "https://api.playposit.com/go/play/918814/1403540/1083318/0/IDS-702--Module-36-Proportional-odds-model-illustration"
     
   - title: "In-class: Q&A and discussion session"
+    
+  - date: "DELIVERABLES:"
+    title: "Team project I reports due"
   
+  - date: "DELIVERABLES:"
+    title: "Team project I evaluations due"
+  
+  
+  - date: "Fri, Oct 8"
+    title: "Instructions for final project proposals"   
+    project: "final-project-proposal.html"
+
+    
     
   - title: " "
   - title: "MODULE 4: MULTILEVEL/HIERARCHICAL MODELS"
     reading: "4-reading.html"
   - title: " "
-  
-  
-  - date: "Thur, Oct 7"
+    
+
+  - week: "WEEK 8"
+    date: "Tue, Oct 12"
     title: "Module 4.1: Introduction to multilevel/hierarchical models"
     slides: "4-1-hierarchical-models-intro.html"
     slidespdf: "4-1-hierarchical-models-intro.pdf"
@@ -275,12 +287,12 @@ lessons:
   - title: "In-class analysis 7: Do more beautiful professors get higher evaluations I"
     inClass: "0-7-beautiful-professors-I.html"
   
-  - date: "Fri, Oct 8"
-    title: "Instructions for final project proposals"   
-    project: "final-project-proposal.html"
-
-  - week: "WEEK 8"
-    date: "Tue, Oct 12"
+  - date: "NEW ASSIGNMENT:"
+    title: "Team project II"
+    #project: "team-project-02.html"
+  
+  
+  - date: "Thur, Oct 14"
     title: "Module 4.3: Multilevel/hierarchical linear models (illustration I)"
     slides: "4-3-hierarchical-linear-models-illustration-I.html"
     slidespdf: "4-3-hierarchical-linear-models-illustration-I.pdf"
@@ -293,13 +305,11 @@ lessons:
     
   - title: "In-class analysis 8: Do more beautiful professors get higher evaluations II"
     inClass: "0-8-beautiful-professors-II.html"
+    
+    
   
-  - date: "NEW ASSIGNMENT:"
-    title: "Team project II"
-    #project: "team-project-02.html"
-  
-  
-  - date: "Thur, Oct 14"
+  - week: "WEEK 9"
+    date: "Tue, Oct 19"
     title: "Module 4.5: Multilevel/hierarchical logistic models"
     slides: "4-5-hierarchical-logistic-models.html"
     slidespdf: "4-5-hierarchical-logistic-models.pdf"
@@ -313,6 +323,19 @@ lessons:
   - title: "In-class analysis 9: Do more beautiful professors get higher evaluations III"
     inClass: "0-9-beautiful-professors-III.html"
   
+    
+  - date: "Thur, Oct 21"
+    title: "Team project II presentations"
+    
+  
+  - week: "WEEK 10"
+    date: "Sun, Oct 24 | DELIVERABLES:"
+    title: "Team project II reports due"
+  
+  
+  - date: "Mon, Oct 25 | DELIVERABLES:"
+    title: "Team project II evaluations due!"
+  
   
   - title: " "
   - title: "MODULE 5: HANDLING MISSING DATA"
@@ -320,8 +343,7 @@ lessons:
   - title: " "
   
   
-  - week: "WEEK 9"
-    date: "Tue, Oct 19"
+  - date: "Tue, Oct 26"
     title: "Module 5.1: Introduction to missing data"
     slides: "5-1-missing-data-intro.html"
     slidespdf: "5-1-missing-data-intro.pdf"
@@ -334,21 +356,16 @@ lessons:
     
   - title: "In-class: Q&A session and team meetings for project"
     
-  - date: "Thur, Oct 21"
-    title: "Team project II presentations"
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment IV"
+    hw: "hw-04.html"
+    
+  - date: "Wed, Oct 27 | DELIVERABLES:"
+    title: "Final project proposal due!"
     
   
-  
-  - week: "WEEK 10"
-    date: "Sun, Oct 24 | DELIVERABLES:"
-    title: "Team project II reports due"
-  
-  
-  - date: "Mon, Oct 25 | DELIVERABLES:"
-    title: "Team project II evaluations due!"
-  
-  
-  - date: "Tue, Oct 26"
+    
+  - date: "Thur, Oct 28"
     title: "Module 5.3: Imputation methods II"
     slides: "5-3-imputation-methods-II.html"
     slidespdf: "5-3-imputation-methods-II.pdf"
@@ -360,22 +377,16 @@ lessons:
     #video: "https://api.playposit.com/go/play/970549/1403540/1083318/0/IDS-702--Module-54-Multiple-imputation-in-R"
     
   - title: "In-class: Discussion session"
-    
-  - date: "NEW ASSIGNMENT:"
-    title: "Data analysis assignment IV"
-    hw: "hw-04.html"
-    
-  - date: "Wed, Oct 27 | DELIVERABLES:"
-    title: "Final project proposal due!"
-    
-    
+  
+  
   - title: " "
   - title: "MODULE 6: INTRODUCTION TO CAUSAL INFERENCE"
     reading: "6-reading.html"
   - title: " "
   
-    
-  - date: "Thur, Oct 28"
+  
+  - week: "WEEK 11"
+    date: "Tue, Nov 2"
     title: "Module 6.1: The potential outcomes framework and causal estimands"
     slides: "6-1-causal-inference-intro.html"
     slidespdf: "6-1-causal-inference-intro.pdf"
@@ -388,8 +399,14 @@ lessons:
   
   - title: "In-class: Q&A and discussion session"
   
-  - week: "WEEK 11"
-    date: "Tue, Nov 2"
+  - date: "DELIVERABLES:"
+    title: "Data analysis assignment IV due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment V"
+    hw: "hw-05.html"
+    
+  - date: "Thur, Nov 4"
     title: "Module 6.3: Unconfoundedness and overlap"
     slides: "6-3-unconfoundedness-and-overlap.html"
     slidespdf: "6-3-unconfoundedness-and-overlap.pdf"
@@ -407,15 +424,10 @@ lessons:
   
   - title: "In-class analysis 10: Right Heart Catheterization I"
     inClass: "1-0-rhc-I.html"
+    
   
-  - date: "DELIVERABLES:"
-    title: "Data analysis assignment IV due!"
-    
-  - date: "NEW ASSIGNMENT:"
-    title: "Data analysis assignment V"
-    hw: "hw-05.html"
-    
-  - date: "Thur, Nov 4"
+  - week: "WEEK 12"
+    date: "Tue, Nov 9"
     title: "Module 6.6: Propensity scores"
     slides: "6-6-propensity-scores.html"
     slidespdf: "6-6-propensity-scores.pdf"
@@ -433,14 +445,17 @@ lessons:
     
   - title: "In-class analysis 11: Right Heart Catheterization II"
     inClass: "1-1-rhc-II.html"
-  
+    
+    
+    
   - title: " "
   - title: "MODULE 7: INTRODUCTION TO TIME SERIES MODELS"
     reading: "7-reading.html"
   - title: " "
   
-  - week: "WEEK 12"
-    date: "Tue, Nov 9"
+  
+  
+  - date: "Thur, Nov 11"
     title: "Module 7.1: Introduction to time series analysis"
     slides: "7-1-time-series-intro.html"
     slidespdf: "7-1-time-series-intro.pdf"
@@ -456,7 +471,10 @@ lessons:
   - date: "Wed, Nov 10 | DELIVERABLES:"
     title: "Data analysis assignment V due!"
     
-  - date: "Thur, Nov 11"
+  
+   
+  - week: "WEEK 13"
+    date: "Tue, Nov 16"
     title: "Module 7.3: AR and MA models"
     slides: "7-3-ar-ma-model.html"
     slidespdf: "7-3-ar-ma-model.pdf"
@@ -469,15 +487,14 @@ lessons:
   
   - title: "In-class: Q&A and discussion session"
   
-   
+  
   - title: " "
   - title: "MODULE 8: OTHER TOPICS"
     reading: "8-reading.html"
   - title: " "
   
-   
-  - week: "WEEK 13"
-    date: "Tue, Nov 16"
+  
+  - date: "Thur, Nov 18"
     title: "Module 8.1: Random number generation"
     #slides: "8-1-random-number-generation.html"
     #slidespdf: "8-1-random-number-generation.pdf"
@@ -494,9 +511,13 @@ lessons:
     #video: 
   
   - title: "In-class: Polynomial regression; local regression"
+    
   
+  - week: "WEEK 14"
+    date: "Mon, Nov 22 | DELIVERABLES:"
+    title: "Upload final project presentations"
   
-  - date: "Thur, Nov 18"
+  - date: "Tue, Nov 23"
     title: "Module 8.4: Classification and regression trees"
     #slides: "8-4-cart.html"
     #slidespdf: "8-4-cart.pdf"
@@ -507,15 +528,7 @@ lessons:
     #slidespdf: "8-5-ensemble-tree-methods.pdf"
     #video: "https://api.playposit.com/go/play/1019728/1403540/1083318/0/IDS-702--Module-92-Ensemble-tree-methods"
     
-  - title: "In-class: Q&A and discussion session"
-    
-  
-  - week: "WEEK 14"
-    date: "Mon, Nov 22 | DELIVERABLES:"
-    title: "Upload final project presentations"
-  
-  - date: "Tue, Nov 23"
-    title: "In-class: wrap-up and open OH for final projects"
+  - title: "In-class: wrap-up and open OH for final projects"
     
   - date: "Thur, Nov 25"
     title: "Reading week: work on final projects"
