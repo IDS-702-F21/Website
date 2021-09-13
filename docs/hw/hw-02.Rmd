@@ -101,7 +101,7 @@ These days, it is widely understood that mothers who smoke during pregnancy risk
     dht              |        father's height
     dwt              |       father's pre-pregnancy weight in pounds
     marital          |    marital status of mother <br /> 1 = married <br /> 2 = legally separated <br /> 3 = divorced <br /> 4 = widowed <br /> 5 = never married
-    income           |    family yearly income in 2500 increments. 0 = under 2500, 1 = 2500-4999, ..., 9 = 15000+.   98=unknown, 99=not asked
+    income           |    family yearly income in 2500 increments. 0 = under 2500, 1 = 2500-4999, ...;
     smoke            |    does mother smoke? <br /> 0 = never <br /> 1 = smokes now <br /> 2 = until preg <br /> 3 = once did, not now
     time             |       If mother quit, how long ago did she quit? <br /> 0 = never smoked, <br /> 1 = still smokes, <br /> 2 = quit during pregnancy, <br /> 3 = up to 1 yr ago, <br /> 4 = up to 2 yr ago, <br /> 5 = up to 3 yr ago, <br /> 6 = up to 4 yr ago, <br /> 7 = 5 to 9yr ago, <br /> 8 = 10+yr ago, <br /> 9 = quit and don't know, <br /> 98 = unknown
     number           |      number of cigs smoked a day for past and current smokers <br /> 0 = never smoked <br /> 1 = 1-4 <br /> 2 = 5-9 <br /> 3 = 10-14 <br /> 4 = 15-19 <br /> 5 = 20-29 <br /> 6 = 30-39 <br /> 7 = 40-60 <br /> 8 = 60+, <br /> 9 = smoke but don't know
