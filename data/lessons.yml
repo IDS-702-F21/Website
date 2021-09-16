@@ -168,8 +168,7 @@ lessons:
     slidespdf: "2-5-logistic-multiple-predictors-I.pdf"
     video: "https://api.playposit.com/go/play/860920/1403540/1083318/0/IDS-702--Module-25-Logistic-regression-with-multiple-predictors-I"
     
-  - title: "In-class analysis 5: Predicting nba wins I"
-    inClass: "0-5-predicting-nba-wins-I.html"
+  - title: "In-class: Q&A and discussion session"
   
   
   - week: "WEEK 5"
@@ -184,8 +183,8 @@ lessons:
     slidespdf: "2-7-aggregated-outcomes.pdf"
     video: "https://api.playposit.com/go/play/877498/1403540/1083318/0/IDS-702--Module-27-Aggregated-outcomes-Probit-regression"
     
-  - title: "In-class analysis 6: Predicting nba wins II"
-    inClass: "0-6-predicting-nba-wins-II.html"
+  - title: "In-class analysis 5: Predicting nba wins I"
+    inClass: "0-5-predicting-nba-wins-I.html"
   
   - date: "Wed, Sept 22 | DELIVERABLES:"
     title: "Data analysis assignment III due!"
@@ -212,7 +211,8 @@ lessons:
     slidespdf: "3-2-poisson-regression-illustration.pdf"
     video: "https://api.playposit.com/go/play/884051/1403540/1083318/0/IDS-702--Module-32-Poisson-regression-illustration"
     
-  - title: "In-class: Q&A session and team meetings for project"
+  - title: "In-class analysis 6: Predicting nba wins II"
+    inClass: "0-6-predicting-nba-wins-II.html"
   
   
   - week: "WEEK 6"
