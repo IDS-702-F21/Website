@@ -26,7 +26,7 @@ You MUST work within your assigned teams.
 - The other responsibilities must be divided according to the following designations:
   + <font color="green">Checker:</font> Double-checks the work for reproducibility and errors. Also responsible for submitting the report and presentation files.
   + <font color="green">Coordinator:</font> Keeps everyone on task and makes sure everyone is involved. Also responsible for coordinating team meetings and defining the objectives for each meeting.
-  + <font color="green">Presenter:</font> Primarily responsible for putting the team presentations together, including the presentation slides and recorded videos.
+  + <font color="green">Presenter:</font> Primarily responsible for organizing and putting the team presentations together.
   + <font color="green">Programmer:</font> Primarily responsible for all things coding. The programmer is responsible for putting everyone's code together and making sure the final product is "readable".
   + <font color="green">Writer:</font> Prepares the final report.
 
