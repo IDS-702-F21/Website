@@ -32,7 +32,6 @@ You MUST work within your assigned teams.
 
 
 ### GitHub
-
 Each MIDS team MUST collaborate using GitHub. This is not compulsory for non-MIDSters, however, I would recommend also collaborating using GitHub.
 A blank repository has been created for this project. Follow this link: https://classroom.github.com/g/d5NUdL34 to gain access. You should already know how to clone the repository locally once you gain access. The first student to accept the invitation within each team will be responsible for creating the team name. All other members of the team will be able to join the team once the first person has added the team name. You should only join your pre-assigned team. Feel free to create other folders within the repository as needed but you must push your final reports and presentation files to the corresponding folders already created for you.
 
