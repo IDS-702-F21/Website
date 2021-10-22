@@ -329,12 +329,10 @@ lessons:
     
   
   - week: "WEEK 10"
-    date: "Sun, Oct 24 | DELIVERABLES:"
-    title: "Team project II reports due"
-  
-  
-  - date: "Mon, Oct 25 | DELIVERABLES:"
-    title: "Team project II evaluations due!"
+    date: "Mon, Oct 25 | DELIVERABLES:"
+    title: "Team project II reports and evaluations due!"
+    # date: "Sun, Oct 24 | DELIVERABLES:"
+    # title: "Team project II reports due"
   
   
   - title: " "

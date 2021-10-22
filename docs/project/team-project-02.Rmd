@@ -25,7 +25,7 @@ knitr::opts_chunk$set(eval = FALSE)
 ## Due dates
 
 - In-class presentations: 10:15 - 11:30am, Thursday, October 21.
-- Final reports: 11:59pm, Sunday, October 24.
+- Final reports: 11:59pm, Monday, October 25.
 - Evaluation of team members: 11:59pm, Monday, October 25.
 
 
