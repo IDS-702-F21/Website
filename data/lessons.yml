@@ -396,13 +396,6 @@ lessons:
     video: "https://api.playposit.com/go/play/974981/1403540/1083318/0/IDS-702--Module-62-Assignment-mechanisms-and-the-role-of-randomization"
   
   - title: "In-class: Q&A and discussion session"
-  
-  - date: "Wed, Nov 3 | DELIVERABLES:"
-    title: "Data analysis assignment IV due!"
-    
-  - date: "NEW ASSIGNMENT:"
-    title: "Data analysis assignment V"
-    hw: "hw-05.html"
     
   - date: "Thur, Nov 4"
     title: "Module 6.3: Unconfoundedness and overlap"
@@ -422,6 +415,13 @@ lessons:
   
   - title: "In-class analysis 10: Right Heart Catheterization I"
     inClass: "1-0-rhc-I.html"
+    
+  - date: "Fri, Nov 5 | DELIVERABLES:"
+    title: "Data analysis assignment IV due!"
+    
+  - date: "NEW ASSIGNMENT:"
+    title: "Data analysis assignment V"
+    hw: "hw-05.html"
     
   
   - week: "WEEK 12"
@@ -445,10 +445,6 @@ lessons:
     inClass: "1-1-rhc-II.html"
     
     
-  - date: "Wed, Nov 10 | DELIVERABLES:"
-    title: "Data analysis assignment V due!"
-    
-    
   - title: " "
   - title: "MODULE 7: INTRODUCTION TO TIME SERIES MODELS"
     reading: "7-reading.html"
@@ -469,6 +465,9 @@ lessons:
   
   - title: "In-class: Q&A and discussion session"
     
+    
+  - date: "Fri, Nov 12 | DELIVERABLES:"
+    title: "Data analysis assignment V due!"
   
    
   - week: "WEEK 13"
