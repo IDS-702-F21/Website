@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>IDS 702: Module 8.2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr. Olanrewaju Michael Akande" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# IDS 702: Module 8.2
+## Classification and regression trees
+### Dr. Olanrewaju Michael Akande
+
+---
+
+
+
+
+
+
+
+
+## Tree-based methods
+
+- The regression approaches we have covered so far in this course are all .hlight[parametric]. 
+
+--
+
+- .hlight[Parametric] means that we need to assume an underlying probability distribution to explain the randomness.
+
+--
+
+- For example, for linear regression,
+.block[
+.small[
+`$$y_i = \beta_0 + \beta_1 x_{i1} + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} N(0, \sigma^2),$$`
+]
+]
+
+  we assume a normal distribution.
+  
+--
+
+- For logistic regression,
+.block[
+.small[
+$$
+`\begin{split}
+y_i | x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ &amp; \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i,
+\end{split}`
+$$
+]
+]
+
+  we assume a Bernoulli distribution.
+  
+  
+---
+## Tree-based methods
+
+- All the models we have covered requires specifying function for the mean or odds, and specifying distribution for randomness.
+
+--
+
+- We may not want to run the risk of mis-specifying those.
+
+--
+
+- As an alternative one can turn to .hlight[nonparametric models] that optimize certain criteria rather than specify models.
+  + Classification and regression trees (CART)
+  
+  + Random forests
+  
+  + Boosting
+  
+  + Other machine learning methods
+  
+--
+
+- Over the next few modules, we will briefly discuss a few of those methods.
+
+
+---
+## CART
+
+- Goal: predict outcome variable from several predictors.
+
+--
+
+- Can be used for categorical outcomes (classification trees) or continuous outcomes (regression trees).
+
+--
+
+- Let `\(Y\)` represent the outcome and `\(X\)` represent the predictors.
+
+--
+
+- CART recursively partitions the predictor space in a way that can be effectively represented by a tree structure, with leaves corresponding to the subsets of units.
+
+
+
+---
+## CART for categorical outcomes
+
+- Partition `\(X\)` space so that subsets of individuals formed by partitions have relatively homogeneous `\(Y\)`.
+
+--
+
+- Partitions from recursive binary splits of `\(X\)`.
+
+--
+
+- Grow tree until it reaches pre-determined maximum size (minimum number of points in leaves).
+
+--
+
+- Various ways to prune tree based on cross validation.
+
+--
+
+- Making predictions:
+
+--
+
+  + For any new `\(X\)`, trace down tree until you reach the appropriate leaf.
+  
+--
+
+  + Use value of `\(Y\)` that occurs most frequently in leaf as the prediction.
+
+
+---
+## CART
+
+&lt;img src="img/cart.png" width="600px" height="480px" style="display: block; margin: auto;" /&gt;
+
+
+---
+## CART for categorical outcomes
+
+- To illustrate, Figure 1 displays a fictional regression tree for 
+  + an outcome variable.
+  + two predictors, gender (male or female) and race/ethnicity (African-American, Caucasian, or Hispanic).
+  
+--
+
+- To approximate the conditional distribution of `\(Y\)` for a particular gender and race/ethnicity combination, one uses the values in the corresponding leaf.
+
+--
+
+- For example, to predict a `\(Y\)` value for for female Caucasians, one uses the `\(Y\)` value that occurs most frequently in leaf `\(L3\)`.
+
+
+---
+## CART for continuous outcomes
+
+- Same idea as for categorical outcomes: grow tree by recursive partitions on `\(X\)`.
+
+--
+
+- Use the variance of the `\(Y\)` values as a splitting criterion:
+  choose the split that makes the sum of the variances of the `\(Y\)` values in the leaves as small as possible.
+
+--
+
+- When making predictions for new `\(X\)`, use the average value of `\(Y\)` in the leaf for that `\(X\)`.
+
+
+---
+## Model diagnostics
+
+- Can look at residuals, but...
+
+--
+
+  + No parametric model, so for continuous outcomes we can’t check for linearity, non constant variance, normality, etc.
+  
+--
+
+  + Big residuals identify `\(X\)` values for which the predictions are not close to the actual `\(Y\)` values. But...what should we do with them?
+  
+--
+
+  + Could use binned residuals for logistic regression, but they only tell you where model does not give good predictions.
+  
+--
+
+- Transforming the `\(X\)` values is irrelevant for trees (as long as transformation is monotonic, like logs)
+
+--
+
+- Can still do model validation, that is, compute and compare RMSEs, AUC, accuracy, and so on.
+
+
+---
+## CART vs. parametric regression: benefits
+
+- No parametric assumptions.
+
+--
+
+- Automatic model selection.
+
+--
+
+- Multi-collinearity not problematic.
+
+--
+
+- Useful exploratory tool to find important interactions.
+
+--
+
+- In R, use `tree` or `rpart`.
+
+
+---
+## CART vs. parametric regression: limitations
+
+- Regression predictions forced to range of observed `\(Y\)` values. May or may not be a limitation depending on the context.
+
+--
+
+- Bins continuous predictors, so fine grained relationships lost.
+
+--
+
+- Finds one tree, making it hard to interpret chance error for that tree.
+
+--
+
+- No obvious ways to assess variable importance.
+
+--
+
+- Harder to interpret effects of individual predictors.
+
+--
+
+Also, One big tree is limiting, but, we need different datasets or variables to grow more than one tree...
+
+
+
+---
+
+class: center, middle
+
+# What's next? 
+
+### Move on to the readings for the next module!
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

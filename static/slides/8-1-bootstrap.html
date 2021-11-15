@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>IDS 702: Module 8.4</title>
+    <title>IDS 702: Module 8.1</title>
     <meta charset="utf-8" />
     <meta name="author" content="Dr. Olanrewaju Michael Akande" />
     <script src="libs/header-attrs/header-attrs.js"></script>
@@ -13,8 +13,8 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# IDS 702: Module 8.4
-## Classification and regression trees
+# IDS 702: Module 8.1
+## Bootstrap
 ### Dr. Olanrewaju Michael Akande
 
 ---
@@ -26,225 +26,148 @@ class: center, middle, inverse, title-slide
 
 
 
-## Tree-based methods
+## Introduction
 
-- The regression approaches we have covered so far in this course are all .hlight[parametric]. 
-
---
-
-- .hlight[Parametric] means that we need to assume an underlying probability distribution to explain the randomness.
+- When building statistical models, we often need to quantify the uncertainty around the estimated parameters we are interested in.
 
 --
 
-- For example, for linear regression,
-.block[
-.small[
-`$$y_i = \beta_0 + \beta_1 x_{i1} + \epsilon_i; \ \ \epsilon_i \overset{iid}{\sim} N(0, \sigma^2),$$`
-]
-]
-
-  we assume a normal distribution.
-  
---
-
-- For logistic regression,
-.block[
-.small[
-$$
-`\begin{split}
-y_i | x_i \sim \textrm{Bernoulli}(\pi_i); \ \ \ &amp; \textrm{log}\left(\dfrac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i,
-\end{split}`
-$$
-]
-]
-
-  we assume a Bernoulli distribution.
-  
-  
----
-## Tree-based methods
-
-- All the models we have covered requires specifying function for the mean or odds, and specifying distribution for randomness.
+- So far in this class, we have been doing so using standard errors and confidence intervals. 
 
 --
 
-- We may not want to run the risk of mis-specifying those.
+- Computing standard errors is often straightforward when we have closed forms. 
 
 --
 
-- As an alternative one can turn to .hlight[nonparametric models] that optimize certain criteria rather than specify models.
-  + Classification and regression trees (CART)
-  
-  + Random forests
-  
-  + Boosting
-  
-  + Other machine learning methods
-  
+- For example, the standard error for `\(\bar{X}\)` is `\(\sigma/\sqrt{n}\)`.
+
 --
 
-- Over the next few modules, we will briefly discuss a few of those methods.
+-  When `\(\sigma\)` is unknown, replace with `\(s = \hat{\sigma}\)`.
+
+--
+
+- What to do when we do not have closed forms?
 
 
 ---
-## CART
+## Introduction
 
-- Goal: predict outcome variable from several predictors.
-
---
-
-- Can be used for categorical outcomes (classification trees) or continuous outcomes (regression trees).
+- Setting confidence intervals and conducting hypotheses testing often requires us to know the distribution of the parameter of interest. 
 
 --
 
-- Let `\(Y\)` represent the outcome and `\(X\)` represent the predictors.
+- A key tool for doing this is the central limit theorem.
 
 --
 
-- CART recursively partitions the predictor space in a way that can be effectively represented by a tree structure, with leaves corresponding to the subsets of units.
+- Recall that according to CLT, for large samples, averages and sums are approximately normally distributed.
 
+--
+
+- With some work, the CLT allows confidence intervals and hypotheses testing on means, proportions, sums, intercepts, slopes, and so on. 
+
+--
+
+- But...what if we want to set confidence intervals on a correlation or an sd or a ratio?
 
 
 ---
-## CART for categorical outcomes
+## Introduction
 
-- Partition `\(X\)` space so that subsets of individuals formed by partitions have relatively homogeneous `\(Y\)`.
-
---
-
-- Partitions from recursive binary splits of `\(X\)`.
+- Once neat solution is to approximate whatever distribution you have in mind via re-sampling from the true population.
 
 --
 
-- Grow tree until it reaches pre-determined maximum size (minimum number of points in leaves).
+- For example, suppose I would like to estimate the average income of Durham residents and quantify uncertainty around my estimate.
 
 --
 
-- Various ways to prune tree based on cross validation.
+- First I need a sample (of course!).
 
 --
 
-- Making predictions:
+- Suppose I sample 1000 residents and record their income as `\(X_1, \ldots, X_{1000}\)`. Then, my estimate of average income is `\(\bar{X}\)`.
 
 --
 
-  + For any new `\(X\)`, trace down tree until you reach the appropriate leaf.
+- Next, I should quantify my uncertainty around that number. I can do so using the standard error `\(\sigma/\sqrt{n}\)` mentioned earlier, which relies on the CLT.
+
+
+---
+## Bootstrap
+
+- Alternatively, I could approximate the entire distribution of average income myself as follows:
+
+--
+
+  1. Generate `\(B=100\)` different samples of 1000 Durham residents.
   
 --
 
-  + Use value of `\(Y\)` that occurs most frequently in leaf as the prediction.
-
-
----
-## CART
-
-&lt;img src="img/cart.png" width="600px" height="480px" style="display: block; margin: auto;" /&gt;
-
-
----
-## CART for categorical outcomes
-
-- To illustrate, Figure 1 displays a fictional regression tree for 
-  + an outcome variable.
-  + two predictors, gender (male or female) and race/ethnicity (African-American, Caucasian, or Hispanic).
+  2. For each set `\(b = 1, \ldots, B\)` of 1000 residents, compute `\(\bar{X}^b\)`.
   
 --
 
-- To approximate the conditional distribution of `\(Y\)` for a particular gender and race/ethnicity combination, one uses the values in the corresponding leaf.
-
---
-
-- For example, to predict a `\(Y\)` value for for female Caucasians, one uses the `\(Y\)` value that occurs most frequently in leaf `\(L3\)`.
-
-
----
-## CART for continuous outcomes
-
-- Same idea as for categorical outcomes: grow tree by recursive partitions on `\(X\)`.
-
---
-
-- Use the variance of the `\(Y\)` values as a splitting criterion:
-  choose the split that makes the sum of the variances of the `\(Y\)` values in the leaves as small as possible.
-
---
-
-- When making predictions for new `\(X\)`, use the average value of `\(Y\)` in the leaf for that `\(X\)`.
-
-
----
-## Model diagnostics
-
-- Can look at residuals, but...
-
---
-
-  + No parametric model, so for continuous outcomes we can’t check for linearity, non constant variance, normality, etc.
+  3. Make a histogram of all `\(\bar{X}^1, \ldots, \bar{X}^{100}\)` values. This approximates the distribution of average income of Durham residents.
   
 --
 
-  + Big residuals identify `\(X\)` values for which the predictions are not close to the actual `\(Y\)` values. But...what should we do with them?
+- Point estimate of average income is thus the mean of `\(\bar{X}^1, \ldots, \bar{X}^{100}\)`.
+
+--
+
+- To quantify uncertainty, can use the standard deviation of `\(\bar{X}^1, \ldots, \bar{X}^{100}\)`.
+
+--
+
+- For confidence intervals, use the quantiles of the histogram.
+
+--
   
---
-
-  + Could use binned residuals for logistic regression, but they only tell you where model does not give good predictions.
-  
---
-
-- Transforming the `\(X\)` values is irrelevant for trees (as long as transformation is monotonic, like logs)
+- In practice, however, the procedure above cannot be applied, because we  usually cannot generate many samples from the original population. 
 
 --
 
-- Can still do model validation, that is, compute and compare RMSEs, AUC, accuracy, and so on.
+- What to do then? .hlight[Bootstrap]!
+
 
 
 ---
-## CART vs. parametric regression: benefits
+## Bootstrap
 
-- No parametric assumptions.
-
---
-
-- Automatic model selection.
+- .hlight[Bootstrap] is a very powerful statistical tool. 
 
 --
 
-- Multi-collinearity not problematic.
+- It can be used to "approximate" the distribution of almost any parameter of interest.
 
 --
 
-- Useful exploratory tool to find important interactions.
+- .block[Bootstrap allows us to mimic the process of obtaining new sample sets by repeatedly sampling observations from the original data set.]
 
 --
 
-- In R, use `tree` or `rpart`.
+- That is, replace step 1 of the previously outlined approach with
+  1. Generate `\(B=100\)` different samples of 1000 Durham residents by re-sampling from the original observed sample with replacement.
+ 
+--
+ 
+- Can then follow the remaining steps to approximate the distribution of the parameter of interest.
+
+--
+
+- Ideally, the sample you start with should be representative of the entire population. Bootstrap relies on the original sample!
+
 
 
 ---
-## CART vs. parametric regression: limitations
+## Bootstrap
 
-- Regression predictions forced to range of observed `\(Y\)` values. May or may not be a limitation depending on the context.
+Here's a figure from the [ISL](http://faculty.marshall.usc.edu/gareth-james/ISL/) book illustrating the approach.
 
---
-
-- Bins continuous predictors, so fine grained relationships lost.
-
---
-
-- Finds one tree, making it hard to interpret chance error for that tree.
-
---
-
-- No obvious ways to assess variable importance.
-
---
-
-- Harder to interpret effects of individual predictors.
-
---
-
-Also, One big tree is limiting, but, we need different datasets or variables to grow more than one tree...
-
+&lt;img src="img/bootstrap.png" width="600px" height="480px" style="display: block; margin: auto;" /&gt;
 
 
 ---

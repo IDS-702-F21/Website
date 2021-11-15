@@ -1,5 +1,5 @@
 ---
-title: "IDS 702: Module 8.5"
+title: "IDS 702: Module 8.3"
 subtitle: "Ensemble tree methods"
 author: "Dr. Olanrewaju Michael Akande"
 #date: " "
@@ -280,13 +280,9 @@ Educ | years of schooling of the head of household
 
 class: center, middle
 
-# What's next?
+# What's next? 
 
-### Well.........nothing!
-
-### You made it to the end of this course.
-
-### Hope you enjoyed the course and that you have learned a lot.
+### Move on to the readings for the next module!
 
 
 

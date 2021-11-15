@@ -1,5 +1,5 @@
 ---
-title: "IDS 702: Module 8.2"
+title: "IDS 702: Module 8.1"
 subtitle: "Bootstrap"
 author: "Dr. Olanrewaju Michael Akande"
 #date: " "

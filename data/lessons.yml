@@ -492,22 +492,23 @@ lessons:
   
   
   - date: "Thur, Nov 18"
-    title: "Module 8.1: Random number generation"
-    #slides: "8-1-random-number-generation.html"
-    #slidespdf: "8-1-random-number-generation.pdf"
-    #video: 
+    title: "Module 8.1: Bootstrap"
+    slides: "8-1-boostrap.html"
+    slidespdf: "8-1-boostrap.pdf"
+    video: "https://api.playposit.com/go/play/1019722/1403540/1083318/0/IDS-702--Module-81-Bootstrap"
     
-  - title: "Module 8.2: Bootstrap"
-    #slides: "8-2-boostrap.html"
-    #slidespdf: "8-2-boostrap.pdf"
-    #video: "https://api.playposit.com/go/play/1019722/1403540/1083318/0/IDS-702--Module-82-Bootstrap"
     
-  - title: "Module 8.3: Monte Carlo"
-    #slides: "8-3-monte-carlo.html"
-    #slidespdf: "8-3-monte-carlo.pdf"
-    #video: 
+  - title: "Module 8.2: Classification and regression trees"
+    slides: "8-2-cart.html"
+    slidespdf: "8-2-cart.pdf"
+    video: "https://api.playposit.com/go/play/1019726/1403540/1083318/0/IDS-702--Module-82-Classification-and-regression-trees"
   
-  - title: "In-class: Polynomial regression; local regression"
+  - title: "Module 8.3: Ensemble tree methods"
+    slides: "8-3-ensemble-tree-methods.html"
+    slidespdf: "8-3-ensemble-tree-methods.pdf"
+    video: "https://api.playposit.com/go/play/1019728/1403540/1083318/0/IDS-702--Module-83-Ensemble-tree-methods"
+    
+  - title: "In-class: Q&A session and open OH for final projects"
     
   
   - week: "WEEK 14"
@@ -515,17 +516,18 @@ lessons:
     title: "Upload final project presentations"
   
   - date: "Tue, Nov 23"
-    title: "Module 8.4: Classification and regression trees"
-    #slides: "8-4-cart.html"
-    #slidespdf: "8-4-cart.pdf"
-    #video: "https://api.playposit.com/go/play/1019726/1403540/1083318/0/IDS-702--Module-91-Classification-and-regression-trees"
-  
-  - title: "Module 8.5: Ensemble tree methods"
-    #slides: "8-5-ensemble-tree-methods.html"
-    #slidespdf: "8-5-ensemble-tree-methods.pdf"
-    #video: "https://api.playposit.com/go/play/1019728/1403540/1083318/0/IDS-702--Module-92-Ensemble-tree-methods"
+    title: "Module 8.4: Random number generation"
+    #slides: "8-4-random-number-generation.html"
+    #slidespdf: "8-4-random-number-generation.pdf"
+    #video: 
+    
+  - title: "Module 8.5: Monte Carlo"
+    #slides: "8-5-monte-carlo.html"
+    #slidespdf: "8-5-monte-carlo.pdf"
+    #video: 
     
   - title: "In-class: wrap-up and open OH for final projects"
+  #- title: "In-class: Polynomial regression; local regression"
     
   - date: "Thur, Nov 25"
     title: "Reading week: work on final projects"
