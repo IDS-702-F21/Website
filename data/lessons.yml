@@ -483,6 +483,7 @@ lessons:
     video: "https://api.playposit.com/go/play/1010862/1403540/1083318/0/IDS-702--Module-74-Time-series-analysis-illustration"
   
   - title: "In-class: Q&A and discussion session"
+    slides: "presentation-instructions.html"
   
   
   - title: " "
