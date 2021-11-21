@@ -516,18 +516,20 @@ lessons:
     date: "Mon, Nov 22 | DELIVERABLES:"
     title: "Upload final project presentations"
   
+  
   - date: "Tue, Nov 23"
-    title: "Module 8.4: Random number generation"
+    title: "In-class: wrap-up and open OH for final projects"
+    #title: "Module 8.4: Random number generation"
     #slides: "8-4-random-number-generation.html"
     #slidespdf: "8-4-random-number-generation.pdf"
     #video: 
     
-  - title: "Module 8.5: Monte Carlo"
+  #- title: "Module 8.5: Monte Carlo"
     #slides: "8-5-monte-carlo.html"
     #slidespdf: "8-5-monte-carlo.pdf"
     #video: 
     
-  - title: "In-class: wrap-up and open OH for final projects"
+  #- title: "In-class: wrap-up and open OH for final projects"
   #- title: "In-class: Polynomial regression; local regression"
     
   - date: "Thur, Nov 25"
